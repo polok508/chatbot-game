@@ -3,108 +3,71 @@ class Scene4 extends Phaser.Scene {
     super({ key: 'Scene4' });
   }
 
-  create() {
-    // Фон
-    this.add.rectangle(400, 300, 800, 600, 0xf9f9f9);
-
-    // Заголовок
-    this.add.text(400, 60, "С ботом у вас высвободилось время. Что дальше?", {
-      fontFamily: 'Arial',
-      fontSize: '26px',
-      color: '#222222',
-      fontStyle: 'bold',
-      align: 'center',
-      wordWrap: { width: 700 }
-    }).setOrigin(0.5);
-
-    // Варианты выбора
-    const options = [
-      { text: "Масштабировать бизнес", key: "scale" },
-      { text: "Добавить обработку заявок прямо в Telegram", key: "telegram" },
-      { text: "Интеграция с CRM", key: "crm" }
-    ];
-
-    options.forEach((opt, idx) => {
-      const y = 150 + idx * 120;
-
-      // Контейнер кнопки
-      const container = this.add.container(400, y);
-
-      // Кнопка фон
-      const rect = this.add.rectangle(0, 0, 600, 80, 0x4488cc).setStrokeStyle(2, 0x225577);
-
-      // Текст
-      const text = this.add.text(0, 0, opt.text, {
-        fontFamily: 'Arial',
-        fontSize: '20px',
-        color: '#ffffff',
-        align: 'center',
-        wordWrap: { width: 580 }
-      }).setOrigin(0.5);
-
-      container.add([rect, text]);
-
-      container.setSize(600, 80);
-      container.setInteractive({ useHandCursor: true });
-
-      container.on('pointerover', () => rect.setFillStyle(0x66aaff));
-      container.on('pointerout', () => rect.setFillStyle(0x4488cc));
-
-      container.on('pointerdown', () => {
-        this.showPopup(opt.text);
-        this.registry.set('scaleChoice', opt.key);
-
-        this.time.delayedCall(1500, () => {
-          if (this.scene.get('Scene5')) {
-            this.scene.start('Scene5');
-          } else {
-            console.warn('Scene5 is not found. Make sure it is registered.');
-          }
-        });
-      });
-    });
+  preload() {
+    this.load.image('happy_face', 'assets/icons/happy_face.png');
+    this.load.image('money_bag', 'assets/icons/money_bag.png');
+    this.load.image('chart_up', 'assets/icons/chart_up.png');
   }
 
-  showPopup(text) {
-    const popup = this.add.container(400, 500);
+  create() {
+    const centerX = this.cameras.main.centerX;
+    const centerY = this.cameras.main.centerY;
 
-    const bg = this.add.rectangle(0, 0, 700, 60, 0x222222, 0.85);
-    const popupText = this.add.text(0, 0, `Вы выбрали: ${text}`, {
-      fontFamily: 'Arial',
-      fontSize: '22px',
-      color: '#ffffff'
+    // Фон
+    this.cameras.main.setBackgroundColor('#e6f0fa');
+
+
+    const titleFontSize = Math.min(this.scale.width, 600) / 16;
+    const subtitleFontSize = titleFontSize * 0.85;
+
+    // Заголовок
+    this.add.text(centerX, 50, 'Успех бизнеса', {
+      fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
+      fontSize: `${titleFontSize}px`,
+      color: '#222222',
+      fontWeight: '700',
+      letterSpacing: 1.4,
+      lineHeight: `${titleFontSize * 1.4}px`,
+      align: 'center',
     }).setOrigin(0.5);
 
-    popup.add([bg, popupText]);
-    popup.setScale(0.5);
-    popup.setAlpha(0);
+    // Иконки 
+    const iconsY = centerY + titleFontSize * 1.8;
+    const spacing = this.scale.width / 5;
+    const iconScale = Math.min(this.scale.width / 800, 1) * 1.0; 
 
-    this.tweens.add({
-      targets: popup,
-      alpha: 1,
-      scale: 1.1,
-      ease: 'Power1',
-      duration: 200,
-      onComplete: () => {
-        this.tweens.add({
-          targets: popup,
-          scale: 1,
-          ease: 'Power1',
-          duration: 150,
-          onComplete: () => {
-            this.time.delayedCall(800, () => {
-              this.tweens.add({
-                targets: popup,
-                alpha: 0,
-                duration: 400,
-                onComplete: () => popup.destroy()
-              });
-            });
-          }
-        });
-      }
+    const happyFace = this.add.image(centerX - spacing, iconsY, 'happy_face').setAlpha(0).setScale(iconScale);
+    const moneyBag = this.add.image(centerX, iconsY, 'money_bag').setAlpha(0).setScale(iconScale);
+    const chartUp = this.add.image(centerX + spacing, iconsY, 'chart_up').setAlpha(0).setScale(iconScale);
+
+    // Анимация появления иконок
+    this.time.delayedCall(500, () => this.tweens.add({ targets: happyFace, alpha: 1, duration: 400 }));
+    this.time.delayedCall(900, () => this.tweens.add({ targets: moneyBag, alpha: 1, duration: 400 }));
+    this.time.delayedCall(1300, () => this.tweens.add({ targets: chartUp, alpha: 1, duration: 400 }));
+
+    // Подпись с плавным появлением
+    this.time.delayedCall(1800, () => {
+      const congratsText = this.add.text(centerX, iconsY + titleFontSize * 3, 'Поздравляю, вы автоматизировали бизнес!', {
+        fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
+        fontSize: `${subtitleFontSize}px`,
+        color: '#333333',
+        fontWeight: '500',
+        letterSpacing: 0.8,
+        lineHeight: `${subtitleFontSize * 1.5}px`,
+        align: 'center',
+        wordWrap: { width: this.scale.width * 0.8 }
+      }).setOrigin(0.5).setAlpha(0);
+
+      this.tweens.add({ targets: congratsText, alpha: 1, duration: 600 });
+    });
+
+    // Переход на следующую сцену через 5 секунды
+    this.time.delayedCall(5000, () => {
+      this.scene.start('Scene5');
     });
   }
 }
 
 window.Scene4 = Scene4;
+
+

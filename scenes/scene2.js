@@ -4,51 +4,42 @@ class Scene2 extends Phaser.Scene {
   }
 
   preload() {
-    // Фон 
     this.load.image('manager_bg', 'assets/bg/manager.png');
-    // Иконка Telegram
     this.load.image('telegram_icon', 'assets/icons/telegram_icon.png');
+    this.load.image('bot_avatar', 'assets/icons/bot_avatar.png');
   }
 
   create() {
-
     this.add.image(400, 300, 'manager_bg').setDisplaySize(800, 600);
 
     this.time.delayedCall(1000, () => {
-      // Координаты и размеры окна слева внизу
-      const boxX = 0;
-      const boxY = 600;
-      const boxWidth = 400;
-      const boxHeight = 200;
-
+      const boxX = 20;
+      const boxY = 580;
+      const boxWidth = 460;
+      const boxHeight = 160;
 
       const box = this.add.rectangle(boxX, boxY, boxWidth, boxHeight, 0xffffff)
         .setOrigin(0, 1)
         .setStrokeStyle(3, 0x000000)
         .setAlpha(0);
 
-      // Иконка 
       let icon;
       if (this.textures.exists('telegram_icon')) {
-        icon = this.add.image(boxX + 20, boxY - boxHeight + 20, 'telegram_icon')
+        icon = this.add.image(boxX + 16, boxY - boxHeight + 16, 'telegram_icon')
           .setOrigin(0, 0)
-          .setDisplaySize(40, 40)
+          .setDisplaySize(36, 36)
           .setAlpha(0);
-      } else {
-        console.warn('Telegram icon texture not found!');
       }
 
-      // Текст внутри окна
-      const msg = this.add.text(boxX + 80, boxY - boxHeight + 30, "", {
+      const msg = this.add.text(boxX + 64, boxY - boxHeight + 24, "", {
         fontFamily: 'Arial',
-        fontSize: '22px',
+        fontSize: '20px',
         color: '#000000',
         fontStyle: 'bold',
-        wordWrap: { width: boxWidth - 100 },
+        wordWrap: { width: boxWidth - 80 },
         align: 'left'
       }).setOrigin(0, 0).setAlpha(0);
 
-      // Появление окна, иконки и текста
       const appearTargets = [box, msg];
       if (icon) appearTargets.push(icon);
 
@@ -60,14 +51,13 @@ class Scene2 extends Phaser.Scene {
         ease: 'Power2'
       });
 
-      // Эффект печатания текста "Бот устанавливается..."
       const fullText = "Бот устанавливается...";
       let currentText = "";
       let charIndex = 0;
 
       this.time.delayedCall(500, () => {
         this.time.addEvent({
-          delay: 50,
+          delay: 40,
           repeat: fullText.length - 1,
           callback: () => {
             currentText += fullText[charIndex];
@@ -77,39 +67,43 @@ class Scene2 extends Phaser.Scene {
         });
       });
 
-      // Через 2.5 секунды меняем текст на "Установка завершена"
-      this.time.delayedCall(2500, () => {
+      this.time.delayedCall(2200, () => {
         msg.setText("Установка завершена");
 
         this.time.delayedCall(400, () => {
-          // Большой полупрозрачный фон и текст "Бот активирован" по центру
-          const bigTextBg = this.add.rectangle(400, 170, 380, 80, 0x000000, 0.6)
+          const centerX = 400;
+          const centerY = 180;
+
+          const bigTextBg = this.add.rectangle(centerX, centerY, 380, 70, 0x000000, 0.6)
             .setOrigin(0.5)
             .setAlpha(0);
 
-          const bigText = this.add.text(400, 170, "🤖 Бот активирован", {
+          const botAvatar = this.add.image(centerX - 120, centerY, 'bot_avatar')
+            .setDisplaySize(32, 32)
+            .setOrigin(0.5)
+            .setAlpha(0);
+
+          const bigText = this.add.text(centerX - 80, centerY, "Бот активирован", {
             fontFamily: 'Arial',
-            fontSize: '32px',
+            fontSize: '28px',
             fontStyle: 'bold',
-            color: '#ffffff',
-            align: 'center'
-          }).setOrigin(0.5).setAlpha(0);
+            color: '#ffffff'
+          }).setOrigin(0, 0.5).setAlpha(0);
 
           this.tweens.add({
-            targets: [bigTextBg, bigText],
+            targets: [bigTextBg, botAvatar, bigText],
             alpha: 1,
             duration: 600,
             ease: 'Power2'
           });
 
-          // Кнопка "Продолжить" 
-          const button = this.add.rectangle(400, 290, 220, 60, 0x2a6b2a)
+          const button = this.add.rectangle(centerX, 290, 220, 60, 0x2a6b2a)
             .setOrigin(0.5)
             .setInteractive({ useHandCursor: true })
             .setStrokeStyle(2, 0x1e4d1e)
             .setAlpha(0);
 
-          const label = this.add.text(400, 290, "Продолжить", {
+          const label = this.add.text(centerX, 290, "Продолжить", {
             fontFamily: 'Arial',
             fontSize: '20px',
             fontStyle: 'bold',
@@ -134,4 +128,6 @@ class Scene2 extends Phaser.Scene {
 }
 
 window.Scene2 = Scene2;
+
+
 
