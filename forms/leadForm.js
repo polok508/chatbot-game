@@ -8,42 +8,74 @@ class LeadForm {
 
     const container = document.createElement('div');
     container.id = 'lead-form-container';
-    container.style.position = 'absolute';
-    container.style.top = '150px';
-    container.style.left = '50%';
-    container.style.transform = 'translateX(-50%)';
-    container.style.width = '400px';
-    container.style.background = '#ffffffcc';
-    container.style.borderRadius = '8px';
-    container.style.padding = '20px';
-    container.style.boxShadow = '0 0 15px rgba(0,0,0,0.2)';
-    container.style.fontFamily = 'Arial';
-    container.style.color = '#2a6b2a';
-    container.style.zIndex = 1000;
+
+    Object.assign(container.style, {
+      position: 'absolute',
+      top: '100px',
+      left: '50%',
+      transform: 'translateX(-50%)',
+      width: '92vw',
+      maxWidth: '400px',
+      background: '#ffffffee',
+      borderRadius: '10px',
+      padding: '20px',
+      boxSizing: 'border-box',
+      boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
+      fontFamily: 'Arial, sans-serif',
+      color: '#2a6b2a',
+      zIndex: 1000,
+    });
 
     container.innerHTML = `
-      <label style="display:block; margin-bottom:8px; font-weight:bold;">Имя</label>
-      <input type="text" id="lead-name" style="width:100%; padding:8px; margin-bottom:15px; font-size:16px; border:1px solid #aaa; border-radius:4px;" placeholder="Ваше имя" required />
+      <style>
+        #lead-form-container input,
+        #lead-form-container button {
+          box-sizing: border-box;
+          width: 100%;
+          font-size: 16px;
+          border-radius: 6px;
+          border: 1px solid #ccc;
+          padding: 12px;
+          margin-bottom: 12px;
+        }
 
-      <label style="display:block; margin-bottom:8px; font-weight:bold;">Телефон</label>
-      <input type="tel" id="lead-phone" style="width:100%; padding:8px; margin-bottom:15px; font-size:16px; border:1px solid #aaa; border-radius:4px;" placeholder="+7 999 999-99-99" required />
+        #lead-form-container label {
+          display: block;
+          margin-bottom: 6px;
+          font-weight: bold;
+        }
 
-      <label style="display:block; margin-bottom:8px; font-weight:bold;">Email</label>
-      <input type="email" id="lead-email" style="width:100%; padding:8px; margin-bottom:15px; font-size:16px; border:1px solid #aaa; border-radius:4px;" placeholder="example@mail.com" required />
+        #lead-form-container button {
+          background-color: #2a6b2a;
+          color: white;
+          border: none;
+          font-weight: bold;
+          cursor: pointer;
+          transition: background-color 0.2s ease;
+        }
 
-      <button id="lead-submit" style="
-        width: 100%;
-        padding: 12px;
-        font-size: 18px;
-        background-color: #2a6b2a;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        font-weight: bold;
-      ">Отправить заявку</button>
+        #lead-form-container button:hover {
+          background-color: #3e8e3e;
+        }
 
-      <div id="lead-message" style="margin-top:15px; text-align:center; font-size:16px;"></div>
+        #lead-form-container #lead-message {
+          margin-top: 14px;
+          text-align: center;
+          font-size: 16px;
+        }
+      </style>
+
+      <label>Имя</label>
+      <input type="text" id="lead-name" placeholder="Ваше имя" required />
+
+      <label>Телефон</label>
+      <input type="tel" id="lead-phone" placeholder="+7 999 999-99-99" required />
+
+      <label>Email</label>
+      <input type="email" id="lead-email" placeholder="example@mail.com" required />
+
+      <button id="lead-submit">Отправить заявку</button>
+      <div id="lead-message"></div>
     `;
 
     document.body.appendChild(container);
@@ -67,7 +99,6 @@ class LeadForm {
     messageBox.style.color = '#2a6b2a';
     messageBox.textContent = 'Отправка...';
 
-    // Глобальная переменная
     const botToken = window.AppConfig.BOT_TOKEN;
     const chatId = window.AppConfig.CHAT_ID;
 
@@ -84,7 +115,7 @@ class LeadForm {
 
       if (data.ok) {
         messageBox.style.color = 'green';
-        messageBox.textContent = 'Спасибо! Ваша заявка отправлена. Мы скоро свяжемся с вами.';
+        messageBox.textContent = 'Спасибо! Ваша заявка отправлена.';
         this.clearFields();
       } else {
         throw new Error("Telegram API error");
