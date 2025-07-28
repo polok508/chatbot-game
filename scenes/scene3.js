@@ -131,9 +131,9 @@ class Scene3 extends Phaser.Scene {
 
   addToChat(text, onComplete, isBot = true, options = {}) {
     const { height } = this.scale;
-    const fontSize = options.fontSize || Math.floor(height / 45);
-    const lineSpacing = options.lineSpacing || 8;
-    const fontWeight = options.fontWeight || 'normal';
+    const fontSize = options.fontSize || Math.floor(height / 30);
+    const lineSpacing = options.lineSpacing || 10;
+    const fontWeight = options.fontWeight || 'bold';
     const color = options.color || '#000000';
 
     const containerWidth = this.chatAreaWidth;
@@ -141,16 +141,16 @@ class Scene3 extends Phaser.Scene {
     const messageGroup = this.add.container(0, this.nextMessageY);
 
     if (isBot) {
-      const avatar = this.add.image(0, 4, 'bot_avatar').setOrigin(0, 0).setDisplaySize(32, 32);
+      const avatar = this.add.image(0, 4, 'bot_avatar').setOrigin(0, 0).setDisplaySize(36, 36);
       messageGroup.add(avatar);
     }
 
-    const label = this.add.text(isBot ? 40 : 0, 6, '', {
+    const label = this.add.text(isBot ? 44 : 0, 6, '', {
       fontFamily: 'Arial',
       fontSize: `${fontSize}px`,
       fontWeight: fontWeight,
       color: color,
-      wordWrap: { width: containerWidth - 40 }
+      wordWrap: { width: containerWidth - 44 }
     }).setOrigin(0, 0);
 
     messageGroup.add(label);
@@ -171,7 +171,7 @@ class Scene3 extends Phaser.Scene {
         if (i === text.length) {
           this.time.delayedCall(100, () => {
             const textHeight = label.height;
-            const avatarHeight = isBot ? 36 : 0;
+            const avatarHeight = isBot ? 40 : 0;
             const messageHeight = Math.max(textHeight, avatarHeight);
             this.nextMessageY += messageHeight + lineSpacing;
 
@@ -228,7 +228,9 @@ class Scene3 extends Phaser.Scene {
       { fontSize: 22, fontWeight: 'bold', lineSpacing: 14, color: '#000' }
     );
 
-    this.time.delayedCall(3000, () => this.finishScene());
+    this.time.delayedCall(3000, () => {
+      this.finishScene();
+    });
   }
 
   animateQuestionBlock(text, onComplete) {
@@ -266,16 +268,19 @@ class Scene3 extends Phaser.Scene {
 
     const { width, height } = this.scale;
 
-    const overlay = this.add.rectangle(width / 2, height / 2, width * 0.9, height * 0.25, 0x000000, 0.5)
+    // Более тёмный фон для читаемости
+    const overlay = this.add.rectangle(width / 2, height / 2, width * 0.9, height * 0.25, 0x000000, 0.75)
       .setOrigin(0.5);
 
     this.add.text(width / 2, height / 2, 'Чат Бот взял рутину на себя.\nКоманда работает с важным — без перегрузки', {
       fontFamily: 'Arial',
-      fontSize: `${Math.floor(height / 25)}px`,
-      color: '#fff',
+      fontSize: `${Math.floor(height / 22)}px`,
+      color: '#f0f0f0',
       align: 'center',
-      stroke: '#000',
-      strokeThickness: 3
+      stroke: '#222222',
+      strokeThickness: 4,
+      fontStyle: 'bold',
+      padding: { x: 10, y: 10 }
     }).setOrigin(0.5);
 
     this.time.delayedCall(4000, () => {
@@ -285,3 +290,4 @@ class Scene3 extends Phaser.Scene {
 }
 
 window.Scene3 = Scene3;
+

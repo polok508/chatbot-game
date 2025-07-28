@@ -5,7 +5,7 @@ class LeadForm {
   }
 
   create() {
-    if (this.container) return;
+    if (document.getElementById('lead-form-container')) return;
 
     const container = document.createElement('div');
     container.id = 'lead-form-container';
@@ -15,7 +15,7 @@ class LeadForm {
       top: '100px',
       left: '50%',
       transform: 'translateX(-50%)',
-      width: '92vw',
+      width: '90vw',
       maxWidth: '400px',
       background: '#ffffffee',
       borderRadius: '10px',
@@ -29,10 +29,16 @@ class LeadForm {
 
     container.innerHTML = `
       <style>
+        #lead-form-container {
+          box-sizing: border-box;
+          padding: 0;
+        }
+
         #lead-form-container input,
         #lead-form-container button {
-          box-sizing: border-box;
           width: 100%;
+          max-width: 100%;
+          box-sizing: border-box;
           font-size: 16px;
           border-radius: 6px;
           border: 1px solid #ccc;
@@ -83,9 +89,7 @@ class LeadForm {
     this.container = container;
 
     const submitButton = this.container.querySelector('#lead-submit');
-    ['click', 'touchend', 'pointerup'].forEach(evt =>
-      submitButton.addEventListener(evt, () => this.submit())
-    );
+    submitButton.addEventListener('click', () => this.submit());
   }
 
   async submit() {
@@ -120,8 +124,8 @@ class LeadForm {
 
     try {
       const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ chat_id: chatId, text })
       });
 
@@ -132,7 +136,7 @@ class LeadForm {
         messageBox.textContent = '✅ Спасибо! Ваша заявка отправлена.';
         this.clearFields();
       } else {
-        throw new Error('Ошибка Telegram API');
+        throw new Error('Telegram API error');
       }
     } catch (error) {
       console.error('Ошибка отправки:', error);
@@ -166,6 +170,8 @@ class LeadForm {
 }
 
 window.LeadForm = LeadForm;
+
+
 
 
 

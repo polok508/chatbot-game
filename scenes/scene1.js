@@ -10,7 +10,7 @@ class Scene1 extends Phaser.Scene {
   create() {
     this.add.image(400, 300, 'bg_office').setDisplaySize(800, 600);
 
-    const bgText = this.add.rectangle(400, 100, 660, 140, 0x1a1a1a, 0.8)
+    const bgText = this.add.rectangle(400, 100, 520, 100, 0x1a1a1a, 0.8)
       .setOrigin(0.5)
       .setStrokeStyle(2, 0xffffff, 0.3)
       .setDepth(1);
@@ -22,7 +22,7 @@ class Scene1 extends Phaser.Scene {
       fontSize: '20px',
       color: '#ffffff',
       align: 'center',
-      wordWrap: { width: 620 },
+      wordWrap: { width: 480 },
       lineSpacing: 6,
       shadow: {
         offsetX: 1,
@@ -125,8 +125,8 @@ class Scene1 extends Phaser.Scene {
           }).setOrigin(0.5).setDepth(7);
 
         if (installBotButton) {
-          installBotButton.button.setFillStyle(0x00e676); 
-          installBotButton.label.setShadow(0, 0, '#ffffff', 12, true, true); 
+          installBotButton.button.setFillStyle(0x00e676);
+          installBotButton.label.setShadow(0, 0, '#ffffff', 12, true, true);
 
           this.tweens.add({
             targets: [installBotButton.label],
@@ -156,6 +156,7 @@ class Scene1 extends Phaser.Scene {
 }
 
 window.Scene1 = Scene1;
+
 
 
 
