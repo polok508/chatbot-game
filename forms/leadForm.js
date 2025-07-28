@@ -1,6 +1,7 @@
 class LeadForm {
   constructor() {
     this.container = null;
+    this.isSubmitting = false;
   }
 
   create() {
@@ -81,10 +82,15 @@ class LeadForm {
     document.body.appendChild(container);
     this.container = container;
 
-    this.container.querySelector('#lead-submit').addEventListener('click', () => this.submit());
+    const submitButton = this.container.querySelector('#lead-submit');
+    ['click', 'touchend', 'pointerup'].forEach(evt =>
+      submitButton.addEventListener(evt, () => this.submit())
+    );
   }
 
   async submit() {
+    if (this.isSubmitting) return;
+
     const name = this.container.querySelector('#lead-name').value.trim();
     const phone = this.container.querySelector('#lead-phone').value.trim();
     const email = this.container.querySelector('#lead-email').value.trim();
@@ -96,11 +102,19 @@ class LeadForm {
       return;
     }
 
-    messageBox.style.color = '#2a6b2a';
-    messageBox.textContent = 'Отправка...';
+    const botToken = window.AppConfig?.BOT_TOKEN;
+    const chatId = window.AppConfig?.CHAT_ID;
 
-    const botToken = window.AppConfig.BOT_TOKEN;
-    const chatId = window.AppConfig.CHAT_ID;
+    if (!botToken || !chatId) {
+      console.error('BOT_TOKEN или CHAT_ID не определены');
+      messageBox.style.color = 'red';
+      messageBox.textContent = 'Ошибка конфигурации. Обратитесь к администратору.';
+      return;
+    }
+
+    this.isSubmitting = true;
+    messageBox.style.color = '#2a6b2a';
+    messageBox.textContent = '⏳ Отправка...';
 
     const text = `🧾 Новая заявка с игры:\n\n👤 Имя: ${name}\n📞 Телефон: ${phone}\n📧 Email: ${email}`;
 
@@ -108,22 +122,24 @@ class LeadForm {
       const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ chat_id: chatId, text: text })
+        body: JSON.stringify({ chat_id: chatId, text })
       });
 
       const data = await response.json();
 
       if (data.ok) {
         messageBox.style.color = 'green';
-        messageBox.textContent = 'Спасибо! Ваша заявка отправлена.';
+        messageBox.textContent = '✅ Спасибо! Ваша заявка отправлена.';
         this.clearFields();
       } else {
-        throw new Error("Telegram API error");
+        throw new Error('Ошибка Telegram API');
       }
     } catch (error) {
-      console.error(error);
+      console.error('Ошибка отправки:', error);
       messageBox.style.color = 'red';
-      messageBox.textContent = 'Ошибка при отправке. Попробуйте позже.';
+      messageBox.textContent = '❌ Ошибка при отправке. Попробуйте позже.';
+    } finally {
+      this.isSubmitting = false;
     }
   }
 
@@ -150,5 +166,6 @@ class LeadForm {
 }
 
 window.LeadForm = LeadForm;
+
 
 

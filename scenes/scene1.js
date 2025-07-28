@@ -4,24 +4,18 @@ class Scene1 extends Phaser.Scene {
   }
 
   preload() {
-    // Фон
     this.load.image('bg_office', 'assets/bg/office.png');
   }
 
   create() {
-
     this.add.image(400, 300, 'bg_office').setDisplaySize(800, 600);
-
 
     const bgText = this.add.rectangle(400, 100, 660, 140, 0x1a1a1a, 0.8)
       .setOrigin(0.5)
       .setStrokeStyle(2, 0xffffff, 0.3)
       .setDepth(1);
 
-    // Основной текст описания ситуации
-    const textContent =
-      "Ваш бизнес растёт, но вы не справляетесь с заявками.\n\n" +
-      "Круглосуточно поступают вопросы, менеджеры не успевают — клиенты уходят.";
+    const textContent = "Ваш бизнес растёт, но вы не справляетесь с заявками.";
 
     this.add.text(400, 100, textContent, {
       fontFamily: 'Arial',
@@ -40,7 +34,6 @@ class Scene1 extends Phaser.Scene {
       }
     }).setOrigin(0.5).setDepth(2);
 
-    // Позиции для всплывающих тревожных сообщений
     const positions = [
       { x: 200, y: 200 },
       { x: 600, y: 220 },
@@ -49,7 +42,6 @@ class Scene1 extends Phaser.Scene {
 
     const messages = ["Много заявок", "Куча сообщений", "Очередь клиентов"];
 
-    // Последовательно выводим тревожные сообщения
     messages.forEach((msg, index) => {
       this.time.delayedCall(index * 500, () => {
         const pos = positions[index];
@@ -61,7 +53,6 @@ class Scene1 extends Phaser.Scene {
           fontStyle: 'bold',
         }).setOrigin(0.5);
 
-        // Анимация дрожания
         this.tweens.add({
           targets: [bg, text],
           x: `+=4`,
@@ -73,13 +64,10 @@ class Scene1 extends Phaser.Scene {
       });
     });
 
-    // Через 4 секунды показываем кнопки
     this.time.delayedCall(1500, () => {
       let installBotButton = null;
 
-
       const createStyledButton = (x, y, labelText, onClick) => {
-
         const button = this.add.rectangle(x, y, 240, 64, 0x2a6b2a)
           .setOrigin(0.5)
           .setInteractive({ useHandCursor: true })
@@ -87,7 +75,6 @@ class Scene1 extends Phaser.Scene {
           .setAlpha(0)
           .setDepth(1);
 
-        // Текст на кнопке
         const label = this.add.text(x, y, labelText, {
           fontFamily: 'Arial',
           fontSize: '20px',
@@ -95,7 +82,6 @@ class Scene1 extends Phaser.Scene {
           color: '#ffffff'
         }).setOrigin(0.5).setAlpha(0).setDepth(2);
 
-        // Наведение: подсветка
         button.on('pointerover', () => {
           button.setFillStyle(0x3c8f3c);
           button.setScale(1.02);
@@ -105,13 +91,11 @@ class Scene1 extends Phaser.Scene {
           button.setScale(1);
         });
 
-        // Клик по кнопке
         button.on('pointerdown', () => {
           button.setFillStyle(0x1e4d1e);
           onClick.call(this, button, label);
         });
 
-        // Плавное появление кнопки и текста
         this.tweens.add({
           targets: [button, label],
           alpha: 1,
@@ -122,17 +106,13 @@ class Scene1 extends Phaser.Scene {
         return { button, label };
       };
 
-      // Кнопка "Нанять менеджера"
       createStyledButton(250, 520, "Нанять менеджера", () => {
-        // Затемнение фона
         this.add.rectangle(400, 300, 800, 600, 0x000000, 0.5).setDepth(5);
 
-        // Красное окно-предупреждение
         this.add.rectangle(400, 300, 600, 200, 0x8b0000, 0.95)
           .setStrokeStyle(3, 0xffffff)
           .setDepth(6);
 
-        // Сообщение о последствиях
         this.add.text(400, 300,
           "Хаос продолжается!\nКлиенты по-прежнему ждут ответа.\nОдин менеджер не спасает ситуацию.\n(Потери: -10 клиентов в неделю)",
           {
@@ -144,35 +124,31 @@ class Scene1 extends Phaser.Scene {
             wordWrap: { width: 540 }
           }).setOrigin(0.5).setDepth(7);
 
-          // Подсветка кнопки "Установить Чат Бота"
         if (installBotButton) {
-          this.tweens.add({
-          targets: installBotButton.button,
-          alpha: { from: 1, to: 0.4 },
-          duration: 600,
-          yoyo: true,
-          repeat: -1,
-          ease: 'Sine.easeInOut',
-        });
-  
-  // Ярко-зеленый цвет, чтобы кнопка не меркла
-        installBotButton.button.setFillStyle(0x4CAF50);
-        
-        this.tweens.add({
-          targets: installBotButton.label,
-          alpha: { from: 1, to: 0.7 },
-          duration: 600,
-          yoyo: true,
-          repeat: -1,
-          ease: 'Sine.easeInOut',
-        });
-      }
+          installBotButton.button.setFillStyle(0x00e676); 
+          installBotButton.label.setShadow(0, 0, '#ffffff', 12, true, true); 
 
+          this.tweens.add({
+            targets: [installBotButton.label],
+            scale: { from: 1, to: 1.05 },
+            duration: 500,
+            yoyo: true,
+            repeat: -1,
+            ease: 'Sine.easeInOut'
+          });
+
+          this.tweens.add({
+            targets: installBotButton.button,
+            scale: { from: 1, to: 1.04 },
+            duration: 500,
+            yoyo: true,
+            repeat: -1,
+            ease: 'Sine.easeInOut'
+          });
+        }
       });
 
-      // Кнопка "Установить Чат Бота"
       installBotButton = createStyledButton(550, 520, "Установить Чат Бота", () => {
-        // Переход на следующую сцену
         this.scene.start('Scene2');
       });
     });
@@ -180,6 +156,7 @@ class Scene1 extends Phaser.Scene {
 }
 
 window.Scene1 = Scene1;
+
 
 
 

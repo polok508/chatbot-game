@@ -27,7 +27,7 @@ class Scene5 extends Phaser.Scene {
       .setOrigin(0.5);
 
     // Заголовок поверх полупрозрачного фона
-    this.add.text(centerX, rectY, 'Хотите такую же игру?', {
+    this.add.text(centerX, rectY, 'Хотите такого же Бота?', {
       fontFamily: 'Arial',
       fontSize: '40px',
       fontWeight: '700',
