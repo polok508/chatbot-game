@@ -33,7 +33,6 @@ class LeadForm {
           box-sizing: border-box;
           padding: 0;
         }
-
         #lead-form-container input,
         #lead-form-container button {
           width: 100%;
@@ -45,13 +44,11 @@ class LeadForm {
           padding: 12px;
           margin-bottom: 12px;
         }
-
         #lead-form-container label {
           display: block;
           margin-bottom: 6px;
           font-weight: bold;
         }
-
         #lead-form-container button {
           background-color: #2a6b2a;
           color: white;
@@ -60,11 +57,9 @@ class LeadForm {
           cursor: pointer;
           transition: background-color 0.2s ease;
         }
-
         #lead-form-container button:hover {
           background-color: #3e8e3e;
         }
-
         #lead-form-container #lead-message {
           margin-top: 14px;
           text-align: center;
@@ -92,19 +87,45 @@ class LeadForm {
     submitButton.addEventListener('click', () => this.submit());
   }
 
+  sanitizeInput(str) {
+    const temp = document.createElement('div');
+    temp.textContent = str;
+    return temp.innerHTML;
+  }
+
   async submit() {
     if (this.isSubmitting) return;
 
-    console.log('AppConfig:', window.AppConfig);
-
-    const name = this.container.querySelector('#lead-name').value.trim();
-    const phone = this.container.querySelector('#lead-phone').value.trim();
-    const email = this.container.querySelector('#lead-email').value.trim();
     const messageBox = this.container.querySelector('#lead-message');
+
+    let name = this.container.querySelector('#lead-name').value.trim();
+    let phone = this.container.querySelector('#lead-phone').value.trim();
+    let email = this.container.querySelector('#lead-email').value.trim();
+
+    // Очистка от HTML/JS
+    name = this.sanitizeInput(name);
+    phone = this.sanitizeInput(phone);
+    email = this.sanitizeInput(email);
 
     if (!name || !phone || !email) {
       messageBox.style.color = 'red';
       messageBox.textContent = 'Пожалуйста, заполните все поля.';
+      return;
+    }
+
+    // Валидация email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      messageBox.style.color = 'red';
+      messageBox.textContent = 'Введите корректный email.';
+      return;
+    }
+
+    // Валидация телефона
+    const phoneRegex = /^\+?[0-9\s\-()]{7,}$/;
+    if (!phoneRegex.test(phone)) {
+      messageBox.style.color = 'red';
+      messageBox.textContent = 'Введите корректный телефон.';
       return;
     }
 
@@ -172,9 +193,3 @@ class LeadForm {
 }
 
 window.LeadForm = LeadForm;
-
-
-
-
-
-

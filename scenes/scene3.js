@@ -19,8 +19,7 @@ class Scene3 extends Phaser.Scene {
 
     const headerBgWidth = width * 0.6;
     const headerBgHeight = height * 0.08;
-    this.headerBg = this.add.rectangle(width / 2, height * 0.07, headerBgWidth, headerBgHeight, 0x000000, 0.5)
-      .setOrigin(0.5);
+    this.headerBg = this.add.rectangle(width / 2, height * 0.07, headerBgWidth, headerBgHeight, 0x000000, 0.5).setOrigin(0.5);
 
     this.header = this.add.text(width / 2, height * 0.07, 'Летят заявки, ловите их!', {
       fontFamily: 'Arial',
@@ -74,7 +73,7 @@ class Scene3 extends Phaser.Scene {
           if (this.claimsCaught === this.totalClaims) {
             this.header.destroy();
             this.headerBg.destroy();
-            this.time.delayedCall(600, () => this.showBotWindow());
+            this.showBotWindow();
           }
         }
       });
@@ -83,47 +82,39 @@ class Scene3 extends Phaser.Scene {
 
   showBotWindow() {
     const { width, height } = this.scale;
-    const boxWidth = width * 0.8;
-    const boxHeight = height * 0.25;
-    const boxX = width * 0.1;
-    const boxY = height * 0.92;
+    const boxWidth = width * 0.35;
+    const boxHeight = height * 0.65;
+    const boxX = width - boxWidth - 20;
+    const boxY = height - 20;
 
     this.botBox = this.add.rectangle(boxX, boxY, boxWidth, boxHeight, 0xffffff)
       .setOrigin(0, 1)
       .setStrokeStyle(2, 0x000000);
 
-    this.botIcon = this.add.image(boxX + 16, boxY - boxHeight + 16, 'telegram_icon')
+    this.botIcon = this.add.image(boxX + 12, boxY - boxHeight + 12, 'telegram_icon')
       .setOrigin(0, 0)
-      .setDisplaySize(40, 40);
+      .setDisplaySize(36, 36);
 
-    this.chatArea = this.add.container(boxX + 60, boxY - boxHeight + 10);
-
-    this.chatAreaHeight = boxHeight - 20;
-    this.chatAreaWidth = boxWidth - 80;
+    this.chatArea = this.add.container(boxX + 54, boxY - boxHeight + 16);
+    this.chatAreaHeight = boxHeight - 32;
+    this.chatAreaWidth = boxWidth - 72;
 
     const maskShape = this.make.graphics();
     maskShape.fillStyle(0xffffff);
-    maskShape.fillRect(boxX + 60, boxY - boxHeight + 10, this.chatAreaWidth, this.chatAreaHeight);
+    maskShape.fillRect(boxX + 54, boxY - boxHeight + 16, this.chatAreaWidth, this.chatAreaHeight);
     const mask = maskShape.createGeometryMask();
     this.chatArea.setMask(mask);
 
     this.chatMessages = [];
-    this.nextMessageY = 0;
+    this.nextMessageY = 6;
 
     this.addToChatAsync(
-      "Чат-Бот принял 56 заявок за минуту. Зарегистрировано и распределено по категориям.",
+      "Чат-Бот принял 5 заявок за минуту. Зарегистрировано и распределено по категориям.",
       true,
-      { fontSize: 22, fontWeight: 'bold', lineSpacing: 14, color: '#000' }
+      { fontSize: 20, fontWeight: 'bold', lineSpacing: 12, color: '#000' }
     ).then(() => {
-      this.time.delayedCall(3000, () => {
-        this.chatMessages.forEach(msg => {
-          if (msg.textTimer) {
-            msg.textTimer.remove(false);
-          }
-          msg.destroy();
-        });
-        this.chatMessages = [];
-        this.nextMessageY = 0;
+      this.showContinueButton(() => {
+        this.clearChat();
         this.startAutoDialog();
       });
     });
@@ -131,61 +122,91 @@ class Scene3 extends Phaser.Scene {
 
   addToChat(text, onComplete, isBot = true, options = {}) {
     const { height } = this.scale;
-    const fontSize = options.fontSize || Math.floor(height / 30);
+    const defaultFontSize = options.fontSize || Math.floor(height / 30);
     const lineSpacing = options.lineSpacing || 10;
     const fontWeight = options.fontWeight || 'bold';
     const color = options.color || '#000000';
 
     const containerWidth = this.chatAreaWidth;
-
     const messageGroup = this.add.container(0, this.nextMessageY);
 
+    const forceNarrow = text.includes('Чат-Бот принял');
+
+    const maxWidth = forceNarrow ? containerWidth * 0.6 : containerWidth * 0.54;
+
+    let labelX, align, bgColor;
     if (isBot) {
-      const avatar = this.add.image(0, 4, 'bot_avatar').setOrigin(0, 0).setDisplaySize(36, 36);
+      const avatar = this.add.image(0, 4, 'bot_avatar').setOrigin(0, 0).setDisplaySize(32, 32);
       messageGroup.add(avatar);
+      labelX = 40;
+      align = 'left';
+      bgColor = 0xe0f0e9;
+    } else {
+      labelX = containerWidth;
+      align = 'right';
+      bgColor = 0xd0d0d0;
     }
 
-    const label = this.add.text(isBot ? 44 : 0, 6, '', {
+  
+    let fontSize = defaultFontSize;
+    let label = this.add.text(0, 0, text, {
       fontFamily: 'Arial',
       fontSize: `${fontSize}px`,
       fontWeight: fontWeight,
       color: color,
-      wordWrap: { width: containerWidth - 44 }
-    }).setOrigin(0, 0);
+      wordWrap: { width: maxWidth },
+      align: align
+    });
+
+
+    while (label.width > maxWidth && fontSize > 10) {
+      fontSize -= 1;
+      label.setFontSize(fontSize);
+    }
+
+    label.setOrigin(isBot ? 0 : 1, 0);
+    label.x = labelX;
 
     messageGroup.add(label);
     this.chatArea.add(messageGroup);
     this.chatMessages.push(messageGroup);
 
+    // Печать текста по символам
+    label.setText('');
     let i = 0;
     messageGroup.textTimer = this.time.addEvent({
       delay: 30,
       repeat: text.length - 1,
       callback: () => {
-        if (!label || label.destroyed) {
-          messageGroup.textTimer.remove(false);
-          return;
-        }
+        if (!label || label.destroyed) return;
         label.setText(label.text + text[i]);
         i++;
         if (i === text.length) {
-          this.time.delayedCall(100, () => {
-            const textHeight = label.height;
-            const avatarHeight = isBot ? 40 : 0;
-            const messageHeight = Math.max(textHeight, avatarHeight);
-            this.nextMessageY += messageHeight + lineSpacing;
+          const textWidth = label.width;
+          const textHeight = label.height;
 
-            if (this.nextMessageY > this.chatAreaHeight) {
-              const overflow = this.nextMessageY - this.chatAreaHeight;
-              this.nextMessageY = this.chatAreaHeight;
+          const bg = this.add.graphics();
+          bg.fillStyle(bgColor, 1);
+          bg.fillRoundedRect(
+            isBot ? label.x - 6 : label.x - textWidth - 6,
+            label.y - 8,
+            textWidth + 20,
+            textHeight + 16,
+            12
+          );
+          messageGroup.addAt(bg, 0);
 
-              this.chatMessages.forEach(msg => {
-                msg.y -= overflow;
-              });
-            }
+          this.nextMessageY += textHeight + 16 + lineSpacing;
 
-            if (onComplete) onComplete();
-          });
+          if (this.nextMessageY > this.chatAreaHeight) {
+            const overflow = this.nextMessageY - this.chatAreaHeight;
+            this.nextMessageY = this.chatAreaHeight;
+            this.chatMessages.forEach(msg => {
+              msg.y -= overflow;
+            });
+          }
+
+          if (onComplete) onComplete();
         }
       }
     });
@@ -195,6 +216,57 @@ class Scene3 extends Phaser.Scene {
     return new Promise(resolve => {
       this.addToChat(text, () => resolve(), isBot, options);
     });
+  }
+
+  showContinueButton(callback) {
+    if (this.continueBtn) return;
+    const btnWidth = 130;
+    const btnHeight = 32;
+    const btnX = this.botBox.x + this.botBox.width - btnWidth - 12;
+    const btnY = this.botBox.y - btnHeight - 12;
+    this.continueBtn = this.add.container(btnX, btnY);
+
+    const graphics = this.add.graphics();
+    graphics.fillStyle(0x2a6b2a, 1);
+    graphics.fillRoundedRect(0, 0, btnWidth, btnHeight, 10);
+    graphics.lineStyle(2, 0x1b431b, 1);
+    graphics.strokeRoundedRect(0, 0, btnWidth, btnHeight, 10);
+
+    const btnText = this.add.text(btnWidth / 2, btnHeight / 2, 'Продолжить', {
+      fontFamily: 'Arial',
+      fontSize: '16px',
+      color: '#fff',
+      fontStyle: 'bold',
+    }).setOrigin(0.5);
+
+    this.continueBtn.add([graphics, btnText]);
+
+    graphics.setInteractive(
+      new Phaser.Geom.Rectangle(0, 0, btnWidth, btnHeight),
+      Phaser.Geom.Rectangle.Contains
+    );
+
+    graphics.on('pointerover', () => this.input.setDefaultCursor('pointer'));
+    graphics.on('pointerout', () => this.input.setDefaultCursor('default'));
+
+    graphics.on('pointerdown', () => graphics.setScale(0.95));
+    graphics.on('pointerup', () => {
+      graphics.setScale(1);
+      if (this.continueBtn) {
+        this.continueBtn.destroy();
+        this.continueBtn = null;
+      }
+      if (callback) callback();
+    });
+  }
+
+  clearChat() {
+    this.chatMessages.forEach(msg => {
+      if (msg.textTimer) msg.textTimer.remove(false);
+      msg.destroy();
+    });
+    this.chatMessages = [];
+    this.nextMessageY = 6;
   }
 
   async startAutoDialog() {
@@ -213,22 +285,14 @@ class Scene3 extends Phaser.Scene {
       await new Promise(r => this.time.delayedCall(1000, r));
     }
 
-    this.chatMessages.forEach(msg => {
-      if (msg.textTimer) {
-        msg.textTimer.remove(false);
-      }
-      msg.destroy();
-    });
-    this.chatMessages = [];
-    this.nextMessageY = 0;
-
+    this.clearChat();
     await this.addToChatAsync(
       'Автоответы активированы.\nСреднее время ответа: 2 секунды.\nСложные вопросы отправлены менеджеру.',
       true,
-      { fontSize: 22, fontWeight: 'bold', lineSpacing: 14, color: '#000' }
+      { fontSize: 20, fontWeight: 'bold', lineSpacing: 14, color: '#000' }
     );
 
-    this.time.delayedCall(3000, () => {
+    this.showContinueButton(() => {
       this.finishScene();
     });
   }
@@ -248,13 +312,14 @@ class Scene3 extends Phaser.Scene {
     this.tweens.add({
       targets: [block, label],
       y: height * 0.3,
-      alpha: 0,
-      duration: 2500,
-      ease: 'Sine.easeInOut',
+      duration: 600,
+      ease: 'Sine.easeOut',
       onComplete: () => {
-        block.destroy();
-        label.destroy();
-        onComplete();
+        this.time.delayedCall(900, () => {
+          block.destroy();
+          label.destroy();
+          onComplete();
+        });
       }
     });
   }
@@ -263,15 +328,11 @@ class Scene3 extends Phaser.Scene {
     this.botBox.destroy();
     this.botIcon.destroy();
     this.chatArea.destroy();
-
+    if (this.continueBtn) this.continueBtn.destroy();
     this.bg.setTexture('bg_office2');
 
     const { width, height } = this.scale;
-
-    // Более тёмный фон для читаемости
-    const overlay = this.add.rectangle(width / 2, height / 2, width * 0.9, height * 0.25, 0x000000, 0.75)
-      .setOrigin(0.5);
-
+    this.add.rectangle(width / 2, height / 2, width * 0.9, height * 0.25, 0x000000, 0.75).setOrigin(0.5);
     this.add.text(width / 2, height / 2, 'Чат Бот взял рутину на себя.\nКоманда работает с важным — без перегрузки', {
       fontFamily: 'Arial',
       fontSize: `${Math.floor(height / 22)}px`,
@@ -290,4 +351,3 @@ class Scene3 extends Phaser.Scene {
 }
 
 window.Scene3 = Scene3;
-
