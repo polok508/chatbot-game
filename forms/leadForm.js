@@ -95,6 +95,8 @@ class LeadForm {
   async submit() {
     if (this.isSubmitting) return;
 
+    console.log('AppConfig:', window.AppConfig);
+
     const name = this.container.querySelector('#lead-name').value.trim();
     const phone = this.container.querySelector('#lead-phone').value.trim();
     const email = this.container.querySelector('#lead-email').value.trim();
@@ -170,6 +172,7 @@ class LeadForm {
 }
 
 window.LeadForm = LeadForm;
+
 
 
 
