@@ -82,7 +82,7 @@ class Scene3 extends Phaser.Scene {
 
   showBotWindow() {
     const { width, height } = this.scale;
-    const boxWidth = width * 0.35;
+    const boxWidth = width * 0.4;
     const boxHeight = height * 0.65;
     const boxX = width - boxWidth - 20;
     const boxY = height - 20;
@@ -91,9 +91,10 @@ class Scene3 extends Phaser.Scene {
       .setOrigin(0, 1)
       .setStrokeStyle(2, 0x000000);
 
-    this.botIcon = this.add.image(boxX + 12, boxY - boxHeight + 12, 'telegram_icon')
+  
+    this.botIcon = this.add.image(boxX + 14, boxY - boxHeight + 14, 'telegram_icon')
       .setOrigin(0, 0)
-      .setDisplaySize(36, 36);
+      .setDisplaySize(46, 40);
 
     this.chatArea = this.add.container(boxX + 54, boxY - boxHeight + 16);
     this.chatAreaHeight = boxHeight - 32;
@@ -109,9 +110,9 @@ class Scene3 extends Phaser.Scene {
     this.nextMessageY = 6;
 
     this.addToChatAsync(
-      "Чат-Бот принял 5 заявок за минуту. Зарегистрировано и распределено по категориям.",
+      "Чат-Бот принял 5 заявок за минуту.\nЗарегистрировано и распределено по категориям.",
       true,
-      { fontSize: 20, fontWeight: 'bold', lineSpacing: 12, color: '#000' }
+      { fontSize: 18, fontWeight: 'bold', lineSpacing: 12, color: '#000' }
     ).then(() => {
       this.showContinueButton(() => {
         this.clearChat();
@@ -122,7 +123,7 @@ class Scene3 extends Phaser.Scene {
 
   addToChat(text, onComplete, isBot = true, options = {}) {
     const { height } = this.scale;
-    const defaultFontSize = options.fontSize || Math.floor(height / 30);
+    const fontSize = options.fontSize || Math.floor(height / 30);
     const lineSpacing = options.lineSpacing || 10;
     const fontWeight = options.fontWeight || 'bold';
     const color = options.color || '#000000';
@@ -130,9 +131,7 @@ class Scene3 extends Phaser.Scene {
     const containerWidth = this.chatAreaWidth;
     const messageGroup = this.add.container(0, this.nextMessageY);
 
-    const forceNarrow = text.includes('Чат-Бот принял');
-
-    const maxWidth = forceNarrow ? containerWidth * 0.6 : containerWidth * 0.54;
+    const maxWidth = containerWidth * 0.75;
 
     let labelX, align, bgColor;
     if (isBot) {
@@ -142,14 +141,12 @@ class Scene3 extends Phaser.Scene {
       align = 'left';
       bgColor = 0xe0f0e9;
     } else {
-      labelX = containerWidth;
       align = 'right';
       bgColor = 0xd0d0d0;
+      labelX = containerWidth - 10; 
     }
 
-  
-    let fontSize = defaultFontSize;
-    let label = this.add.text(0, 0, text, {
+    const label = this.add.text(0, 0, text, {
       fontFamily: 'Arial',
       fontSize: `${fontSize}px`,
       fontWeight: fontWeight,
@@ -158,57 +155,38 @@ class Scene3 extends Phaser.Scene {
       align: align
     });
 
-
-    while (label.width > maxWidth && fontSize > 10) {
-      fontSize -= 1;
-      label.setFontSize(fontSize);
-    }
-
     label.setOrigin(isBot ? 0 : 1, 0);
     label.x = labelX;
 
+
+    const textWidth = label.width;
+    const textHeight = label.height;
+    const bg = this.add.graphics();
+    bg.fillStyle(bgColor, 1);
+    bg.fillRoundedRect(
+      isBot ? label.x - 6 : label.x - textWidth - 16,
+      label.y - 8,
+      textWidth + 24,
+      textHeight + 16,
+      20 
+    );
+
+    messageGroup.add(bg);
     messageGroup.add(label);
+
     this.chatArea.add(messageGroup);
     this.chatMessages.push(messageGroup);
 
-    // Печать текста по символам
-    label.setText('');
-    let i = 0;
-    messageGroup.textTimer = this.time.addEvent({
-      delay: 30,
-      repeat: text.length - 1,
-      callback: () => {
-        if (!label || label.destroyed) return;
-        label.setText(label.text + text[i]);
-        i++;
-        if (i === text.length) {
-          const textWidth = label.width;
-          const textHeight = label.height;
+    this.nextMessageY += textHeight + 16 + lineSpacing;
 
-          const bg = this.add.graphics();
-          bg.fillStyle(bgColor, 1);
-          bg.fillRoundedRect(
-            isBot ? label.x - 6 : label.x - textWidth - 6,
-            label.y - 8,
-            textWidth + 20,
-            textHeight + 16,
-            12
-          );
-          messageGroup.addAt(bg, 0);
+    if (this.nextMessageY > this.chatAreaHeight) {
+      const overflow = this.nextMessageY - this.chatAreaHeight;
+      this.nextMessageY = this.chatAreaHeight;
+      this.chatMessages.forEach(msg => msg.y -= overflow);
+    }
 
-          this.nextMessageY += textHeight + 16 + lineSpacing;
-
-          if (this.nextMessageY > this.chatAreaHeight) {
-            const overflow = this.nextMessageY - this.chatAreaHeight;
-            this.nextMessageY = this.chatAreaHeight;
-            this.chatMessages.forEach(msg => {
-              msg.y -= overflow;
-            });
-          }
-
-          if (onComplete) onComplete();
-        }
-      }
+    this.time.delayedCall(800, () => {
+      if (onComplete) onComplete();
     });
   }
 
@@ -261,10 +239,7 @@ class Scene3 extends Phaser.Scene {
   }
 
   clearChat() {
-    this.chatMessages.forEach(msg => {
-      if (msg.textTimer) msg.textTimer.remove(false);
-      msg.destroy();
-    });
+    this.chatMessages.forEach(msg => msg.destroy());
     this.chatMessages = [];
     this.nextMessageY = 6;
   }
@@ -280,9 +255,9 @@ class Scene3 extends Phaser.Scene {
     for (const { q, a } of data) {
       await new Promise(resolve => this.animateQuestionBlock(q, resolve));
       await this.addToChatAsync(`👤 ${q}`, false);
-      await new Promise(r => this.time.delayedCall(500, r));
+      await new Promise(r => this.time.delayedCall(1200, r));
       await this.addToChatAsync(a, true);
-      await new Promise(r => this.time.delayedCall(1000, r));
+      await new Promise(r => this.time.delayedCall(1500, r));
     }
 
     this.clearChat();
@@ -351,3 +326,4 @@ class Scene3 extends Phaser.Scene {
 }
 
 window.Scene3 = Scene3;
+

@@ -131,6 +131,7 @@ class LeadForm {
 
     const botToken = window.AppConfig?.BOT_TOKEN;
     const chatId = window.AppConfig?.CHAT_ID;
+    const spreadsheetId = window.AppConfig?.SPREADSHEET_ID;
 
     if (!botToken || !chatId) {
       console.error('BOT_TOKEN или CHAT_ID не определены');
@@ -146,21 +147,28 @@ class LeadForm {
     const text = `🧾 Новая заявка с игры:\n\n👤 Имя: ${name}\n📞 Телефон: ${phone}\n📧 Email: ${email}`;
 
     try {
-      const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+      // Отправка в Telegram
+      const tgResponse = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ chat_id: chatId, text })
       });
 
-      const data = await response.json();
+      const tgData = await tgResponse.json();
+      if (!tgData.ok) throw new Error('Ошибка Telegram API');
 
-      if (data.ok) {
-        messageBox.style.color = 'green';
-        messageBox.textContent = '✅ Спасибо! Ваша заявка отправлена.';
-        this.clearFields();
-      } else {
-        throw new Error('Telegram API error');
-      }
+      // Отправка в Google Sheets через сервер  
+      /*
+      await fetch("https://YOUR_SERVER_URL/api/lead", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, phone, email, spreadsheetId })
+      });
+      */
+
+      messageBox.style.color = 'green';
+      messageBox.textContent = '✅ Спасибо! Ваша заявка отправлена.';
+      this.clearFields();
     } catch (error) {
       console.error('Ошибка отправки:', error);
       messageBox.style.color = 'red';
@@ -193,3 +201,4 @@ class LeadForm {
 }
 
 window.LeadForm = LeadForm;
+
