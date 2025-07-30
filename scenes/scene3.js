@@ -37,8 +37,7 @@ class Scene3 extends Phaser.Scene {
   }
 
   spawnClaim(i, x, width, height) {
-    const startY = height + 50;
-    const targetY = height * 0.7 - i * height * 0.08;
+    const startY = height * 0.7 - i * height * 0.08;
 
     const box = this.add.rectangle(x, startY, width * 0.3, height * 0.07, 0xffee88)
       .setStrokeStyle(2, 0x000000)
@@ -51,10 +50,10 @@ class Scene3 extends Phaser.Scene {
       color: '#000'
     }).setOrigin(0.5).setAlpha(0);
 
+
     this.tweens.add({
       targets: [box, label],
       alpha: 1,
-      y: targetY,
       duration: 1000,
       delay: i * 600,
       ease: 'Power2'
@@ -91,7 +90,6 @@ class Scene3 extends Phaser.Scene {
       .setOrigin(0, 1)
       .setStrokeStyle(2, 0x000000);
 
-  
     this.botIcon = this.add.image(boxX + 14, boxY - boxHeight + 14, 'telegram_icon')
       .setOrigin(0, 0)
       .setDisplaySize(46, 40);
@@ -143,7 +141,7 @@ class Scene3 extends Phaser.Scene {
     } else {
       align = 'right';
       bgColor = 0xd0d0d0;
-      labelX = containerWidth - 10; 
+      labelX = containerWidth - 10;
     }
 
     const label = this.add.text(0, 0, text, {
@@ -158,7 +156,6 @@ class Scene3 extends Phaser.Scene {
     label.setOrigin(isBot ? 0 : 1, 0);
     label.x = labelX;
 
-
     const textWidth = label.width;
     const textHeight = label.height;
     const bg = this.add.graphics();
@@ -168,25 +165,30 @@ class Scene3 extends Phaser.Scene {
       label.y - 8,
       textWidth + 24,
       textHeight + 16,
-      20 
+      20
     );
 
     messageGroup.add(bg);
     messageGroup.add(label);
 
+    messageGroup.setAlpha(0);
     this.chatArea.add(messageGroup);
     this.chatMessages.push(messageGroup);
 
-    this.nextMessageY += textHeight + 16 + lineSpacing;
+    this.tweens.add({
+      targets: messageGroup,
+      alpha: 1,
+      duration: 600,
+      onComplete: () => {
+        this.nextMessageY += textHeight + 16 + lineSpacing;
 
-    if (this.nextMessageY > this.chatAreaHeight) {
-      const overflow = this.nextMessageY - this.chatAreaHeight;
-      this.nextMessageY = this.chatAreaHeight;
-      this.chatMessages.forEach(msg => msg.y -= overflow);
-    }
-
-    this.time.delayedCall(800, () => {
-      if (onComplete) onComplete();
+        if (this.nextMessageY > this.chatAreaHeight) {
+          const overflow = this.nextMessageY - this.chatAreaHeight;
+          this.nextMessageY = this.chatAreaHeight;
+          this.chatMessages.forEach(msg => (msg.y -= overflow));
+        }
+        if (onComplete) onComplete();
+      }
     });
   }
 
@@ -274,26 +276,34 @@ class Scene3 extends Phaser.Scene {
 
   animateQuestionBlock(text, onComplete) {
     const { width, height } = this.scale;
-    const block = this.add.rectangle(width / 2, height + 40, width * 0.6, height * 0.06, 0xffffff)
+    const block = this.add.rectangle(width / 2, height * 0.3, width * 0.6, height * 0.06, 0xffffff)
       .setStrokeStyle(2, 0x000000)
-      .setOrigin(0.5);
+      .setOrigin(0.5)
+      .setAlpha(0);
 
-    const label = this.add.text(width / 2, height + 40, text, {
+    const label = this.add.text(width / 2, height * 0.3, text, {
       fontFamily: 'Arial',
       fontSize: `${Math.floor(height / 35)}px`,
       color: '#000000'
-    }).setOrigin(0.5);
+    }).setOrigin(0.5).setAlpha(0);
 
     this.tweens.add({
       targets: [block, label],
-      y: height * 0.3,
+      alpha: 1,
       duration: 600,
       ease: 'Sine.easeOut',
       onComplete: () => {
         this.time.delayedCall(900, () => {
-          block.destroy();
-          label.destroy();
-          onComplete();
+          this.tweens.add({
+            targets: [block, label],
+            alpha: 0,
+            duration: 400,
+            onComplete: () => {
+              block.destroy();
+              label.destroy();
+              onComplete();
+            }
+          });
         });
       }
     });
@@ -326,4 +336,5 @@ class Scene3 extends Phaser.Scene {
 }
 
 window.Scene3 = Scene3;
+
 
