@@ -4,160 +4,216 @@ class Scene1 extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image('bg_office', 'assets/bg/office.png');
+    this.load.image('bg_office', 'assets/bg/scene1.png');
+
+    this.load.image('vector1', 'assets/icons/vector1.png');
+    this.load.image('vector2', 'assets/icons/vector2.png');
+    this.load.image('vector3', 'assets/icons/vector3.png');
   }
 
   create() {
-    this.add.image(400, 300, 'bg_office').setDisplaySize(800, 600);
+    this.add.image(0, 0, 'bg_office')
+      .setOrigin(0, 0)
+      .setDisplaySize(1440, 992);
 
-    const bgText = this.add.rectangle(400, 100, 520, 100, 0x1a1a1a, 0.8)
-      .setOrigin(0.5)
-      .setStrokeStyle(2, 0xffffff, 0.3)
-      .setDepth(1);
+    // заголовок
+    const titleBgGfx = this.add.graphics();
+    titleBgGfx.fillStyle(0xffffff, 0.7);
+    titleBgGfx.fillRoundedRect(0, 0, 1300, 87, 10);
+    titleBgGfx.generateTexture('title_bg', 1300, 87);
+    titleBgGfx.destroy();
 
-    const textContent = "Ваш бизнес растёт, но вы не справляетесь с заявками.";
+    const titleBg = this.add.image((1440 - 1300) / 2, 100, 'title_bg')
+      .setOrigin(0, 0)
+      .setAlpha(0);
+    const titleText = this.add.text(255, 120, "Бизнес растёт, но заявки становятся проблемой?", {
+      fontFamily: 'Roboto',
+      fontSize: '40px',
+      fontWeight: '400',
+      color: '#000000',
+      wordWrap: { width: 935 }
+    }).setAlpha(0);
 
-    this.add.text(400, 100, textContent, {
-      fontFamily: 'Arial',
-      fontSize: '20px',
-      color: '#ffffff',
-      align: 'center',
-      wordWrap: { width: 480 },
-      lineSpacing: 6,
-      shadow: {
-        offsetX: 1,
-        offsetY: 1,
-        color: '#000000',
-        blur: 2,
-        stroke: true,
-        fill: true
-      }
-    }).setOrigin(0.5).setDepth(2);
+    this.tweens.add({ targets: [titleBg, titleText], alpha: 1, duration: 500, delay: 200 });
 
-    const positions = [
-      { x: 200, y: 200 },
-      { x: 600, y: 220 },
-      { x: 400, y: 320 },
+    // линии
+    const linesData = [
+      { key: 'vector1', x: 169.87, y: 262.93, w: 233.48, h: 97.10, delay: 1200 },
+      { key: 'vector2', x: 721.55, y: 374.16, w: 225.30, h: 94.92, delay: 2200 },
+      { key: 'vector3', x: 406.13, y: 478.05, w: 213.83, h: 107.56, delay: 3200 },
     ];
 
-    const messages = ["Много заявок", "Куча сообщений", "Очередь клиентов"];
+    linesData.forEach(({ key, x, y, w, h, delay }) => {
+      const line = this.add.image(x, y, key)
+        .setOrigin(0, 0)
+        .setDisplaySize(w, h)
+        .setDepth(2)
+        .setAlpha(0.9);
 
-    messages.forEach((msg, index) => {
-      this.time.delayedCall(index * 500, () => {
-        const pos = positions[index];
-        const bg = this.add.rectangle(pos.x, pos.y, msg.length * 20, 50, 0xcc0000, 0.9).setOrigin(0.5);
-        const text = this.add.text(pos.x, pos.y, msg, {
-          fontFamily: 'Arial',
-          fontSize: '20px',
-          color: '#ffffff',
-          fontStyle: 'bold',
-        }).setOrigin(0.5);
 
-        this.tweens.add({
-          targets: [bg, text],
-          x: `+=4`,
-          yoyo: true,
-          repeat: -1,
-          duration: 100,
-          ease: 'Sine.easeInOut'
-        });
+      const shadow = this.add.image(x + 3, y + 3, key)
+        .setOrigin(0, 0)
+        .setDisplaySize(w, h)
+        .setTint(0x000000)
+        .setAlpha(0.3)
+        .setDepth(1);
+
+      const shape = this.make.graphics();
+      shape.fillRect(x, y, 0, h);
+      const mask = shape.createGeometryMask();
+
+      line.setMask(mask);
+      shadow.setMask(mask);
+
+      this.tweens.add({
+        targets: shape,
+        props: {
+          scaleX: { from: 0, to: 1 },
+        },
+        duration: 700,
+        delay,
+        ease: 'Power1',
+        onUpdate: () => {
+          shape.clear();
+          shape.fillStyle(0xffffff);
+          shape.fillRect(x, y, w * shape.scaleX, h);
+        }
       });
     });
 
-    this.time.delayedCall(1500, () => {
-      let installBotButton = null;
+    // сообщения
+    const messages = [
+      { x: 270, y: 227, w: 378, h: 75, text: "Теряете клиентов из-за:", tw: 338, delay: 1800 },
+      { x: 400, y: 342, w: 319, h: 75, text: "Очередей в ответах", tw: 279, delay: 2800 },
+      { x: 510, y: 457, w: 330, h: 75, text: "Хаоса в сообщениях", tw: 290, delay: 3800 },
+      { x: 626, y: 572, w: 362, h: 75, text: "Пропущенных заказов", tw: 322, delay: 4800 },
+    ];
 
-      const createStyledButton = (x, y, labelText, onClick) => {
-        const button = this.add.rectangle(x, y, 240, 64, 0x2a6b2a)
-          .setOrigin(0.5)
-          .setInteractive({ useHandCursor: true })
-          .setStrokeStyle(2, 0x1e4d1e)
-          .setAlpha(0)
-          .setDepth(1);
+    messages.forEach(({ x, y, w, h, text, tw, delay }) => {
+      const g = this.add.graphics();
+      g.fillStyle(0xffffff, 0.7);
+      g.fillRoundedRect(0, 0, w, h, 10);
+      g.generateTexture(`msg_bg_${x}_${y}`, w, h);
+      g.destroy();
 
-        const label = this.add.text(x, y, labelText, {
-          fontFamily: 'Arial',
-          fontSize: '20px',
-          fontStyle: 'bold',
-          color: '#ffffff'
-        }).setOrigin(0.5).setAlpha(0).setDepth(2);
+      const bg = this.add.image(x, y, `msg_bg_${x}_${y}`).setOrigin(0, 0).setAlpha(0);
+      const txt = this.add.text(x + 20, y + 20, text, {
+        fontFamily: 'Roboto',
+        fontSize: '30px',
+        fontWeight: '400',
+        color: '#000000',
+        wordWrap: { width: tw }
+      }).setOrigin(0, 0).setAlpha(0);
 
-        button.on('pointerover', () => {
-          button.setFillStyle(0x3c8f3c);
-          button.setScale(1.02);
-        });
-        button.on('pointerout', () => {
-          button.setFillStyle(0x2a6b2a);
-          button.setScale(1);
-        });
+      this.tweens.add({ targets: [bg, txt], alpha: 1, duration: 400, delay });
+    });
 
-        button.on('pointerdown', () => {
-          button.setFillStyle(0x1e4d1e);
-          onClick.call(this, button, label);
-        });
+    // кнопки
+    this.time.delayedCall(5300, () => {
+      this.createButtonContainer(
+        290, 739,
+        "дорого и долго", 211, 48, 0x0F0F0F, 0.5,
+        "Нанять менеджера", 331, 95,
+        () => { this.showManagerPopup(); }
+      );
 
-        this.tweens.add({
-          targets: [button, label],
-          alpha: 1,
-          duration: 400,
-          ease: 'Power1'
-        });
+      this.createButtonContainer(
+        840, 739,
+        "справится уже сегодня", 301, 48, 0x0F0F0F, 0.5,
+        "Установить Чат-Бота", 357, 95,
+        () => { this.scene.start('Scene2'); }
+      );
+    });
+  }
 
-        return { button, label };
-      };
+  createButtonContainer(x, y, topText, topBgWidth, topBgHeight, topBgColor, topBgAlpha, btnText, btnWidth, btnHeight, onClick) {
+    const topBg = this.add.graphics();
+    topBg.fillStyle(topBgColor, topBgAlpha);
+    topBg.fillRoundedRect(0, 0, topBgWidth, topBgHeight, topBgHeight / 2);
+    topBg.generateTexture(`top_bg_${x}_${y}`, topBgWidth, topBgHeight);
+    topBg.destroy();
 
-      createStyledButton(250, 520, "Нанять менеджера", () => {
-        this.add.rectangle(400, 300, 800, 600, 0x000000, 0.5).setDepth(5);
+    const topBgImage = this.add.image(x + (btnWidth - topBgWidth) / 2, y, `top_bg_${x}_${y}`)
+      .setOrigin(0, 0)
+      .setDepth(3)
+      .setAlpha(0);
 
-        this.add.rectangle(400, 300, 600, 200, 0x8b0000, 0.95)
-          .setStrokeStyle(3, 0xffffff)
-          .setDepth(6);
+    const topTxt = this.add.text(topBgImage.x + topBgWidth / 2, topBgImage.y + topBgHeight / 2, topText, {
+      fontFamily: 'Roboto',
+      fontSize: '24px',
+      fontWeight: '400',
+      color: '#FFFFFF',
+      align: 'center'
+    }).setOrigin(0.5).setDepth(4).setAlpha(0);
 
-        this.add.text(400, 300,
-          "Хаос продолжается!\nКлиенты по-прежнему ждут ответа.\nОдин менеджер не спасает ситуацию.\n(Потери: -10 клиентов в неделю)",
-          {
-            fontFamily: 'Arial',
-            fontSize: '20px',
-            color: '#ffffff',
-            align: 'center',
-            lineSpacing: 8,
-            wordWrap: { width: 540 }
-          }).setOrigin(0.5).setDepth(7);
+    const btnBg = this.add.graphics();
+    btnBg.fillStyle(0x3A25B4, 1);
+    btnBg.fillRoundedRect(0, 0, btnWidth, btnHeight, 20);
+    btnBg.generateTexture(`btn_bg_${x}_${y}`, btnWidth, btnHeight);
+    btnBg.destroy();
 
-        if (installBotButton) {
-          installBotButton.button.setFillStyle(0x00e676);
-          installBotButton.label.setShadow(0, 0, '#ffffff', 12, true, true);
+    const btnImage = this.add.image(x, y + topBgHeight + 10, `btn_bg_${x}_${y}`)
+      .setOrigin(0, 0)
+      .setInteractive({ useHandCursor: true })
+      .on('pointerdown', onClick)
+      .setDepth(3)
+      .setAlpha(0);
 
-          this.tweens.add({
-            targets: [installBotButton.label],
-            scale: { from: 1, to: 1.05 },
-            duration: 500,
-            yoyo: true,
-            repeat: -1,
-            ease: 'Sine.easeInOut'
-          });
+    const btnTxt = this.add.text(btnImage.x + btnWidth / 2, btnImage.y + btnHeight / 2, btnText, {
+      fontFamily: 'Roboto',
+      fontSize: '30px',
+      fontWeight: '400',
+      color: '#FFFFFF',
+      align: 'center'
+    }).setOrigin(0.5).setDepth(4).setAlpha(0);
 
-          this.tweens.add({
-            targets: installBotButton.button,
-            scale: { from: 1, to: 1.04 },
-            duration: 500,
-            yoyo: true,
-            repeat: -1,
-            ease: 'Sine.easeInOut'
-          });
-        }
-      });
+    this.tweens.add({ targets: [topBgImage, topTxt, btnImage, btnTxt], alpha: 1, duration: 500 });
+  }
 
-      installBotButton = createStyledButton(550, 520, "Установить Чат Бота", () => {
-        this.scene.start('Scene2');
-      });
+  showManagerPopup() {
+    const overlay = this.add.rectangle(720, 496, 1440, 992, 0x000000, 0.6).setOrigin(0.5).setDepth(10);
+
+    const popupWidth = 600;
+    const popupHeight = 250;
+    const popupX = 720;
+    const popupY = 496;
+
+    const popupBg = this.add.graphics().setDepth(11);
+    popupBg.fillStyle(0x8b0000, 0.95);
+    popupBg.fillRoundedRect(popupX - popupWidth / 2, popupY - popupHeight / 2, popupWidth, popupHeight, 20);
+
+    const popupText = this.add.text(popupX, popupY,
+      "Хаос продолжается!\nКлиенты по-прежнему ждут ответа.\nОдин менеджер не спасает ситуацию.\n(Потери: -10 клиентов в неделю)",
+      {
+        fontFamily: 'Roboto',
+        fontSize: '22px',
+        fontWeight: '400',
+        color: '#ff6666',
+        align: 'center',
+        lineSpacing: 8,
+        wordWrap: { width: popupWidth - 60 }
+      }).setOrigin(0.5).setDepth(12);
+
+    const closeBtnSize = 36;
+    const closeBtnBg = this.add.circle(popupX + popupWidth / 2 - closeBtnSize, popupY - popupHeight / 2 + closeBtnSize, closeBtnSize / 2, 0xff4c4c)
+      .setDepth(13)
+      .setInteractive({ useHandCursor: true });
+
+    const closeBtnText = this.add.text(closeBtnBg.x, closeBtnBg.y, '×', {
+      fontFamily: 'Arial',
+      fontSize: '28px',
+      color: '#ffffff',
+      fontWeight: 'bold'
+    }).setOrigin(0.5).setDepth(14);
+
+    closeBtnBg.on('pointerdown', () => {
+      overlay.destroy();
+      popupBg.destroy();
+      popupText.destroy();
+      closeBtnBg.destroy();
+      closeBtnText.destroy();
     });
   }
 }
 
 window.Scene1 = Scene1;
-
-
-
-
-
