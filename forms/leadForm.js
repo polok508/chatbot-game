@@ -15,7 +15,7 @@ class LeadForm {
       top: '200px',
       left: '50%',
       transform: 'translateX(-50%)',
-      width: '400px',           // фиксированная ширина по умолчанию
+      width: '400px',
       maxHeight: '80vh',
       background: 'rgba(255, 255, 255, 0.85)',
       backdropFilter: 'blur(30px)',
@@ -41,7 +41,7 @@ class LeadForm {
         }
         @media (max-width: 480px) {
           #lead-form-container {
-            width: 320px !important; /* сужаем ширину на узких экранах */
+            width: 320px !important;
           }
         }
         #lead-form-container h2 {
@@ -122,7 +122,6 @@ class LeadForm {
     let phone = this.container.querySelector('#lead-phone').value.trim();
     let email = this.container.querySelector('#lead-email').value.trim();
 
-    // Очистка от HTML/JS
     name = this.sanitizeInput(name);
     phone = this.sanitizeInput(phone);
     email = this.sanitizeInput(email);
@@ -158,7 +157,7 @@ class LeadForm {
     }
 
     this.isSubmitting = true;
-    messageBox.style.color = '#2a6b2a';
+    messageBox.style.color = '#2e1c87';
     messageBox.textContent = '⏳ Отправка...';
 
     const text = `🧾 Новая заявка с игры:\n\n👤 Имя: ${name}\n📞 Телефон: ${phone}\n📧 Email: ${email}`;
@@ -176,6 +175,7 @@ class LeadForm {
       messageBox.style.color = 'green';
       messageBox.textContent = '✅ Спасибо! Ваша заявка отправлена.';
       this.clearFields();
+      this.hide();
     } catch (error) {
       console.error('Ошибка отправки:', error);
       messageBox.style.color = 'red';
