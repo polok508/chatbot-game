@@ -4,23 +4,19 @@ class LeadForm {
     this.isSubmitting = false;
   }
 
-  create(scene) {
+  create() {
     if (document.getElementById('lead-form-container')) return;
 
     const container = document.createElement('div');
     container.id = 'lead-form-container';
 
-    const formWidth = 400;
-    const formHeight = 500;
-    const topPosition = 200;
-
     Object.assign(container.style, {
       position: 'absolute',
-      top: `${topPosition}px`,
+      top: '220px', // чуть ниже заголовка
       left: '50%',
       transform: 'translateX(-50%)',
-      width: `${formWidth}px`,
-      height: `${formHeight}px`,
+      width: '90vw',         // адаптивно, максимум 400px
+      maxWidth: '400px',
       background: 'rgba(255, 255, 255, 0.85)',
       backdropFilter: 'blur(30px)',
       borderRadius: '20px',
@@ -29,13 +25,12 @@ class LeadForm {
       boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
       fontFamily: 'Roboto, Arial, sans-serif',
       color: '#2a6b2a',
-      overflowY: 'auto',
-      overflowX: 'hidden',
-      zIndex: 1000,
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'stretch',
-      maxWidth: '90vw',
+      zIndex: 1000,
+      overflowY: 'auto',
+      maxHeight: 'calc(100vh - 240px)' // не вылезает за экран по высоте
     });
 
     container.innerHTML = `
@@ -65,6 +60,9 @@ class LeadForm {
           font-family: 'Roboto', Arial, sans-serif;
           color: #000000;
         }
+        #lead-form-container input::placeholder {
+          color: #999999;
+        }
         #lead-form-container button {
           width: 100%;
           height: 60px;
@@ -77,9 +75,8 @@ class LeadForm {
           cursor: pointer;
           transition: background-color 0.2s ease;
           user-select: none;
-          display: flex;
-          justify-content: center;
-          align-items: center;
+          padding: 20px 30px;
+          box-sizing: border-box;
         }
         #lead-form-container button:hover {
           background-color: #2e1c87;
@@ -125,7 +122,7 @@ class LeadForm {
     let phone = this.container.querySelector('#lead-phone').value.trim();
     let email = this.container.querySelector('#lead-email').value.trim();
 
-    // очистка от HTML/JS
+    // Очистка от HTML/JS
     name = this.sanitizeInput(name);
     phone = this.sanitizeInput(phone);
     email = this.sanitizeInput(email);
@@ -161,7 +158,7 @@ class LeadForm {
     }
 
     this.isSubmitting = true;
-    messageBox.style.color = '##3A25B4';
+    messageBox.style.color = '#2a6b2a';
     messageBox.textContent = '⏳ Отправка...';
 
     const text = `🧾 Новая заявка с игры:\n\n👤 Имя: ${name}\n📞 Телефон: ${phone}\n📧 Email: ${email}`;

@@ -28,7 +28,7 @@ class Scene5 extends Phaser.Scene {
     }).setOrigin(0.5);
 
     // форма
-    this.leadForm.create(403, 237, 635, 675);
+    this.leadForm.create();
   }
 }
 
