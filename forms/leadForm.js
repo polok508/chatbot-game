@@ -12,12 +12,11 @@ class LeadForm {
 
     Object.assign(container.style, {
       position: 'absolute',
-      top: '200px',            // Отступ сверху (можно подстроить)
+      top: '200px',
       left: '50%',
       transform: 'translateX(-50%)',
-      width: '90vw',           // Почти вся ширина экрана на мобильных
-      maxWidth: '400px',       // Максимальная ширина на больших экранах
-      maxHeight: '80vh',       // Максимальная высота (80% высоты окна)
+      width: '400px',           // фиксированная ширина по умолчанию
+      maxHeight: '80vh',
       background: 'rgba(255, 255, 255, 0.85)',
       backdropFilter: 'blur(30px)',
       borderRadius: '20px',
@@ -26,7 +25,7 @@ class LeadForm {
       boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
       fontFamily: 'Roboto, Arial, sans-serif',
       color: '#2a6b2a',
-      overflowY: 'auto',      // Вертикальная прокрутка при необходимости
+      overflowY: 'auto',
       overflowX: 'hidden',
       zIndex: 1000,
       display: 'flex',
@@ -39,6 +38,11 @@ class LeadForm {
         #lead-form-container {
           box-sizing: border-box;
           padding: 0;
+        }
+        @media (max-width: 480px) {
+          #lead-form-container {
+            width: 320px !important; /* сужаем ширину на узких экранах */
+          }
         }
         #lead-form-container h2 {
           font-family: 'Roboto', sans-serif;
