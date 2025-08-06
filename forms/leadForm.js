@@ -12,11 +12,12 @@ class LeadForm {
 
     Object.assign(container.style, {
       position: 'absolute',
-      top: '220px', // чуть ниже заголовка
+      top: '200px',            // Отступ сверху (можно подстроить)
       left: '50%',
       transform: 'translateX(-50%)',
-      width: '90vw',         // адаптивно, максимум 400px
-      maxWidth: '400px',
+      width: '90vw',           // Почти вся ширина экрана на мобильных
+      maxWidth: '400px',       // Максимальная ширина на больших экранах
+      maxHeight: '80vh',       // Максимальная высота (80% высоты окна)
       background: 'rgba(255, 255, 255, 0.85)',
       backdropFilter: 'blur(30px)',
       borderRadius: '20px',
@@ -25,12 +26,12 @@ class LeadForm {
       boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
       fontFamily: 'Roboto, Arial, sans-serif',
       color: '#2a6b2a',
+      overflowY: 'auto',      // Вертикальная прокрутка при необходимости
+      overflowX: 'hidden',
+      zIndex: 1000,
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'stretch',
-      zIndex: 1000,
-      overflowY: 'auto',
-      maxHeight: 'calc(100vh - 240px)' // не вылезает за экран по высоте
     });
 
     container.innerHTML = `
@@ -60,13 +61,10 @@ class LeadForm {
           font-family: 'Roboto', Arial, sans-serif;
           color: #000000;
         }
-        #lead-form-container input::placeholder {
-          color: #999999;
-        }
         #lead-form-container button {
           width: 100%;
           height: 60px;
-          border-radius: 20px;
+          border-radius: 15px;
           border: none;
           background-color: #3A25B4;
           color: #FFFFFF;
@@ -75,8 +73,6 @@ class LeadForm {
           cursor: pointer;
           transition: background-color 0.2s ease;
           user-select: none;
-          padding: 20px 30px;
-          box-sizing: border-box;
         }
         #lead-form-container button:hover {
           background-color: #2e1c87;
