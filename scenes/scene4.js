@@ -4,79 +4,151 @@ class Scene4 extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image('happy_face', 'assets/icons/happy_face.png');
-    this.load.image('money_bag', 'assets/icons/money_bag.png');
-    this.load.image('chart_up', 'assets/icons/chart_up.png');
+    this.load.image('bg_office4', 'assets/bg/scene4.png');
+    this.load.image('bot2', 'assets/icons/bot2.png');
+    this.load.image('team', 'assets/icons/team.png');
   }
 
   create() {
-    const centerX = this.cameras.main.centerX;
-    const centerY = this.cameras.main.centerY;
+    const { width, height } = this.scale;
 
-    // Фон
-    this.cameras.main.setBackgroundColor('#e6f0fa');
+    // фон сцены
+    this.add.image(width / 2, height / 2, 'bg_office4').setDisplaySize(width, height);
 
-    const titleFontSize = Math.min(this.scale.width, 600) / 16;
-    const subtitleFontSize = titleFontSize * 0.85;
+    // левый полупрозрачный блок
+    const bgPanelLeft = this.add.graphics();
+    bgPanelLeft.fillStyle(0xE0E0E0, 0.85);
+    bgPanelLeft.fillRoundedRect(70, 331, 635, 330, 20);
 
-    // Заголовок
-    this.add.text(centerX, 50, 'Успех бизнеса', {
-      fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
-      fontSize: `${titleFontSize}px`,
-      color: '#222222',
-      fontWeight: '700',
-      letterSpacing: 1.4,
-      align: 'center',
-    }).setOrigin(0.5);
 
-    // Иконки
-    const iconsY = centerY - 20;
-    const spacing = this.scale.width / 4;
-    const iconScale = Math.min(this.scale.width / 800, 1) * 1.0;
+    this.add.image(70 + 16.88 + 45, 331 + 5.63 + 45, 'bot2')
+      .setOrigin(0.5)
+      .setDisplaySize(90, 90);
 
-    const happyFace = this.add.image(centerX - spacing, iconsY, 'happy_face')
-      .setAlpha(0)
-      .setScale(iconScale)
-      .setOrigin(0.5);
 
-    const moneyBag = this.add.image(centerX, iconsY, 'money_bag')
-      .setAlpha(0)
-      .setScale(iconScale)
-      .setOrigin(0.5);
+    this.add.text(70 + 120, 331 + 20, "Чат-бот автоматизирует рутину:", {
+      fontFamily: 'Roboto',
+      fontSize: '30px',
+      color: '#000000',
+      fontWeight: '400'
+    }).setOrigin(0, 0);
 
-    const chartUp = this.add.image(centerX + spacing, iconsY - 10, 'chart_up') // приподнята
-      .setAlpha(0)
-      .setScale(iconScale)
-      .setOrigin(0.5);
 
-    // Анимация появления иконок
-    this.time.delayedCall(500, () => this.tweens.add({ targets: happyFace, alpha: 1, duration: 400 }));
-    this.time.delayedCall(900, () => this.tweens.add({ targets: moneyBag, alpha: 1, duration: 400 }));
-    this.time.delayedCall(1300, () => this.tweens.add({ targets: chartUp, alpha: 1, duration: 400 }));
+    this.add.text(70 + 120, 331 + 70, "Отвечает на вопросы 24/7", {
+      fontFamily: 'Roboto',
+      fontSize: '30px',
+      color: '#000000',
+      fontWeight: '400'
+    }).setOrigin(0, 0);
 
-    // Подпись
-    this.time.delayedCall(1800, () => {
-      const congratsText = this.add.text(centerX, centerY + 100, 'Поздравляю, вы автоматизировали бизнес!', {
-        fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
-        fontSize: `${subtitleFontSize}px`,
-        color: '#333333',
-        fontWeight: '500',
-        letterSpacing: 0.8,
-        align: 'center',
-        wordWrap: { width: this.scale.width * 0.8 },
-      }).setOrigin(0.5).setAlpha(0);
 
-      this.tweens.add({ targets: congratsText, alpha: 1, duration: 600 });
-    });
+    this.add.text(70 + 120, 331 + 110, "Собирает и систематизирует", {
+      fontFamily: 'Roboto',
+      fontSize: '30px',
+      color: '#000000',
+      fontWeight: '400'
+    }).setOrigin(0, 0);
 
-    // Переход на следующую сцену через 5 секунд
-    this.time.delayedCall(5000, () => {
-      this.scene.start('Scene5');
-    });
+    this.add.text(70 + 120, 331 + 150, "заявки", {
+      fontFamily: 'Roboto',
+      fontSize: '30px',
+      color: '#000000',
+      fontWeight: '400'
+    }).setOrigin(0, 0);
+
+
+    this.add.text(70 + 120, 331 + 190, "Фильтрует спам и первичные", {
+      fontFamily: 'Roboto',
+      fontSize: '30px',
+      color: '#000000',
+      fontWeight: '400'
+    }).setOrigin(0, 0);
+
+    this.add.text(70 + 120, 331 + 230, "запросы", {
+      fontFamily: 'Roboto',
+      fontSize: '30px',
+      color: '#000000',
+      fontWeight: '400'
+    }).setOrigin(0, 0);
+
+    // правый полупрозрачный блок
+    const bgPanelRight = this.add.graphics();
+    bgPanelRight.fillStyle(0xE0E0E0, 0.85);
+    bgPanelRight.fillRoundedRect(735, 331, 635, 330, 20);
+
+
+    this.add.image(735 + 16.88 + 45, 331 + 5.63 + 45, 'team')
+      .setOrigin(0.5)
+      .setDisplaySize(90, 90);
+
+
+    this.add.text(735 + 120, 331 + 20, "Ваша команда фокусируется", {
+      fontFamily: 'Roboto',
+      fontSize: '30px',
+      color: '#000000',
+      fontWeight: '400'
+    }).setOrigin(0, 0);
+
+
+    this.add.text(735 + 120, 331 + 70, "на том, что приносит деньги:", {
+      fontFamily: 'Roboto',
+      fontSize: '30px',
+      color: '#000000',
+      fontWeight: '400'
+    }).setOrigin(0, 0);
+
+
+    this.add.text(735 + 120, 331 + 120, "Закрытие сделок", {
+      fontFamily: 'Roboto',
+      fontSize: '30px',
+      color: '#000000',
+      fontWeight: '400'
+    }).setOrigin(0, 0);
+
+
+    this.add.text(735 + 120, 331 + 160, "Работа с лояльными", {
+      fontFamily: 'Roboto',
+      fontSize: '30px',
+      color: '#000000',
+      fontWeight: '400'
+    }).setOrigin(0, 0);
+
+    this.add.text(735 + 120, 331 + 200, "клиентами", {
+      fontFamily: 'Roboto',
+      fontSize: '30px',
+      color: '#000000',
+      fontWeight: '400'
+    }).setOrigin(0, 0);
+
+    this.add.text(735 + 120, 331 + 240, "Без шаблонных ответов", {
+      fontFamily: 'Roboto',
+      fontSize: '30px',
+      color: '#000000',
+      fontWeight: '400'
+    }).setOrigin(0, 0);
+
+    // кнопка продолжить
+    const btnX = 1068;
+    const btnY = 847;
+    const btnWidth = 302;
+    const btnHeight = 75;
+    const btnRadius = 20;
+
+    const btnBg = this.add.graphics();
+    btnBg.fillStyle(0x3A25B4, 1);
+    btnBg.fillRoundedRect(btnX, btnY, btnWidth, btnHeight, btnRadius);
+    btnBg.setInteractive(new Phaser.Geom.Rectangle(btnX, btnY, btnWidth, btnHeight), Phaser.Geom.Rectangle.Contains)
+      .on('pointerdown', () => {
+        this.scene.start('Scene5');
+      });
+
+    const btnText = this.add.text(btnX + btnWidth / 2, btnY + btnHeight / 2, "Продолжить", {
+      fontFamily: 'Roboto',
+      fontSize: '30px',
+      color: '#FFFFFF',
+      fontWeight: '400'
+    }).setOrigin(0.5, 0.5);
   }
 }
 
 window.Scene4 = Scene4;
-
-
-

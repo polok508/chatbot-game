@@ -5,76 +5,31 @@ class Scene5 extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image('office3', 'assets/bg/office3.png');
+    this.load.image('bg_office5', 'assets/bg/scene5.png');
   }
 
   create() {
-    const centerX = this.cameras.main.centerX;
-    const centerY = this.cameras.main.centerY;
+    const { width, height } = this.scale;
 
-    this.add.image(centerX, centerY, 'office3')
-      .setDisplaySize(this.scale.width, this.scale.height)
-      .setOrigin(0.5);
 
-    const rectWidth = this.scale.width * 0.8;
-    const rectHeight = 100;
-    const rectY = 150;
+    this.add.image(width / 2, height / 2, 'bg_office5').setDisplaySize(width, height);
 
-    this.bgRect = this.add.rectangle(centerX, rectY, rectWidth, rectHeight, 0x2a6b2a, 0.6)
-      .setOrigin(0.5);
-
-    this.titleText = this.add.text(centerX, rectY, 'Хотите такого же Бота?', {
-      fontFamily: 'Arial',
+    // заголовок
+    const headerBg = this.add.graphics();
+    headerBg.fillStyle(0x000000, 0.5);
+    headerBg.fillRoundedRect(403, 100, 635, 87, 10);
+    this.add.text(403 + 635 / 2, 100 + 87 / 2, "Хотите такого же бота?", {
+      fontFamily: 'Roboto',
       fontSize: '40px',
-      fontWeight: '700',
-      color: '#ffffff',
+      color: '#FFFFFF',
+      fontWeight: '400',
       align: 'center',
-      wordWrap: { width: rectWidth * 0.9 }
+      wordWrap: { width: 438 }
     }).setOrigin(0.5);
 
-    const btnWidth = 350;
-    const btnHeight = 70;
-    const btnY = centerY + 50;
-
-    const btn = this.add.rectangle(centerX, btnY, btnWidth, btnHeight, 0x2a6b2a)
-      .setStrokeStyle(3, 0x195219)
-      .setInteractive({ useHandCursor: true });
-
-    this.add.text(centerX, btnY, 'Оставить заявку', {
-      fontFamily: 'Arial',
-      fontSize: '28px',
-      fontWeight: '700',
-      color: '#ffffff'
-    }).setOrigin(0.5);
-
-    btn.on('pointerover', () => btn.setFillStyle(0x3e8e3e));
-    btn.on('pointerout', () => btn.setFillStyle(0x2a6b2a));
-
-    btn.on('pointerdown', () => {
-
-      this.tweens.add({
-        targets: [this.bgRect, this.titleText],
-        alpha: 0,
-        duration: 500,
-        onComplete: () => {
-
-          this.leadForm.create();
-          this.leadForm.show();
-        }
-      });
-    });
-  }
-
-  shutdown() {
-    this.leadForm.destroy();
-  }
-
-  destroy() {
-    this.shutdown();
+    // форма
+    this.leadForm.create(403, 237, 635, 675);
   }
 }
 
 window.Scene5 = Scene5;
-
-
-

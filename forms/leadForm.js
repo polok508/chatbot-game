@@ -4,27 +4,38 @@ class LeadForm {
     this.isSubmitting = false;
   }
 
-  create() {
+  create(scene) {
     if (document.getElementById('lead-form-container')) return;
 
     const container = document.createElement('div');
     container.id = 'lead-form-container';
 
+    const formWidth = 400;
+    const formHeight = 500;
+    const topPosition = 200;
+
     Object.assign(container.style, {
       position: 'absolute',
-      top: '100px',
+      top: `${topPosition}px`,
       left: '50%',
       transform: 'translateX(-50%)',
-      width: '90vw',
-      maxWidth: '400px',
-      background: '#ffffffee',
-      borderRadius: '10px',
-      padding: '20px',
+      width: `${formWidth}px`,
+      height: `${formHeight}px`,
+      background: 'rgba(255, 255, 255, 0.85)',
+      backdropFilter: 'blur(30px)',
+      borderRadius: '20px',
+      padding: '30px 25px',
       boxSizing: 'border-box',
       boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
-      fontFamily: 'Arial, sans-serif',
+      fontFamily: 'Roboto, Arial, sans-serif',
       color: '#2a6b2a',
+      overflowY: 'auto',
+      overflowX: 'hidden',
       zIndex: 1000,
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'stretch',
+      maxWidth: '90vw',
     });
 
     container.innerHTML = `
@@ -33,50 +44,62 @@ class LeadForm {
           box-sizing: border-box;
           padding: 0;
         }
-        #lead-form-container input,
+        #lead-form-container h2 {
+          font-family: 'Roboto', sans-serif;
+          font-weight: 400;
+          font-size: 36px;
+          color: #000000;
+          margin: 0 0 30px 0;
+          text-align: center;
+          user-select: none;
+        }
+        #lead-form-container input {
+          width: 100%;
+          height: 50px;
+          border-radius: 15px;
+          border: 1px solid #ccc;
+          padding: 12px 20px;
+          font-size: 16px;
+          margin-bottom: 20px;
+          box-sizing: border-box;
+          font-family: 'Roboto', Arial, sans-serif;
+          color: #000000;
+        }
         #lead-form-container button {
           width: 100%;
-          max-width: 100%;
-          box-sizing: border-box;
-          font-size: 16px;
-          border-radius: 6px;
-          border: 1px solid #ccc;
-          padding: 12px;
-          margin-bottom: 12px;
-        }
-        #lead-form-container label {
-          display: block;
-          margin-bottom: 6px;
-          font-weight: bold;
-        }
-        #lead-form-container button {
-          background-color: #2a6b2a;
-          color: white;
+          height: 60px;
+          border-radius: 20px;
           border: none;
-          font-weight: bold;
+          background-color: #3A25B4;
+          color: #FFFFFF;
+          font-weight: 400;
+          font-size: 26px;
           cursor: pointer;
           transition: background-color 0.2s ease;
+          user-select: none;
+          display: flex;
+          justify-content: center;
+          align-items: center;
         }
         #lead-form-container button:hover {
-          background-color: #3e8e3e;
+          background-color: #2e1c87;
         }
         #lead-form-container #lead-message {
-          margin-top: 14px;
+          margin-top: 20px;
           text-align: center;
           font-size: 16px;
+          min-height: 24px;
+          user-select: none;
         }
       </style>
 
-      <label>Имя</label>
-      <input type="text" id="lead-name" placeholder="Ваше имя" required />
+      <h2>Оставьте заявку</h2>
 
-      <label>Телефон</label>
-      <input type="tel" id="lead-phone" placeholder="+7 999 999-99-99" required />
+      <input type="text" id="lead-name" placeholder="Имя" required />
+      <input type="tel" id="lead-phone" placeholder="Телефон" required />
+      <input type="email" id="lead-email" placeholder="E-mail" required />
 
-      <label>Email</label>
-      <input type="email" id="lead-email" placeholder="example@mail.com" required />
-
-      <button id="lead-submit">Отправить заявку</button>
+      <button id="lead-submit">Отправить</button>
       <div id="lead-message"></div>
     `;
 
@@ -102,7 +125,7 @@ class LeadForm {
     let phone = this.container.querySelector('#lead-phone').value.trim();
     let email = this.container.querySelector('#lead-email').value.trim();
 
-    // Очистка от HTML/JS
+    // очистка от HTML/JS
     name = this.sanitizeInput(name);
     phone = this.sanitizeInput(phone);
     email = this.sanitizeInput(email);
@@ -113,7 +136,6 @@ class LeadForm {
       return;
     }
 
-    // Валидация email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       messageBox.style.color = 'red';
@@ -121,7 +143,6 @@ class LeadForm {
       return;
     }
 
-    // Валидация телефона
     const phoneRegex = /^\+?[0-9\s\-()]{7,}$/;
     if (!phoneRegex.test(phone)) {
       messageBox.style.color = 'red';
@@ -131,7 +152,6 @@ class LeadForm {
 
     const botToken = window.AppConfig?.BOT_TOKEN;
     const chatId = window.AppConfig?.CHAT_ID;
-    const spreadsheetId = window.AppConfig?.SPREADSHEET_ID;
 
     if (!botToken || !chatId) {
       console.error('BOT_TOKEN или CHAT_ID не определены');
@@ -141,13 +161,12 @@ class LeadForm {
     }
 
     this.isSubmitting = true;
-    messageBox.style.color = '#2a6b2a';
+    messageBox.style.color = '##3A25B4';
     messageBox.textContent = '⏳ Отправка...';
 
     const text = `🧾 Новая заявка с игры:\n\n👤 Имя: ${name}\n📞 Телефон: ${phone}\n📧 Email: ${email}`;
 
     try {
-      // Отправка в Telegram
       const tgResponse = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -156,15 +175,6 @@ class LeadForm {
 
       const tgData = await tgResponse.json();
       if (!tgData.ok) throw new Error('Ошибка Telegram API');
-
-      // Отправка в Google Sheets через сервер  
-      /*
-      await fetch("https://YOUR_SERVER_URL/api/lead", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, phone, email, spreadsheetId })
-      });
-      */
 
       messageBox.style.color = 'green';
       messageBox.textContent = '✅ Спасибо! Ваша заявка отправлена.';
@@ -179,7 +189,7 @@ class LeadForm {
   }
 
   show() {
-    if (this.container) this.container.style.display = 'block';
+    if (this.container) this.container.style.display = 'flex';
   }
 
   hide() {
@@ -201,4 +211,3 @@ class LeadForm {
 }
 
 window.LeadForm = LeadForm;
-
