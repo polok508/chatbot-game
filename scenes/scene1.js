@@ -5,13 +5,32 @@ class Scene1 extends Phaser.Scene {
 
   preload() {
     this.load.image('bg_office', 'assets/bg/scene1.png');
-
     this.load.image('vector1', 'assets/icons/vector1.png');
     this.load.image('vector2', 'assets/icons/vector2.png');
     this.load.image('vector3', 'assets/icons/vector3.png');
   }
 
   create() {
+    // проверка ориентации
+    if (window.innerHeight > window.innerWidth) {
+      this.showRotateMessage();
+      this.scene.pause();
+    }
+
+    window.addEventListener('resize', () => {
+      if (window.innerHeight > window.innerWidth) {
+        this.scene.pause();
+        this.showRotateMessage();
+      } else {
+        this.scene.resume();
+        this.hideRotateMessage();
+      }
+    });
+
+    this.rotateOverlay = null;
+    this.rotateText = null;
+
+    // фон
     this.add.image(0, 0, 'bg_office')
       .setOrigin(0, 0)
       .setDisplaySize(1440, 992);
@@ -49,7 +68,6 @@ class Scene1 extends Phaser.Scene {
         .setDisplaySize(w, h)
         .setDepth(2)
         .setAlpha(0.9);
-
 
       const shadow = this.add.image(x + 3, y + 3, key)
         .setOrigin(0, 0)
@@ -213,6 +231,33 @@ class Scene1 extends Phaser.Scene {
       closeBtnBg.destroy();
       closeBtnText.destroy();
     });
+  }
+
+  showRotateMessage() {
+    if (this.rotateOverlay) return;
+
+    this.rotateOverlay = this.add.rectangle(720, 496, 1440, 992, 0x000000, 0.8).setDepth(100);
+
+    this.rotateText = this.add.text(720, 496, 'Поверните экран горизонтально\nдля начала игры', {
+      fontFamily: 'Roboto',
+      fontSize: '36px',
+      fontWeight: '400',
+      color: '#ffffff',
+      align: 'center',
+      wordWrap: { width: 1000 }
+    }).setOrigin(0.5).setDepth(101);
+  }
+
+  hideRotateMessage() {
+    if (this.rotateOverlay) {
+      this.rotateOverlay.destroy();
+      this.rotateOverlay = null;
+    }
+
+    if (this.rotateText) {
+      this.rotateText.destroy();
+      this.rotateText = null;
+    }
   }
 }
 
