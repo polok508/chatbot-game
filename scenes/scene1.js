@@ -23,6 +23,11 @@ class Scene1 extends Phaser.Scene {
     window.addEventListener('resize', this.onResizeHandler);
     window.addEventListener('orientationchange', this.onResizeHandler);
 
+    // Принудительный скролл вниз, чтобы скрыть панели браузера
+    setTimeout(() => {
+      window.scrollTo(0, 1);
+    }, 200);
+
     // фон
     this.bg = this.add.image(0, 0, 'bg_office')
       .setOrigin(0, 0)
@@ -148,6 +153,16 @@ class Scene1 extends Phaser.Scene {
         this.hideRotateMessage();
       }
       this.scene.resume();
+
+      // принудительный скролл вниз, чтобы убрать панели браузера
+      setTimeout(() => {
+        window.scrollTo(0, 1);
+      }, 100);
+
+      // повторный скролл для надежности
+      setTimeout(() => {
+        window.scrollTo(0, 1);
+      }, 300);
     }
   }
 
