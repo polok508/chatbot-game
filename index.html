@@ -16,11 +16,11 @@
       background: #f4f4f4;
       touch-action: none;
       -webkit-overflow-scrolling: touch;
-      overflow: auto;
+      overflow-y: auto; 
       position: static;
     }
 
-    /* Контейнер с игрой */
+    /* контейнер с игрой */
     #game-container {
       position: fixed;
       top: 0; left: 0;
@@ -29,9 +29,10 @@
       background: #fff;
       overflow: hidden;
       z-index: 20;
+      display: none;
     }
 
-    /* Вспомогательный скроллимый контейнер для Safari iOS */
+    /* вспомогательный скроллимый контейнер для Safari iOS */
     #scroll-wrapper {
       position: fixed;
       top: 0; left: 0;
@@ -40,16 +41,33 @@
       overflow-y: scroll;
       -webkit-overflow-scrolling: touch;
       background: transparent;
-      z-index: 10;
+      z-index: 30;
       display: none;
     }
 
-    /* Высокий элемент для скролла */
+   
     #scroll-content {
       width: 1px;
-      height: 5000px;
+      height: 7000px;
       pointer-events: none;
       user-select: none;
+      background: linear-gradient(to bottom, transparent 0%, #eee 100%);
+    }
+
+
+    #scroll-tip {
+      position: fixed;
+      top: 20px; left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.6);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 12px;
+      font-size: 18px;
+      z-index: 40;
+      user-select: none;
+      display: none;
+      pointer-events: none;
     }
 
     @media screen and (orientation: portrait) {
@@ -81,6 +99,7 @@
   <div id="scroll-wrapper">
     <div id="scroll-content"></div>
   </div>
+  <div id="scroll-tip">Прокрутите вниз, чтобы убрать верхние панели</div>
   <div id="game-container"></div>
 
   <script>
@@ -99,43 +118,50 @@
 
     function setupScrollForSafari() {
       const scrollWrapper = document.getElementById('scroll-wrapper');
+      const scrollTip = document.getElementById('scroll-tip');
+      const gameContainer = document.getElementById('game-container');
 
       if (isIOS() && isSafari()) {
-        // Показываем скроллимый контейнер для реального скролла
+      
         scrollWrapper.style.display = 'block';
+        scrollTip.style.display = 'block';
+        gameContainer.style.display = 'none';
 
-        // Даем возможность скроллить
+        document.documentElement.style.overflow = 'auto';
         document.body.style.position = 'static';
         document.body.style.overflow = 'auto';
-        document.body.style.width = '';
-        document.body.style.height = '';
+        document.body.style.height = 'auto';
 
-        // Пробуждаем скролл
-        setTimeout(() => {
-          scrollWrapper.scrollTop = 1;
-        }, 100);
+        let scrolledEnough = false;
 
-        let scrolled = false;
-        function onUserScroll() {
-          if (!scrolled && scrollWrapper.scrollTop > 10) {
-            scrolled = true;
+        function onScroll() {
+          if (scrollWrapper.scrollTop > 150 && !scrolledEnough) {
+            scrolledEnough = true;
+
+     
             scrollWrapper.style.display = 'none';
+            scrollTip.style.display = 'none';
 
-            // Фиксируем body для запуска игры
+   
             document.body.style.position = 'fixed';
             document.body.style.overflow = 'hidden';
             document.body.style.width = '100vw';
             document.body.style.height = '100vh';
 
-            scrollWrapper.removeEventListener('scroll', onUserScroll);
+            gameContainer.style.display = 'block';
+
+            scrollWrapper.removeEventListener('scroll', onScroll);
           }
         }
 
-        scrollWrapper.addEventListener('scroll', onUserScroll);
+        scrollWrapper.addEventListener('scroll', onScroll);
 
       } else {
-        // Для Яндекса и остальных браузеров
+        // для Яндекса и остальных браузеров 
         scrollWrapper.style.display = 'none';
+        scrollTip.style.display = 'none';
+        gameContainer.style.display = 'block';
+
         if (isYandex()) {
           document.body.style.position = 'fixed';
           document.body.style.overflow = 'hidden';
