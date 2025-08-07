@@ -21,8 +21,12 @@ class Scene1 extends Phaser.Scene {
       this.checkOrientation();
     });
 
+    window.addEventListener('orientationchange', () => {
+      this.checkOrientation();
+    });
+
     // фон
-    this.add.image(0, 0, 'bg_office')
+    this.bg = this.add.image(0, 0, 'bg_office')
       .setOrigin(0, 0)
       .setDisplaySize(1440, 992);
 
@@ -241,15 +245,18 @@ class Scene1 extends Phaser.Scene {
   showRotateMessage() {
     if (this.rotateOverlay) return;
 
-    this.rotateOverlay = this.add.rectangle(720, 496, 1440, 992, 0x000000, 0.8).setDepth(100);
+    const centerX = this.cameras.main.width / 2;
+    const centerY = this.cameras.main.height / 2;
 
-    this.rotateText = this.add.text(720, 496, 'Поверните экран горизонтально\nдля начала игры', {
+    this.rotateOverlay = this.add.rectangle(centerX, centerY, this.cameras.main.width, this.cameras.main.height, 0x000000, 0.8).setDepth(100);
+
+    this.rotateText = this.add.text(centerX, centerY, 'Поверните экран горизонтально\nдля начала игры', {
       fontFamily: 'Roboto',
       fontSize: '36px',
       fontWeight: '400',
       color: '#ffffff',
       align: 'center',
-      wordWrap: { width: 1000 }
+      wordWrap: { width: this.cameras.main.width * 0.7 }
     }).setOrigin(0.5).setDepth(101);
   }
 

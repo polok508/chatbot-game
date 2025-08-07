@@ -2,7 +2,8 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes, viewport-fit=cover">
+  <meta name="viewport"
+  content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes, viewport-fit=cover">
   <link rel="icon" type="image/png" href="favicon.png" />
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
   <title>Чат-Бот Спасает Бизнес</title>
@@ -15,6 +16,7 @@
       height: 100%;
       width: 100%;
     }
+
     #game-container {
       position: fixed;
       top: env(safe-area-inset-top);
@@ -24,6 +26,31 @@
       width: calc(100vw - env(safe-area-inset-left) - env(safe-area-inset-right));
       height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
       overflow: hidden;
+      background: #fff;
+    }
+
+    /* горизонтальный режим обязателен */
+    @media screen and (orientation: portrait) {
+      #game-container::before {
+        content: "Поверните экран 👈";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-family: Roboto, sans-serif;
+        font-size: 24px;
+        color: #333;
+        text-align: center;
+        z-index: 999;
+        background: white;
+        padding: 1rem 2rem;
+        border-radius: 12px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      }
+
+      canvas {
+        display: none !important;
+      }
     }
   </style>
 </head>
@@ -32,7 +59,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/phaser@3.88.2/dist/phaser.js"></script>
 
-  <!-- сцены -->
+  <!-- скрипты игры -->
   <script src="scenes/scene1.js"></script>
   <script src="scenes/scene2.js"></script>
   <script src="scenes/scene3.js"></script>
@@ -40,8 +67,24 @@
   <script src="config.secret.js"></script>
   <script src="forms/leadForm.js"></script>
   <script src="scenes/scene5.js"></script>
-
   <script src="config.js"></script>
   <script src="main.js"></script>
+
+  <!-- скрипт для Safari: скрыть панели -->
+  <script>
+    function hideSafariUI() {
+      // только для iOS Safari
+      const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+      const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
+      if (isIOS && isSafari) {
+        setTimeout(() => {
+          window.scrollTo(0, 1);
+        }, 100);
+      }
+    }
+
+    window.addEventListener('load', hideSafariUI);
+  </script>
 </body>
 </html>
