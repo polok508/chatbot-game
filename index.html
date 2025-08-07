@@ -1,14 +1,13 @@
 <!DOCTYPE html>
 <html lang="ru">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport"
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport"
         content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
-        <link rel="icon" type="image/png" href="favicon.png" />
-        <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet" />
-        <title>Чат-Бот Спасает Бизнес</title>
-        
-        <style>
+  <link rel="icon" type="image/png" href="favicon.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet" />
+  <title>Чат-Бот Спасает Бизнес</title>
+  <style>
     html, body {
       margin: 0; padding: 0;
       width: 100vw;
@@ -17,11 +16,12 @@
       background: #f4f4f4;
       touch-action: none;
       -webkit-overflow-scrolling: touch;
-      overflow: auto;
-      position: static;
+      overflow: hidden;
+      position: fixed;
+      width: 100vw;
+      height: 100vh;
     }
 
-    /* контейнер с игрой */
     #game-container {
       position: fixed;
       top: 0; left: 0;
@@ -32,7 +32,6 @@
       z-index: 20;
     }
 
-
     #scroll-wrapper {
       position: fixed;
       top: 0; left: 0;
@@ -41,14 +40,13 @@
       overflow-y: scroll;
       -webkit-overflow-scrolling: touch;
       background: transparent;
-      z-index: 10;
+      z-index: 30;
       display: none;
     }
 
-  
     #scroll-content {
       width: 1px;
-      height: 5000px;
+      height: 6000px;
       pointer-events: none;
       user-select: none;
     }
@@ -98,58 +96,52 @@
       return /YaBrowser/.test(navigator.userAgent);
     }
 
+    function isLandscape() {
+      return window.matchMedia("(orientation: landscape)").matches;
+    }
+
     function setupScrollForSafari() {
       const scrollWrapper = document.getElementById('scroll-wrapper');
-      const isLandscape = window.matchMedia("(orientation: landscape)").matches;
 
-      if (isIOS() && isSafari()) {
-        if (isLandscape) {
+      if (isIOS() && isSafari() && isLandscape()) {
      
-          scrollWrapper.style.display = 'block';
+        scrollWrapper.style.display = 'block';
 
-         
-          document.body.style.position = 'static';
-          document.body.style.overflow = 'auto';
-          document.body.style.width = '';
-          document.body.style.height = '';
-
-      
-          setTimeout(() => {
-            scrollWrapper.scrollTop = 1;
-          }, 100);
-
-          let scrolled = false;
-          function onUserScroll() {
-            if (!scrolled && scrollWrapper.scrollTop > 10) {
-              scrolled = true;
-              scrollWrapper.style.display = 'none';
+     
+        document.body.style.position = 'static';
+        document.body.style.overflow = 'auto';
+        document.body.style.width = '';
+        document.body.style.height = '';
 
        
-              document.body.style.position = 'fixed';
-              document.body.style.overflow = 'hidden';
-              document.body.style.width = '100vw';
-              document.body.style.height = '100vh';
+        setTimeout(() => {
+          scrollWrapper.scrollTop = 3000;
+        }, 350);
 
-              scrollWrapper.removeEventListener('scroll', onUserScroll);
-            }
+        let userScrolled = false;
+
+        function onUserScroll() {
+          if (!userScrolled && scrollWrapper.scrollTop > 20) {
+            userScrolled = true;
+
+          
+            scrollWrapper.style.display = 'none';
+            document.body.style.position = 'fixed';
+            document.body.style.overflow = 'hidden';
+            document.body.style.width = '100vw';
+            document.body.style.height = '100vh';
+
+            scrollWrapper.removeEventListener('scroll', onUserScroll);
           }
-
-          scrollWrapper.addEventListener('scroll', onUserScroll);
-
-        } else {
-
-          scrollWrapper.style.display = 'none';
-
-       
-          document.body.style.position = '';
-          document.body.style.overflow = 'hidden';
-          document.body.style.width = '100vw';
-          document.body.style.height = '100vh';
         }
 
+        scrollWrapper.addEventListener('scroll', onUserScroll);
+
       } else {
-        // Для Яндекса и остальных браузеров 
+     
+
         scrollWrapper.style.display = 'none';
+
         if (isYandex()) {
           document.body.style.position = 'fixed';
           document.body.style.overflow = 'hidden';
@@ -176,15 +168,15 @@
 
     window.addEventListener('load', () => {
       runAllFixes();
-      setTimeout(runAllFixes, 2000);
+      setTimeout(runAllFixes, 2500);
     });
 
     window.addEventListener('resize', () => {
-      setTimeout(runAllFixes, 500);
+      setTimeout(runAllFixes, 700);
     });
 
     window.addEventListener('orientationchange', () => {
-      setTimeout(runAllFixes, 500);
+      setTimeout(runAllFixes, 700);
     });
   </script>
 
@@ -200,5 +192,6 @@
   <script src="scenes/scene5.js"></script>
   <script src="config.js"></script>
   <script src="main.js"></script>
+
 </body>
 </html>
