@@ -16,7 +16,8 @@
       background: #f4f4f4;
       touch-action: none;
       -webkit-overflow-scrolling: touch;
-      overflow: hidden;
+      overflow: auto; 
+      position: static; 
     }
 
     /* Контейнер с игрой */
@@ -97,34 +98,37 @@
     }
 
     function setupScrollForSafari() {
+      const scrollWrapper = document.getElementById('scroll-wrapper');
+
       if (isIOS() && isSafari()) {
-        const scrollWrapper = document.getElementById('scroll-wrapper');
+        // Показываем скроллимый контейнер для реального скролла
         scrollWrapper.style.display = 'block';
 
-        // Блокируем body, чтобы не было двойного скролла
-        document.body.style.overflow = 'hidden';
-        document.body.style.position = 'fixed';
-        document.body.style.width = '100vw';
-        document.body.style.height = '100vh';
+       
+        document.body.style.position = 'static';
+        document.body.style.overflow = 'auto';
+        document.body.style.width = '';
+        document.body.style.height = '';
+
+        // Принудительный программный скролл вниз через 400ms для скрытия панели Safari
+        setTimeout(() => {
+          scrollWrapper.scrollTop = 1000;
+        }, 400);
 
         let scrolled = false;
-
         function onUserScroll() {
           if (!scrolled && scrollWrapper.scrollTop > 10) {
             scrolled = true;
             scrollWrapper.style.display = 'none';
-            document.body.style.overflow = 'hidden';
-            document.body.style.position = 'fixed';
-            document.body.style.width = '100vw';
-            document.body.style.height = '100vh';
             scrollWrapper.removeEventListener('scroll', onUserScroll);
           }
         }
 
         scrollWrapper.addEventListener('scroll', onUserScroll);
+
       } else {
-        // Для Яндекса и остальных браузеров — не меняем логику
-        document.getElementById('scroll-wrapper').style.display = 'none';
+        // Для Яндекса и остальных браузеров
+        scrollWrapper.style.display = 'none';
         if (isYandex()) {
           document.body.style.position = 'fixed';
           document.body.style.overflow = 'hidden';
