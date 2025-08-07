@@ -8,31 +8,55 @@
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet" />
   <title>Чат-Бот Спасает Бизнес</title>
   <style>
-    :root {
-      --vh: 1vh;
-    }
+    :root { --vh: 1vh; }
+
     html, body {
-      margin: 0; padding: 0;
+      margin: 0;
+      padding: 0;
       width: 100vw;
       height: 100vh;
       font-family: 'Roboto', sans-serif;
       background: #f4f4f4;
       touch-action: none;
       -webkit-overflow-scrolling: touch;
-      overflow: hidden;
+      overflow: hidden; 
       position: fixed;
       user-select: none;
     }
 
+  
     #game-container {
+      position: fixed;
+      top: 0;
+      left: 0;
       width: 100vw;
-      height: calc(var(--vh) * 100);
+      height: calc(var(--vh, 1vh) * 100);
       background: #fff;
       overflow: hidden;
       z-index: 20;
     }
 
+
+    #scroll-wrapper {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      overflow-y: scroll;
+      -webkit-overflow-scrolling: touch;
+      background: transparent;
+      z-index: 30;
+      display: none;
+      pointer-events: auto; 
+    }
+    #scroll-content {
+      width: 1px;
+      height: 6000px;
+      pointer-events: none;
+      user-select: none;
+    }
+
     @media screen and (orientation: portrait) {
+
       #game-container::before {
         content: "Поверните экран горизонтально для начала игры";
         position: fixed;
@@ -49,61 +73,28 @@
         box-shadow: 0 0 10px rgba(0,0,0,0.2);
         pointer-events: none;
       }
-      canvas {
-        display: none !important;
-      }
+      canvas { display: none !important; }
     }
   </style>
 </head>
 <body>
 
+  <div id="scroll-wrapper"><div id="scroll-content"></div></div>
   <div id="game-container"></div>
 
   <script>
     function isIOS() {
       return /iPhone|iPad|iPod/.test(navigator.userAgent);
     }
-
     function isSafari() {
       const ua = navigator.userAgent;
       return /Safari/.test(ua) && !/Chrome/.test(ua) && !/CriOS/.test(ua);
     }
-
+    function isYandex() {
+      return /YaBrowser/.test(navigator.userAgent);
+    }
     function isLandscape() {
       return window.matchMedia("(orientation: landscape)").matches;
-    }
-
-    function applyLayoutFixes() {
-      const gameContainer = document.getElementById('game-container');
-
-      if (isIOS() && isSafari() && isLandscape()) {
-   
-        document.body.style.position = 'static';
-        document.body.style.overflow = 'auto';
-        document.body.style.height = '';
-        document.body.style.width = '';
-
-        gameContainer.style.position = 'absolute';
-        gameContainer.style.top = '0';
-        gameContainer.style.left = '0';
-        gameContainer.style.height = `${window.innerHeight}px`;
-
-
-        setTimeout(() => {
-          window.scrollTo(0, 1000);
-        }, 200);
-      } else {
-
-        document.body.style.position = 'fixed';
-        document.body.style.overflow = 'hidden';
-        document.body.style.height = '100vh';
-        document.body.style.width = '100vw';
-
-        gameContainer.style.position = 'fixed';
-        gameContainer.style.top = '0';
-        gameContainer.style.left = '0';
-        gameContainer.style.height = `calc(var(--vh) * 100)`;
-      }
     }
 
     function setRealVh() {
@@ -111,28 +102,124 @@
       document.documentElement.style.setProperty('--vh', `${vh}px`);
     }
 
-    function runAll() {
+    function applyLayoutFixes() {
+      const gameContainer = document.getElementById('game-container');
+      const scrollWrapper = document.getElementById('scroll-wrapper');
+
+
+      if (isIOS() && isSafari()) {
+        if (isLandscape()) {
+
+          scrollWrapper.style.display = 'block';
+
+
+          document.body.style.position = 'static';
+          document.body.style.overflow = 'auto';
+          document.body.style.width = '';
+          document.body.style.height = '';
+
+
+          gameContainer.style.position = 'absolute';
+          gameContainer.style.top = '0';
+          gameContainer.style.left = '0';
+          gameContainer.style.width = '100vw';
+          gameContainer.style.height = `${window.innerHeight}px`;
+
+
+          setTimeout(() => {
+            try { scrollWrapper.scrollTop = 1000; } catch (e) {}
+          }, 250);
+
+
+          let onUserScroll = function() {
+            if (scrollWrapper.scrollTop > 20) {
+
+              scrollWrapper.style.display = 'none';
+              scrollWrapper.removeEventListener('scroll', onUserScroll);
+
+              document.body.style.position = 'fixed';
+              document.body.style.overflow = 'hidden';
+              document.body.style.width = '100vw';
+              document.body.style.height = '100vh';
+
+   
+              gameContainer.style.position = 'fixed';
+              gameContainer.style.top = '0';
+              gameContainer.style.left = '0';
+              gameContainer.style.height = `${window.innerHeight}px`;
+            }
+          };
+          scrollWrapper.addEventListener('scroll', onUserScroll);
+          return; 
+        } else {
+
+          scrollWrapper.style.display = 'none';
+          document.body.style.position = 'fixed';
+          document.body.style.overflow = 'hidden';
+          document.body.style.width = '100vw';
+          document.body.style.height = '100vh';
+          gameContainer.style.position = 'fixed';
+          gameContainer.style.top = '0';
+          gameContainer.style.left = '0';
+          gameContainer.style.height = `${window.innerHeight}px`;
+          return;
+        }
+      }
+
+
+      scrollWrapper.style.display = 'none';
+
+
+      if (isYandex()) {
+
+        document.body.style.position = 'fixed';
+        document.body.style.overflow = 'hidden';
+        document.body.style.width = '100vw';
+        document.body.style.height = `${window.innerHeight}px`;
+
+        gameContainer.style.position = 'fixed';
+        gameContainer.style.top = '0';
+        gameContainer.style.left = '0';
+        gameContainer.style.width = '100vw';
+        gameContainer.style.height = `${window.innerHeight}px`;
+
+
+        try { window.scrollTo(0, 0); } catch (e) {}
+        return;
+      }
+
+
+      document.body.style.position = 'fixed';
+      document.body.style.overflow = 'hidden';
+      document.body.style.width = '100vw';
+      document.body.style.height = `${window.innerHeight}px`;
+
+      gameContainer.style.position = 'fixed';
+      gameContainer.style.top = '0';
+      gameContainer.style.left = '0';
+      gameContainer.style.width = '100vw';
+      gameContainer.style.height = `${window.innerHeight}px`;
+    }
+
+    function runAllFixes() {
       setRealVh();
       applyLayoutFixes();
     }
 
     window.addEventListener('load', () => {
-      runAll();
-      setTimeout(runAll, 1500);
+      runAllFixes();
+
+      setTimeout(runAllFixes, 1200);
+      setTimeout(runAllFixes, 2500);
     });
 
-    window.addEventListener('resize', () => {
-      setTimeout(runAll, 500);
-    });
-
-    window.addEventListener('orientationchange', () => {
-      setTimeout(runAll, 500);
-    });
+    window.addEventListener('resize', () => { setTimeout(runAllFixes, 350); });
+    window.addEventListener('orientationchange', () => { setTimeout(runAllFixes, 600); });
   </script>
 
   <script src="https://cdn.jsdelivr.net/npm/phaser@3.88.2/dist/phaser.js"></script>
 
-  <!-- Скрипты игры -->
+  <!-- скрипты игры -->
   <script src="scenes/scene1.js"></script>
   <script src="scenes/scene2.js"></script>
   <script src="scenes/scene3.js"></script>
@@ -142,6 +229,5 @@
   <script src="scenes/scene5.js"></script>
   <script src="config.js"></script>
   <script src="main.js"></script>
-
 </body>
 </html>
