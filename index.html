@@ -16,10 +16,11 @@
       background: #f4f4f4;
       touch-action: none;
       -webkit-overflow-scrolling: touch;
-      overflow: auto;
-      position: static;
+      overflow: hidden;
+      position: fixed;
+      width: 100vw;
+      height: 100vh;
     }
-
 
     #game-container {
       position: fixed;
@@ -31,7 +32,6 @@
       z-index: 20;
     }
 
-
     #scroll-wrapper {
       position: fixed;
       top: 0; left: 0;
@@ -40,14 +40,13 @@
       overflow-y: scroll;
       -webkit-overflow-scrolling: touch;
       background: transparent;
-      z-index: 10;
+      z-index: 30;
       display: none;
     }
 
-   
     #scroll-content {
       width: 1px;
-      height: 5000px;
+      height: 6000px;
       pointer-events: none;
       user-select: none;
     }
@@ -93,35 +92,35 @@
       return /Safari/.test(ua) && !/Chrome/.test(ua) && !/CriOS/.test(ua);
     }
 
-    function isYandex() {
-      return /YaBrowser/.test(navigator.userAgent);
+    function isLandscape() {
+      return window.matchMedia("(orientation: landscape)").matches;
     }
 
     function setupScrollForSafari() {
       const scrollWrapper = document.getElementById('scroll-wrapper');
 
-      if (isIOS() && isSafari()) {
-
+      if (isIOS() && isSafari() && isLandscape()) {
+      
         scrollWrapper.style.display = 'block';
 
-      
+     
         document.body.style.position = 'static';
         document.body.style.overflow = 'auto';
         document.body.style.width = '';
         document.body.style.height = '';
 
-
+       
         setTimeout(() => {
-          scrollWrapper.scrollTop = 1;
-        }, 100);
+          scrollWrapper.scrollTop = 3000;
+        }, 300);
 
-        let scrolled = false;
+        let userScrolled = false;
         function onUserScroll() {
-          if (!scrolled && scrollWrapper.scrollTop > 10) {
-            scrolled = true;
+          if (!userScrolled && scrollWrapper.scrollTop > 20) {
+            userScrolled = true;
+        
             scrollWrapper.style.display = 'none';
 
-       
             document.body.style.position = 'fixed';
             document.body.style.overflow = 'hidden';
             document.body.style.width = '100vw';
@@ -132,21 +131,14 @@
         }
 
         scrollWrapper.addEventListener('scroll', onUserScroll);
-
       } else {
-        // Для Яндекса и остальных браузеров
+      
+        const scrollWrapper = document.getElementById('scroll-wrapper');
         scrollWrapper.style.display = 'none';
-        if (isYandex()) {
-          document.body.style.position = 'fixed';
-          document.body.style.overflow = 'hidden';
-          document.body.style.width = '100vw';
-          document.body.style.height = '100vh';
-        } else {
-          document.body.style.position = '';
-          document.body.style.overflow = 'hidden';
-          document.body.style.width = '100vw';
-          document.body.style.height = '100vh';
-        }
+        document.body.style.position = 'fixed';
+        document.body.style.overflow = 'hidden';
+        document.body.style.width = '100vw';
+        document.body.style.height = '100vh';
       }
     }
 
@@ -162,15 +154,15 @@
 
     window.addEventListener('load', () => {
       runAllFixes();
-      setTimeout(runAllFixes, 2000);
+      setTimeout(runAllFixes, 2500);
     });
 
     window.addEventListener('resize', () => {
-      setTimeout(runAllFixes, 500);
+      setTimeout(runAllFixes, 700);
     });
 
     window.addEventListener('orientationchange', () => {
-      setTimeout(runAllFixes, 500);
+      setTimeout(runAllFixes, 700);
     });
   </script>
 
@@ -186,5 +178,6 @@
   <script src="scenes/scene5.js"></script>
   <script src="config.js"></script>
   <script src="main.js"></script>
+
 </body>
 </html>
