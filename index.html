@@ -42,7 +42,7 @@
 
     #scroll-content {
       width: 1px;
-      height: 6000px; 
+      height: 6000px;
       pointer-events: none;
       user-select: none;
     }
@@ -91,7 +91,7 @@
       return window.matchMedia("(orientation: landscape)").matches;
     }
 
-    function setupScrollForSafari() {
+    function setupLayout() {
       const scrollWrapper = document.getElementById('scroll-wrapper');
       const gameContainer = document.getElementById('game-container');
 
@@ -109,7 +109,6 @@
         gameContainer.style.left = '0';
         gameContainer.style.width = '100vw';
         gameContainer.style.height = `${window.innerHeight}px`;
-
 
         setTimeout(() => {
           scrollWrapper.scrollTop = 3000;
@@ -138,7 +137,7 @@
         scrollWrapper.addEventListener('scroll', onUserScroll);
 
       } else {
-
+ 
         scrollWrapper.style.display = 'none';
 
         document.body.style.position = 'fixed';
@@ -150,7 +149,9 @@
         gameContainer.style.top = '0';
         gameContainer.style.left = '0';
         gameContainer.style.width = '100vw';
-        gameContainer.style.height = '100vh';
+
+
+        gameContainer.style.height = `${window.innerHeight}px`;
       }
     }
 
@@ -162,7 +163,7 @@
 
     function runAllFixes() {
       setRealVh();
-      setupScrollForSafari();
+      setupLayout();
     }
 
     window.addEventListener('load', () => {
