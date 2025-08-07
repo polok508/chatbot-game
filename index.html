@@ -12,33 +12,14 @@
       margin: 0; padding: 0;
       width: 100vw;
       height: 100vh;
-      overflow: hidden;
       font-family: 'Roboto', sans-serif;
-      touch-action: none;
       background: #f4f4f4;
-    }
-
-    /* Вечный скролл контейнер для Safari iOS */
-    #scroll-wrapper {
-      display: none; /* включаем только для Safari iOS */
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw;
-      height: 100vh;
-      overflow-y: scroll;
+      touch-action: none;
       -webkit-overflow-scrolling: touch;
-      z-index: 5;
-      background: transparent;
+      overflow: hidden;
     }
 
-    #scroll-content {
-      width: 1px;
-      height: 15000px; /* очень большой скролл */
-      pointer-events: none;
-      user-select: none;
-    }
-
-    /* Основной контейнер с игрой */
+    /* Контейнер с игрой */
     #game-container {
       position: fixed;
       top: 0; left: 0;
@@ -46,7 +27,28 @@
       height: 100vh;
       background: #fff;
       overflow: hidden;
+      z-index: 20;
+    }
+
+    /* Вспомогательный скроллимый контейнер для Safari iOS */
+    #scroll-wrapper {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow-y: scroll;
+      -webkit-overflow-scrolling: touch;
+      background: transparent;
       z-index: 10;
+      display: none;
+    }
+
+    /* Высокий элемент для скролла */
+    #scroll-content {
+      width: 1px;
+      height: 5000px;
+      pointer-events: none;
+      user-select: none;
     }
 
     @media screen and (orientation: portrait) {
@@ -94,23 +96,46 @@
       return /YaBrowser/.test(navigator.userAgent);
     }
 
-    function runFixes() {
+    function setupScrollForSafari() {
       if (isIOS() && isSafari()) {
-        // Включаем скроллимый контейнер для Safari iOS
         const scrollWrapper = document.getElementById('scroll-wrapper');
         scrollWrapper.style.display = 'block';
-        // Фиксируем body, запрещаем прокрутку body
+
+        // Блокируем body, чтобы не было двойного скролла
         document.body.style.overflow = 'hidden';
         document.body.style.position = 'fixed';
         document.body.style.width = '100vw';
         document.body.style.height = '100vh';
+
+        let scrolled = false;
+
+        function onUserScroll() {
+          if (!scrolled && scrollWrapper.scrollTop > 10) {
+            scrolled = true;
+            scrollWrapper.style.display = 'none';
+            document.body.style.overflow = 'hidden';
+            document.body.style.position = 'fixed';
+            document.body.style.width = '100vw';
+            document.body.style.height = '100vh';
+            scrollWrapper.removeEventListener('scroll', onUserScroll);
+          }
+        }
+
+        scrollWrapper.addEventListener('scroll', onUserScroll);
       } else {
-        // Для Яндекса и остальных — оставляем как было, без скролла
+        // Для Яндекса и остальных браузеров — не меняем логику
         document.getElementById('scroll-wrapper').style.display = 'none';
-        document.body.style.position = isYandex() ? 'fixed' : '';
-        document.body.style.overflow = 'hidden';
-        document.body.style.width = '100vw';
-        document.body.style.height = '100vh';
+        if (isYandex()) {
+          document.body.style.position = 'fixed';
+          document.body.style.overflow = 'hidden';
+          document.body.style.width = '100vw';
+          document.body.style.height = '100vh';
+        } else {
+          document.body.style.position = '';
+          document.body.style.overflow = 'hidden';
+          document.body.style.width = '100vw';
+          document.body.style.height = '100vh';
+        }
       }
     }
 
@@ -121,7 +146,7 @@
 
     function runAllFixes() {
       setRealVh();
-      runFixes();
+      setupScrollForSafari();
     }
 
     window.addEventListener('load', () => {
