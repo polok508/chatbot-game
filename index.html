@@ -13,40 +13,38 @@
     html, body {
       margin: 0;
       padding: 0;
-      width: 100vw;
-      height: 100vh;
+      width: 100%;
+      height: 100%;
       font-family: 'Roboto', sans-serif;
       background: #f4f4f4;
       touch-action: none;
       -webkit-overflow-scrolling: touch;
-      overflow: hidden; 
+      overflow: hidden;
       position: fixed;
       user-select: none;
     }
 
-  
     #game-container {
       position: fixed;
       top: 0;
       left: 0;
-      width: 100vw;
-      height: calc(var(--vh, 1vh) * 100);
+      width: 100%;
+      height: 100%;
       background: #fff;
       overflow: hidden;
       z-index: 20;
     }
 
-
     #scroll-wrapper {
       position: fixed;
       top: 0; left: 0;
-      width: 100vw; height: 100vh;
+      width: 100%; height: 100%;
       overflow-y: scroll;
       -webkit-overflow-scrolling: touch;
       background: transparent;
       z-index: 30;
       display: none;
-      pointer-events: auto; 
+      pointer-events: auto;
     }
     #scroll-content {
       width: 1px;
@@ -56,7 +54,6 @@
     }
 
     @media screen and (orientation: portrait) {
-
       #game-container::before {
         content: "Поверните экран горизонтально для начала игры";
         position: fixed;
@@ -106,99 +103,59 @@
       const gameContainer = document.getElementById('game-container');
       const scrollWrapper = document.getElementById('scroll-wrapper');
 
-
-      if (isIOS() && isSafari()) {
-        if (isLandscape()) {
-
-          scrollWrapper.style.display = 'block';
-
-
-          document.body.style.position = 'static';
-          document.body.style.overflow = 'auto';
-          document.body.style.width = '';
-          document.body.style.height = '';
-
-
-          gameContainer.style.position = 'absolute';
-          gameContainer.style.top = '0';
-          gameContainer.style.left = '0';
-          gameContainer.style.width = '100vw';
-          gameContainer.style.height = `${window.innerHeight}px`;
-
-
-          setTimeout(() => {
-            try { scrollWrapper.scrollTop = 1000; } catch (e) {}
-          }, 250);
-
-
-          let onUserScroll = function() {
-            if (scrollWrapper.scrollTop > 20) {
-
-              scrollWrapper.style.display = 'none';
-              scrollWrapper.removeEventListener('scroll', onUserScroll);
-
-              document.body.style.position = 'fixed';
-              document.body.style.overflow = 'hidden';
-              document.body.style.width = '100vw';
-              document.body.style.height = '100vh';
-
-   
-              gameContainer.style.position = 'fixed';
-              gameContainer.style.top = '0';
-              gameContainer.style.left = '0';
-              gameContainer.style.height = `${window.innerHeight}px`;
-            }
-          };
-          scrollWrapper.addEventListener('scroll', onUserScroll);
-          return; 
-        } else {
-
-          scrollWrapper.style.display = 'none';
-          document.body.style.position = 'fixed';
-          document.body.style.overflow = 'hidden';
-          document.body.style.width = '100vw';
-          document.body.style.height = '100vh';
-          gameContainer.style.position = 'fixed';
-          gameContainer.style.top = '0';
-          gameContainer.style.left = '0';
-          gameContainer.style.height = `${window.innerHeight}px`;
-          return;
-        }
-      }
-
-
+      // Сначала скрываем scroll-wrapper
       scrollWrapper.style.display = 'none';
 
-
-      if (isYandex()) {
-
-        document.body.style.position = 'fixed';
-        document.body.style.overflow = 'hidden';
-        document.body.style.width = '100vw';
-        document.body.style.height = `${window.innerHeight}px`;
-
-        gameContainer.style.position = 'fixed';
-        gameContainer.style.top = '0';
-        gameContainer.style.left = '0';
-        gameContainer.style.width = '100vw';
-        gameContainer.style.height = `${window.innerHeight}px`;
-
-
-        try { window.scrollTo(0, 0); } catch (e) {}
-        return;
-      }
-
-
+      // Устанавливаем базовые стили для body и контейнера
       document.body.style.position = 'fixed';
       document.body.style.overflow = 'hidden';
-      document.body.style.width = '100vw';
-      document.body.style.height = `${window.innerHeight}px`;
+      document.body.style.width = '100%';
+      document.body.style.height = '100%';
 
       gameContainer.style.position = 'fixed';
       gameContainer.style.top = '0';
       gameContainer.style.left = '0';
-      gameContainer.style.width = '100vw';
-      gameContainer.style.height = `${window.innerHeight}px`;
+      gameContainer.style.width = '100%';
+      gameContainer.style.height = '100%';
+
+      // Особые случаи для разных браузеров
+      if (isIOS() && isSafari()) {
+        if (isLandscape()) {
+          // Для Safari в ландшафте используем scroll-трюк
+          scrollWrapper.style.display = 'block';
+          document.body.style.position = 'static';
+          document.body.style.overflow = 'auto';
+          
+          setTimeout(() => {
+            try { scrollWrapper.scrollTop = 1000; } catch (e) {}
+          }, 250);
+
+          let onUserScroll = function() {
+            if (scrollWrapper.scrollTop > 20) {
+              scrollWrapper.style.display = 'none';
+              scrollWrapper.removeEventListener('scroll', onUserScroll);
+              document.body.style.position = 'fixed';
+              document.body.style.overflow = 'hidden';
+              gameContainer.style.height = `${window.innerHeight}px`;
+            }
+          };
+          scrollWrapper.addEventListener('scroll', onUserScroll);
+        }
+      } else if (isYandex()) {
+        // Для Яндекс.Браузера принудительно устанавливаем высоту
+        const resizeTimeout = setTimeout(() => {
+          document.body.style.height = `${window.innerHeight}px`;
+          gameContainer.style.height = `${window.innerHeight}px`;
+          try { window.scrollTo(0, 0); } catch (e) {}
+        }, 100);
+        
+        // Дополнительный фикс через 500мс на случай, если браузер не сразу скрывает панель
+        setTimeout(() => {
+          document.body.style.height = `${window.innerHeight}px`;
+          gameContainer.style.height = `${window.innerHeight}px`;
+          try { window.scrollTo(0, 0); } catch (e) {}
+        }, 500);
+      }
     }
 
     function runAllFixes() {
@@ -206,20 +163,45 @@
       applyLayoutFixes();
     }
 
+    // Инициализация
     window.addEventListener('load', () => {
       runAllFixes();
-
-      setTimeout(runAllFixes, 1200);
-      setTimeout(runAllFixes, 2500);
+      
+      // Несколько вызовов с задержкой для надежности
+      setTimeout(runAllFixes, 300);
+      setTimeout(runAllFixes, 1000);
+      setTimeout(runAllFixes, 2000);
     });
 
-    window.addEventListener('resize', () => { setTimeout(runAllFixes, 350); });
-    window.addEventListener('orientationchange', () => { setTimeout(runAllFixes, 600); });
+    // Обработка изменений размеров
+    window.addEventListener('resize', () => {
+      setTimeout(runAllFixes, 100);
+      setTimeout(runAllFixes, 500);
+    });
+    
+    window.addEventListener('orientationchange', () => {
+      setTimeout(runAllFixes, 300);
+      setTimeout(runAllFixes, 1000);
+    });
+
+    // Дополнительный фикс для Яндекс.Браузера при загрузке
+    if (isYandex()) {
+      setTimeout(() => {
+        document.body.style.height = `${window.innerHeight}px`;
+        document.getElementById('game-container').style.height = `${window.innerHeight}px`;
+        try { window.scrollTo(0, 0); } catch (e) {}
+      }, 300);
+      
+      setTimeout(() => {
+        document.body.style.height = `${window.innerHeight}px`;
+        document.getElementById('game-container').style.height = `${window.innerHeight}px`;
+        try { window.scrollTo(0, 0); } catch (e) {}
+      }, 1000);
+    }
   </script>
 
+  <!-- Остальные скрипты игры -->
   <script src="https://cdn.jsdelivr.net/npm/phaser@3.88.2/dist/phaser.js"></script>
-
-  <!-- скрипты игры -->
   <script src="scenes/scene1.js"></script>
   <script src="scenes/scene2.js"></script>
   <script src="scenes/scene3.js"></script>
