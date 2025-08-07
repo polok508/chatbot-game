@@ -96,52 +96,21 @@
       return /YaBrowser/.test(navigator.userAgent);
     }
 
-    function isLandscape() {
-      return window.matchMedia("(orientation: landscape)").matches;
-    }
-
     function setupScrollForSafari() {
       const scrollWrapper = document.getElementById('scroll-wrapper');
 
-      if (isIOS() && isSafari() && isLandscape()) {
-     
-        scrollWrapper.style.display = 'block';
-
-     
-        document.body.style.position = 'static';
-        document.body.style.overflow = 'auto';
-        document.body.style.width = '';
-        document.body.style.height = '';
-
-       
-        setTimeout(() => {
-          scrollWrapper.scrollTop = 3000;
-        }, 350);
-
-        let userScrolled = false;
-
-        function onUserScroll() {
-          if (!userScrolled && scrollWrapper.scrollTop > 20) {
-            userScrolled = true;
-
-          
-            scrollWrapper.style.display = 'none';
-            document.body.style.position = 'fixed';
-            document.body.style.overflow = 'hidden';
-            document.body.style.width = '100vw';
-            document.body.style.height = '100vh';
-
-            scrollWrapper.removeEventListener('scroll', onUserScroll);
-          }
-        }
-
-        scrollWrapper.addEventListener('scroll', onUserScroll);
-
-      } else {
-     
-
+      if (isIOS() && isSafari()) {
+        
         scrollWrapper.style.display = 'none';
 
+        document.body.style.position = 'fixed';
+        document.body.style.overflow = 'hidden';
+        document.body.style.width = '100vw';
+        document.body.style.height = '100vh';
+
+      } else {
+        // Для Яндекса и остальных браузеров
+        scrollWrapper.style.display = 'none';
         if (isYandex()) {
           document.body.style.position = 'fixed';
           document.body.style.overflow = 'hidden';
