@@ -16,8 +16,10 @@
       background: #f4f4f4;
       touch-action: none;
       -webkit-overflow-scrolling: touch;
-      overflow-y: auto; 
-      position: static;
+      overflow: hidden; /* body скрывает скролл всегда */
+      position: fixed; /* фиксируем body, чтобы избежать сдвигов */
+      width: 100vw;
+      height: 100vh;
     }
 
     /* контейнер с игрой */
@@ -29,10 +31,9 @@
       background: #fff;
       overflow: hidden;
       z-index: 20;
-      display: none;
     }
 
-    /* вспомогательный скроллимый контейнер для Safari iOS */
+    /* вспомогательный скроллимый контейнер для Safari iOS при горизонтали */
     #scroll-wrapper {
       position: fixed;
       top: 0; left: 0;
@@ -42,19 +43,18 @@
       -webkit-overflow-scrolling: touch;
       background: transparent;
       z-index: 30;
-      display: none;
+      display: none; /* показываем только на сафари в горизонте */
     }
 
-   
+    /* высокий элемент для скролла */
     #scroll-content {
       width: 1px;
-      height: 7000px;
+      height: 5000px;
       pointer-events: none;
       user-select: none;
-      background: linear-gradient(to bottom, transparent 0%, #eee 100%);
     }
 
-
+    /* подсказка прокрутки */
     #scroll-tip {
       position: fixed;
       top: 20px; left: 50%;
@@ -68,29 +68,6 @@
       user-select: none;
       display: none;
       pointer-events: none;
-    }
-
-    @media screen and (orientation: portrait) {
-      #game-container::before {
-        content: "Поверните экран горизонтально для начала игры";
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        font-size: 24px;
-        color: #333;
-        text-align: center;
-        z-index: 9999;
-        background: white;
-        padding: 1rem 2rem;
-        border-radius: 12px;
-        box-shadow: 0 0 10px rgba(0,0,0,0.2);
-        user-select: none;
-        pointer-events: none;
-      }
-      canvas {
-        display: none !important;
-      }
     }
   </style>
 </head>
@@ -116,21 +93,25 @@
       return /YaBrowser/.test(navigator.userAgent);
     }
 
+    function isLandscape() {
+      return window.matchMedia("(orientation: landscape)").matches;
+    }
+
     function setupScrollForSafari() {
       const scrollWrapper = document.getElementById('scroll-wrapper');
       const scrollTip = document.getElementById('scroll-tip');
       const gameContainer = document.getElementById('game-container');
 
-      if (isIOS() && isSafari()) {
-      
+      // только если iOS Safari и горизонталь
+      if (isIOS() && isSafari() && isLandscape()) {
         scrollWrapper.style.display = 'block';
         scrollTip.style.display = 'block';
-        gameContainer.style.display = 'none';
 
-        document.documentElement.style.overflow = 'auto';
-        document.body.style.position = 'static';
-        document.body.style.overflow = 'auto';
-        document.body.style.height = 'auto';
+        
+        document.body.style.overflow = 'hidden';
+        document.body.style.position = 'fixed';
+        document.body.style.width = '100vw';
+        document.body.style.height = '100vh';
 
         let scrolledEnough = false;
 
@@ -138,17 +119,16 @@
           if (scrollWrapper.scrollTop > 150 && !scrolledEnough) {
             scrolledEnough = true;
 
-     
             scrollWrapper.style.display = 'none';
             scrollTip.style.display = 'none';
 
-   
+            
+            gameContainer.style.display = 'block';
+
             document.body.style.position = 'fixed';
             document.body.style.overflow = 'hidden';
             document.body.style.width = '100vw';
             document.body.style.height = '100vh';
-
-            gameContainer.style.display = 'block';
 
             scrollWrapper.removeEventListener('scroll', onScroll);
           }
@@ -156,8 +136,16 @@
 
         scrollWrapper.addEventListener('scroll', onScroll);
 
+       
+        gameContainer.style.display = 'none';
+
+        
+        setTimeout(() => {
+          scrollWrapper.scrollTop = 1;
+        }, 100);
+
       } else {
-        // для Яндекса и остальных браузеров 
+        // яндекс и остальные
         scrollWrapper.style.display = 'none';
         scrollTip.style.display = 'none';
         gameContainer.style.display = 'block';
