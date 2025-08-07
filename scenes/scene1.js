@@ -1,6 +1,8 @@
 class Scene1 extends Phaser.Scene {
   constructor() {
     super({ key: 'Scene1' });
+    this.rotateOverlay = null;
+    this.rotateText = null;
   }
 
   preload() {
@@ -11,27 +13,13 @@ class Scene1 extends Phaser.Scene {
   }
 
   create() {
-    // стандартный зум
     this.input.manager.canvas.style.touchAction = 'auto';
 
-    // проверка ориентации
-    if (window.innerHeight > window.innerWidth) {
-      this.showRotateMessage();
-      this.scene.pause();
-    }
+    this.checkOrientation();
 
     window.addEventListener('resize', () => {
-      if (window.innerHeight > window.innerWidth) {
-        this.scene.pause();
-        this.showRotateMessage();
-      } else {
-        this.scene.resume();
-        this.hideRotateMessage();
-      }
+      this.checkOrientation();
     });
-
-    this.rotateOverlay = null;
-    this.rotateText = null;
 
     // фон
     this.add.image(0, 0, 'bg_office')
@@ -145,6 +133,20 @@ class Scene1 extends Phaser.Scene {
         () => { this.scene.start('Scene2'); }
       );
     });
+  }
+
+  checkOrientation() {
+    if (window.innerHeight > window.innerWidth) {
+      if (!this.rotateOverlay) {
+        this.showRotateMessage();
+      }
+      this.scene.pause();
+    } else {
+      if (this.rotateOverlay) {
+        this.hideRotateMessage();
+      }
+      this.scene.resume();
+    }
   }
 
   createButtonContainer(x, y, topText, topBgWidth, topBgHeight, topBgColor, topBgAlpha, btnText, btnWidth, btnHeight, onClick) {
