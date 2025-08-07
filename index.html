@@ -16,8 +16,8 @@
       background: #f4f4f4;
       touch-action: none;
       -webkit-overflow-scrolling: touch;
-      overflow: auto; 
-      position: static; 
+      overflow: auto;
+      position: static;
     }
 
     /* Контейнер с игрой */
@@ -104,22 +104,29 @@
         // Показываем скроллимый контейнер для реального скролла
         scrollWrapper.style.display = 'block';
 
-       
+        // Даем возможность скроллить
         document.body.style.position = 'static';
         document.body.style.overflow = 'auto';
         document.body.style.width = '';
         document.body.style.height = '';
 
-        // Принудительный программный скролл вниз через 400ms для скрытия панели Safari
+        // Пробуждаем скролл
         setTimeout(() => {
-          scrollWrapper.scrollTop = 1000;
-        }, 400);
+          scrollWrapper.scrollTop = 1;
+        }, 100);
 
         let scrolled = false;
         function onUserScroll() {
           if (!scrolled && scrollWrapper.scrollTop > 10) {
             scrolled = true;
             scrollWrapper.style.display = 'none';
+
+            // Фиксируем body для запуска игры
+            document.body.style.position = 'fixed';
+            document.body.style.overflow = 'hidden';
+            document.body.style.width = '100vw';
+            document.body.style.height = '100vh';
+
             scrollWrapper.removeEventListener('scroll', onUserScroll);
           }
         }
