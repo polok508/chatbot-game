@@ -110,14 +110,13 @@
       const body = document.body;
 
       if (isIOS() && isSafari() && isLandscape()) {
-
+   
         scrollWrapper.style.display = 'block';
         body.style.position = 'static';
         body.style.overflow = 'auto';
         body.style.width = '';
         body.style.height = '';
 
-   
         setTimeout(() => {
           scrollWrapper.scrollTop = 3000;
         }, 300);
@@ -139,20 +138,27 @@
 
         scrollWrapper.addEventListener('scroll', onScroll);
 
-      } else {
-
+      } else if (isYandex()) {
+       
         scrollWrapper.style.display = 'none';
+
         body.style.position = 'fixed';
         body.style.overflow = 'hidden';
         body.style.width = '100vw';
         body.style.height = '100vh';
 
-    
-        if (isYandex()) {
-          setTimeout(() => {
-            window.scrollTo(0, 0);
-          }, 100);
-        }
+
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+        }, 100);
+
+      } else {
+      
+        scrollWrapper.style.display = 'none';
+        body.style.position = 'fixed';
+        body.style.overflow = 'hidden';
+        body.style.width = '100vw';
+        body.style.height = '100vh';
       }
     }
 
