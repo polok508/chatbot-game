@@ -12,6 +12,7 @@
       margin: 0; padding: 0;
       width: 100vw;
       height: 100vh;
+      min-height: 100vh;
       font-family: 'Roboto', sans-serif;
       background: #f4f4f4;
       touch-action: none;
@@ -22,7 +23,10 @@
     }
 
     #game-container {
+      position: fixed;
+      top: 0; left: 0;
       width: 100vw;
+      height: calc(var(--vh, 1vh) * 100);
       background: #fff;
       overflow: hidden;
       z-index: 20;
@@ -103,7 +107,6 @@
         document.body.style.width = '';
         document.body.style.height = '';
 
-      
         gameContainer.style.position = 'absolute';
         gameContainer.style.top = '0';
         gameContainer.style.left = '0';
@@ -138,7 +141,6 @@
         scrollWrapper.addEventListener('scroll', onUserScroll);
 
       } else {
-    
         scrollWrapper.style.display = 'none';
 
         document.body.style.position = 'fixed';
