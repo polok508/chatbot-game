@@ -26,10 +26,6 @@
       background: #fff;
       overflow: hidden;
       z-index: 20;
-      position: fixed;
-      top: 0;
-      left: 0;
-      height: calc(var(--vh, 1vh) * 100);
     }
 
     #scroll-wrapper {
@@ -46,7 +42,7 @@
 
     #scroll-content {
       width: 1px;
-      height: 6000px;
+      height: 6000px; 
       pointer-events: none;
       user-select: none;
     }
@@ -100,6 +96,7 @@
       const gameContainer = document.getElementById('game-container');
 
       if (isIOS() && isSafari() && isLandscape()) {
+
         scrollWrapper.style.display = 'block';
 
         document.body.style.position = 'static';
@@ -107,12 +104,12 @@
         document.body.style.width = '';
         document.body.style.height = '';
 
-      
         gameContainer.style.position = 'absolute';
         gameContainer.style.top = '0';
         gameContainer.style.left = '0';
         gameContainer.style.width = '100vw';
         gameContainer.style.height = `${window.innerHeight}px`;
+
 
         setTimeout(() => {
           scrollWrapper.scrollTop = 3000;
@@ -138,11 +135,10 @@
             scrollWrapper.removeEventListener('scroll', onUserScroll);
           }
         }
-
         scrollWrapper.addEventListener('scroll', onUserScroll);
 
       } else {
-   
+
         scrollWrapper.style.display = 'none';
 
         document.body.style.position = 'fixed';
@@ -154,9 +150,7 @@
         gameContainer.style.top = '0';
         gameContainer.style.left = '0';
         gameContainer.style.width = '100vw';
-
- 
-        gameContainer.style.height = `calc(var(--vh, 1vh) * 100)`;
+        gameContainer.style.height = '100vh';
       }
     }
 
@@ -187,7 +181,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/phaser@3.88.2/dist/phaser.js"></script>
 
-  <!-- скрипты игры -->
+  <!-- Скрипты игры -->
   <script src="scenes/scene1.js"></script>
   <script src="scenes/scene2.js"></script>
   <script src="scenes/scene3.js"></script>
