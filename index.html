@@ -77,7 +77,6 @@
   }
 
   function setSizes() {
-
     const vh = window.innerHeight;
     document.body.style.width = '100vw';
     document.body.style.height = vh + 'px';
@@ -89,11 +88,9 @@
 
   function setupForSafari() {
     if (isIOS() && isSafari() && isLandscape()) {
-  
       document.body.style.position = 'static';
       document.body.style.overflow = 'auto';
 
-   
       setTimeout(() => {
         window.scrollTo(0, 1);
       }, 300);
@@ -105,7 +102,6 @@
 
   function setupForYandex() {
     if (isYandex() && isLandscape()) {
-
       document.body.style.position = 'fixed';
       document.body.style.overflow = 'hidden';
       setSizes();
@@ -113,9 +109,26 @@
   }
 
   function runAllFixes() {
-    setSizes();
-    setupForSafari();
-    setupForYandex();
+    if (isLandscape()) {
+      if (isYandex()) {
+        setupForYandex();
+      } else if (isIOS() && isSafari()) {
+        setupForSafari();
+      } else {
+        document.body.style.position = 'fixed';
+        document.body.style.overflow = 'hidden';
+        setSizes();
+      }
+    } else {
+      document.body.style.position = 'fixed';
+      document.body.style.overflow = 'hidden';
+      document.body.style.width = '100vw';
+      document.body.style.height = '100vh';
+
+      const game = document.getElementById('game-container');
+      game.style.width = '100vw';
+      game.style.height = '100vh';
+    }
   }
 
   window.addEventListener('load', () => {
