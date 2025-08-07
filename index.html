@@ -87,47 +87,78 @@
 
     function massiveScrollFix() {
       if (isIOS() && isSafari()) {
-        document.documentElement.style.height = '5000px';
-        document.body.style.height = '5000px';
+        // для Safari iOS: даём огромный скролл и прокручиваем вниз-вверх, чтобы убрать панели
+        document.documentElement.style.height = '10000px';
+        document.body.style.height = '10000px';
         document.body.style.position = 'relative';
-        document.body.style.overflow = 'auto';
+        document.body.style.overflow = 'auto'; // важно позволить скролл
 
-        const scrollToY = 4500;
-
+        const scrollToY = 9000;
         let attempts = 0;
         const maxAttempts = 15;
 
         function tryScroll() {
           window.scrollTo(0, scrollToY);
           setTimeout(() => {
-            if (window.pageYOffset === 0 && attempts < maxAttempts) {
-              attempts++;
+            window.scrollTo(0, 0);
+            attempts++;
+            if (attempts < maxAttempts && window.pageYOffset === 0) {
               requestAnimationFrame(tryScroll);
             } else {
+              // после серии прокруток фиксируем тело, скрывая скролл, чтобы не мешал
               setTimeout(() => {
                 document.body.style.position = 'fixed';
                 document.body.style.width = '100vw';
                 document.body.style.height = '100vh';
                 document.body.style.overflow = 'hidden';
                 document.documentElement.style.height = '';
-              }, 200);
+              }, 300);
             }
           }, 150);
         }
 
         tryScroll();
 
+        // фиксируем игровой контейнер, чтобы он оставался видимым при скролле
+        const container = document.getElementById('game-container');
+        container.style.position = 'fixed';
+        container.style.top = '0';
+        container.style.left = '0';
+        container.style.width = '100vw';
+        container.style.height = '100vh';
+        container.style.zIndex = '10';
+
       } else if (isYandex()) {
+        // яндекс
         document.body.style.height = '100vh';
         document.body.style.position = 'fixed';
         document.body.style.width = '100vw';
         document.body.style.overflow = 'hidden';
+
+        // игровой контейнер фиксируем как обычно
+        const container = document.getElementById('game-container');
+        container.style.position = 'fixed';
+        container.style.top = '0';
+        container.style.left = '0';
+        container.style.width = '100vw';
+        container.style.height = '100vh';
+        container.style.zIndex = '10';
+
       } else {
+        // остальные браузеры — фиксируем body и убираем скролл
         document.body.style.position = '';
         document.body.style.overflow = 'hidden';
         document.body.style.width = '100vw';
         document.body.style.height = '100vh';
         document.documentElement.style.height = '';
+
+        const container = document.getElementById('game-container');
+        container.style.position = 'fixed';
+        container.style.top = '0';
+        container.style.left = '0';
+        container.style.width = '100vw';
+        container.style.height = '100vh';
+        container.style.zIndex = '10';
       }
     }
 
