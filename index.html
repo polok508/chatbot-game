@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html lang="ru">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport"
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport"
         content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
-  <link rel="icon" type="image/png" href="favicon.png" />
-  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet" />
-  <title>Чат-Бот Спасает Бизнес</title>
-  <style>
+        <link rel="icon" type="image/png" href="favicon.png" />
+        <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet" />
+        <title>Чат-Бот Спасает Бизнес</title>
+        
+        <style>
     html, body {
       margin: 0; padding: 0;
       width: 100vw;
@@ -16,10 +17,8 @@
       background: #f4f4f4;
       touch-action: none;
       -webkit-overflow-scrolling: touch;
-      overflow: hidden; /* body скрывает скролл всегда */
-      position: fixed; /* фиксируем body, чтобы избежать сдвигов */
-      width: 100vw;
-      height: 100vh;
+      overflow: auto;
+      position: static;
     }
 
     /* контейнер с игрой */
@@ -33,7 +32,7 @@
       z-index: 20;
     }
 
-    /* вспомогательный скроллимый контейнер для Safari iOS при горизонтали */
+
     #scroll-wrapper {
       position: fixed;
       top: 0; left: 0;
@@ -42,11 +41,11 @@
       overflow-y: scroll;
       -webkit-overflow-scrolling: touch;
       background: transparent;
-      z-index: 30;
-      display: none; /* показываем только на сафари в горизонте */
+      z-index: 10;
+      display: none;
     }
 
-    /* высокий элемент для скролла */
+  
     #scroll-content {
       width: 1px;
       height: 5000px;
@@ -54,20 +53,27 @@
       user-select: none;
     }
 
-    /* подсказка прокрутки */
-    #scroll-tip {
-      position: fixed;
-      top: 20px; left: 50%;
-      transform: translateX(-50%);
-      background: rgba(0,0,0,0.6);
-      color: white;
-      padding: 0.5rem 1rem;
-      border-radius: 12px;
-      font-size: 18px;
-      z-index: 40;
-      user-select: none;
-      display: none;
-      pointer-events: none;
+    @media screen and (orientation: portrait) {
+      #game-container::before {
+        content: "Поверните экран горизонтально для начала игры";
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 24px;
+        color: #333;
+        text-align: center;
+        z-index: 9999;
+        background: white;
+        padding: 1rem 2rem;
+        border-radius: 12px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        user-select: none;
+        pointer-events: none;
+      }
+      canvas {
+        display: none !important;
+      }
     }
   </style>
 </head>
@@ -76,7 +82,6 @@
   <div id="scroll-wrapper">
     <div id="scroll-content"></div>
   </div>
-  <div id="scroll-tip">Прокрутите вниз, чтобы убрать верхние панели</div>
   <div id="game-container"></div>
 
   <script>
@@ -93,63 +98,58 @@
       return /YaBrowser/.test(navigator.userAgent);
     }
 
-    function isLandscape() {
-      return window.matchMedia("(orientation: landscape)").matches;
-    }
-
     function setupScrollForSafari() {
       const scrollWrapper = document.getElementById('scroll-wrapper');
-      const scrollTip = document.getElementById('scroll-tip');
-      const gameContainer = document.getElementById('game-container');
+      const isLandscape = window.matchMedia("(orientation: landscape)").matches;
 
-      // только если iOS Safari и горизонталь
-      if (isIOS() && isSafari() && isLandscape()) {
-        scrollWrapper.style.display = 'block';
-        scrollTip.style.display = 'block';
+      if (isIOS() && isSafari()) {
+        if (isLandscape) {
+     
+          scrollWrapper.style.display = 'block';
 
-        
-        document.body.style.overflow = 'hidden';
-        document.body.style.position = 'fixed';
-        document.body.style.width = '100vw';
-        document.body.style.height = '100vh';
+         
+          document.body.style.position = 'static';
+          document.body.style.overflow = 'auto';
+          document.body.style.width = '';
+          document.body.style.height = '';
 
-        let scrolledEnough = false;
+      
+          setTimeout(() => {
+            scrollWrapper.scrollTop = 1;
+          }, 100);
 
-        function onScroll() {
-          if (scrollWrapper.scrollTop > 150 && !scrolledEnough) {
-            scrolledEnough = true;
-
-            scrollWrapper.style.display = 'none';
-            scrollTip.style.display = 'none';
-
-            
-            gameContainer.style.display = 'block';
-
-            document.body.style.position = 'fixed';
-            document.body.style.overflow = 'hidden';
-            document.body.style.width = '100vw';
-            document.body.style.height = '100vh';
-
-            scrollWrapper.removeEventListener('scroll', onScroll);
-          }
-        }
-
-        scrollWrapper.addEventListener('scroll', onScroll);
+          let scrolled = false;
+          function onUserScroll() {
+            if (!scrolled && scrollWrapper.scrollTop > 10) {
+              scrolled = true;
+              scrollWrapper.style.display = 'none';
 
        
-        gameContainer.style.display = 'none';
+              document.body.style.position = 'fixed';
+              document.body.style.overflow = 'hidden';
+              document.body.style.width = '100vw';
+              document.body.style.height = '100vh';
 
-        
-        setTimeout(() => {
-          scrollWrapper.scrollTop = 1;
-        }, 100);
+              scrollWrapper.removeEventListener('scroll', onUserScroll);
+            }
+          }
+
+          scrollWrapper.addEventListener('scroll', onUserScroll);
+
+        } else {
+
+          scrollWrapper.style.display = 'none';
+
+       
+          document.body.style.position = '';
+          document.body.style.overflow = 'hidden';
+          document.body.style.width = '100vw';
+          document.body.style.height = '100vh';
+        }
 
       } else {
-        // яндекс и остальные
+        // Для Яндекса и остальных браузеров 
         scrollWrapper.style.display = 'none';
-        scrollTip.style.display = 'none';
-        gameContainer.style.display = 'block';
-
         if (isYandex()) {
           document.body.style.position = 'fixed';
           document.body.style.overflow = 'hidden';
