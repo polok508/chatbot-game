@@ -1,10 +1,7 @@
 class Scene1 extends Phaser.Scene {
   constructor() {
     super({ key: 'Scene1' });
-    this.rotateOverlay = null;
-    this.rotateText = null;
 
-    // Обработчик для resize/orientationchange с привязкой this
     this.onResizeHandler = this.checkOrientation.bind(this);
   }
 
@@ -23,17 +20,14 @@ class Scene1 extends Phaser.Scene {
     window.addEventListener('resize', this.onResizeHandler);
     window.addEventListener('orientationchange', this.onResizeHandler);
 
-    // Принудительный скролл вниз, чтобы скрыть панели браузера
     setTimeout(() => {
       window.scrollTo(0, 1);
     }, 200);
 
-    // фон
     this.bg = this.add.image(0, 0, 'bg_office')
       .setOrigin(0, 0)
       .setDisplaySize(1440, 992);
 
-    // заголовок
     const titleBgGfx = this.add.graphics();
     titleBgGfx.fillStyle(0xffffff, 0.7);
     titleBgGfx.fillRoundedRect(0, 0, 1300, 87, 10);
@@ -53,7 +47,6 @@ class Scene1 extends Phaser.Scene {
 
     this.tweens.add({ targets: [titleBg, titleText], alpha: 1, duration: 500, delay: 200 });
 
-    // линии
     const linesData = [
       { key: 'vector1', x: 169.87, y: 262.93, w: 233.48, h: 97.10, delay: 1200 },
       { key: 'vector2', x: 721.55, y: 374.16, w: 225.30, h: 94.92, delay: 2200 },
@@ -97,7 +90,6 @@ class Scene1 extends Phaser.Scene {
       });
     });
 
-    // сообщения
     const messages = [
       { x: 270, y: 227, w: 378, h: 75, text: "Теряете клиентов из-за:", tw: 338, delay: 1800 },
       { x: 400, y: 342, w: 319, h: 75, text: "Очередей в ответах", tw: 279, delay: 2800 },
@@ -124,7 +116,6 @@ class Scene1 extends Phaser.Scene {
       this.tweens.add({ targets: [bg, txt], alpha: 1, duration: 400, delay });
     });
 
-    // кнопки
     this.time.delayedCall(5300, () => {
       this.createButtonContainer(
         290, 739,
@@ -143,26 +134,13 @@ class Scene1 extends Phaser.Scene {
   }
 
   checkOrientation() {
+    // Просто пауза сцены при портретной ориентации, без показа overlay
     if (window.matchMedia('(orientation: portrait)').matches) {
-      if (!this.rotateOverlay) {
-        this.showRotateMessage();
-      }
       this.scene.pause();
     } else {
-      if (this.rotateOverlay) {
-        this.hideRotateMessage();
-      }
       this.scene.resume();
-
-      // принудительный скролл вниз, чтобы убрать панели браузера
-      setTimeout(() => {
-        window.scrollTo(0, 1);
-      }, 100);
-
-      // повторный скролл для надежности
-      setTimeout(() => {
-        window.scrollTo(0, 1);
-      }, 300);
+      setTimeout(() => window.scrollTo(0, 1), 100);
+      setTimeout(() => window.scrollTo(0, 1), 300);
     }
   }
 
@@ -253,39 +231,6 @@ class Scene1 extends Phaser.Scene {
       closeBtnBg.destroy();
       closeBtnText.destroy();
     });
-  }
-
-  showRotateMessage() {
-    if (this.rotateOverlay) return;
-
-    const centerX = this.cameras.main.width / 2;
-    const centerY = this.cameras.main.height / 2;
-
-    this.rotateOverlay = this.add.rectangle(centerX, centerY, this.cameras.main.width, this.cameras.main.height, 0x000000, 0.8)
-      .setDepth(100)
-      .setScrollFactor(0)
-      .setInteractive()
-      .setOrigin(0.5);
-
-    this.rotateText = this.add.text(centerX, centerY, 'Поверните экран горизонтально\nдля начала игры', {
-      fontFamily: 'Roboto',
-      fontSize: '36px',
-      fontWeight: '400',
-      color: '#ffffff',
-      align: 'center',
-      wordWrap: { width: this.cameras.main.width * 0.7 }
-    }).setOrigin(0.5).setDepth(101);
-  }
-
-  hideRotateMessage() {
-    if (this.rotateOverlay) {
-      this.rotateOverlay.destroy();
-      this.rotateOverlay = null;
-    }
-    if (this.rotateText) {
-      this.rotateText.destroy();
-      this.rotateText = null;
-    }
   }
 
   shutdown() {
