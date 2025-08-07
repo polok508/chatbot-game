@@ -4,48 +4,38 @@
   <meta charset="UTF-8" />
   <meta name="viewport"
         content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
-  <link rel="icon" type="image/png" href="favicon.png" />
-  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet" />
   <title>Чат-Бот Спасает Бизнес</title>
   <style>
     html, body {
-      margin: 0;
-      padding: 0;
-      background: #f4f4f4;
-      width: 100vw;
-      height: 100vh;
-      font-family: "Roboto", sans-serif;
-      touch-action: none;
-      overscroll-behavior-y: none;
+      margin: 0; padding: 0;
+      width: 100vw; height: 100vh;
       overflow: hidden;
+      font-family: 'Roboto', sans-serif;
+      background: #f4f4f4;
+      -webkit-overflow-scrolling: touch;
+      touch-action: none;
     }
-
     #game-container {
       position: fixed;
       top: 0; left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: #fff;
+      width: 100vw; height: 100vh;
+      background: white;
       overflow: hidden;
+      user-select: none;
     }
-
-    @media screen and (orientation: portrait) {
+    @media (orientation: portrait) {
       #game-container::before {
         content: "Поверните экран горизонтально для начала игры";
-        position: absolute;
-        top: 50%;
-        left: 50%;
+        position: absolute; top: 50%; left: 50%;
         transform: translate(-50%, -50%);
-        font-size: 24px;
-        color: #333;
-        text-align: center;
-        z-index: 9999;
-        background: white;
-        padding: 1rem 2rem;
+        font-size: 24px; color: #333;
+        background: white; padding: 1rem 2rem;
         border-radius: 12px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        text-align: center;
         user-select: none;
         pointer-events: none;
+        z-index: 9999;
       }
       canvas {
         display: none !important;
@@ -69,81 +59,76 @@
       return /YaBrowser/.test(ua);
     }
 
-    function setRealVh() {
-      const vh = window.innerHeight * 0.01;
-      document.documentElement.style.setProperty("--vh", `${vh}px`);
-    }
+    function doHardScroll() {
+      // создаём скрытый большой блок, чтобы была возможность скроллить
+      let scrollBlock = document.getElementById('scrollBlock');
+      if (!scrollBlock) {
+        scrollBlock = document.createElement('div');
+        scrollBlock.id = 'scrollBlock';
+        scrollBlock.style.position = 'absolute';
+        scrollBlock.style.top = '0';
+        scrollBlock.style.left = '0';
+        scrollBlock.style.width = '100vw';
+        scrollBlock.style.height = '4000px';  
+        scrollBlock.style.pointerEvents = 'none';
+        scrollBlock.style.opacity = '0';
+        document.body.appendChild(scrollBlock);
+      }
 
-    function applyScrollFix() {
-      // Для iOS Safari и Яндекс Браузера сделаем большую высоту для скролла и аккуратно зафиксируем body
-      if ((isIOS() && isSafari()) || isYandex()) {
-        // Сначала выставляем большую высоту, чтобы можно было проскроллить
-        document.documentElement.style.height = '5000px';
-        document.body.style.height = '5000px';
-        document.body.style.position = 'relative';
-        document.body.style.overflow = 'visible';
-
-        // Несколько скроллов подряд для надёжности
-        [100, 400, 700, 1000, 1300].forEach(delay => {
-          setTimeout(() => {
-            window.scrollTo(0, 3000);
-          }, delay);
-        });
-
-        // После скроллов фиксируем body, убираем высоту лишнюю
+      // несколько скроллов подряд для фикса панели
+      [100, 400, 700, 1000, 1300].forEach(delay => {
         setTimeout(() => {
-          document.documentElement.style.height = '';
-          document.body.style.height = '';
-          document.body.style.position = 'fixed';
-          document.body.style.width = '100vw';
-          document.body.style.overflow = 'hidden';
+          window.scrollTo(0, 3500);
+        }, delay);
+      });
 
-          // Убедимся, что контейнер под игру занимает всё окно
-          const container = document.getElementById('game-container');
-          if (container) {
-            container.style.width = '100vw';
-            container.style.height = '100vh';
-          }
-        }, 1500);
+      // после скроллов убираем прокрутку, фиксируем body
+      setTimeout(() => {
+        window.scrollTo(0, 3500);
 
-      } else {
-        // Для остальных — нормальная фиксация без лишних трюков
-        document.documentElement.style.height = '';
-        document.body.style.height = '100vh';
+        scrollBlock.style.height = '0px';
+
         document.body.style.position = 'fixed';
+        document.body.style.top = '0';
+        document.body.style.left = '0';
         document.body.style.width = '100vw';
+        document.body.style.height = '100vh';
         document.body.style.overflow = 'hidden';
 
-        const container = document.getElementById('game-container');
-        if (container) {
-          container.style.width = '100vw';
-          container.style.height = '100vh';
-        }
+      }, 1600);
+    }
+
+    function runFixes() {
+      if ((isIOS() && isSafari()) || isYandex()) {
+        doHardScroll();
+      } else {
+        // для остальных просто фиксируем body
+        document.body.style.position = 'fixed';
+        document.body.style.top = '0';
+        document.body.style.left = '0';
+        document.body.style.width = '100vw';
+        document.body.style.height = '100vh';
+        document.body.style.overflow = 'hidden';
       }
     }
 
-    function runAllFixes() {
-      setRealVh();
-      applyScrollFix();
-    }
-
-    window.addEventListener("load", () => {
-      runAllFixes();
-      setTimeout(runAllFixes, 2000);
+    window.addEventListener('load', () => {
+      runFixes();
+      setTimeout(runFixes, 2500);
     });
 
-    window.addEventListener("resize", () => {
-      setTimeout(runAllFixes, 500);
+    window.addEventListener('resize', () => {
+      setTimeout(runFixes, 700);
     });
 
-    window.addEventListener("orientationchange", () => {
-      setTimeout(runAllFixes, 500);
+    window.addEventListener('orientationchange', () => {
+      setTimeout(runFixes, 700);
     });
   </script>
 
   <script src="https://cdn.jsdelivr.net/npm/phaser@3.88.2/dist/phaser.js"></script>
 
-  <!-- скрипты игры -->
+  <!-- ваши скрипты игры -->
   <script src="scenes/scene1.js"></script>
   <script src="scenes/scene2.js"></script>
   <script src="scenes/scene3.js"></script>
