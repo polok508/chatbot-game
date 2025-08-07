@@ -19,19 +19,27 @@
       background: #f4f4f4;
     }
 
-    /* огромный невидимый элемент для создания скролла */
-    #scroll-spacer {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 1px;
-      height: 10000px; /* гигантский запас для вертикального скролла */
-      pointer-events: none;
-      user-select: none;
-      z-index: 0;
+    /* для iOS Safari вложенный скроллимый контейнер */
+    #scroll-wrapper {
+      display: none; /* скрыт по умолчанию */
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow-y: scroll;
+      -webkit-overflow-scrolling: touch;
+      z-index: 5;
+      background: transparent;
     }
 
-    /* контейнер с игрой фиксирован поверх всего */
+    #scroll-content {
+      width: 1px;
+      height: 5000px; /* огромный скролл для срабатывания */
+      pointer-events: none;
+      user-select: none;
+    }
+
+    /* основной контейнер с игрой */
     #game-container {
       position: fixed;
       top: 0; left: 0;
@@ -68,7 +76,9 @@
 </head>
 <body>
 
-  <div id="scroll-spacer"></div>
+  <div id="scroll-wrapper">
+    <div id="scroll-content"></div>
+  </div>
   <div id="game-container"></div>
 
   <script>
@@ -85,80 +95,22 @@
       return /YaBrowser/.test(navigator.userAgent);
     }
 
-    function massiveScrollFix() {
+    function runFixes() {
       if (isIOS() && isSafari()) {
-        // для Safari iOS: даём огромный скролл и прокручиваем вниз-вверх, чтобы убрать панели
-        document.documentElement.style.height = '10000px';
-        document.body.style.height = '10000px';
-        document.body.style.position = 'relative';
-        document.body.style.overflow = 'auto'; // важно позволить скролл
-
-        const scrollToY = 9000;
-        let attempts = 0;
-        const maxAttempts = 15;
-
-        function tryScroll() {
-          window.scrollTo(0, scrollToY);
-          setTimeout(() => {
-            window.scrollTo(0, 0);
-            attempts++;
-            if (attempts < maxAttempts && window.pageYOffset === 0) {
-              requestAnimationFrame(tryScroll);
-            } else {
-              // после серии прокруток фиксируем тело, скрывая скролл, чтобы не мешал
-              setTimeout(() => {
-                document.body.style.position = 'fixed';
-                document.body.style.width = '100vw';
-                document.body.style.height = '100vh';
-                document.body.style.overflow = 'hidden';
-                document.documentElement.style.height = '';
-              }, 300);
-            }
-          }, 150);
-        }
-
-        tryScroll();
-
-        // фиксируем игровой контейнер, чтобы он оставался видимым при скролле
-        const container = document.getElementById('game-container');
-        container.style.position = 'fixed';
-        container.style.top = '0';
-        container.style.left = '0';
-        container.style.width = '100vw';
-        container.style.height = '100vh';
-        container.style.zIndex = '10';
-
-      } else if (isYandex()) {
-        // яндекс
-        document.body.style.height = '100vh';
+        // Включаем скроллимый контейнер для Safari iOS
+        document.getElementById('scroll-wrapper').style.display = 'block';
+        // Блокируем body, чтобы он не скроллился
+        document.body.style.overflow = 'hidden';
         document.body.style.position = 'fixed';
         document.body.style.width = '100vw';
-        document.body.style.overflow = 'hidden';
-
-        // игровой контейнер фиксируем как обычно
-        const container = document.getElementById('game-container');
-        container.style.position = 'fixed';
-        container.style.top = '0';
-        container.style.left = '0';
-        container.style.width = '100vw';
-        container.style.height = '100vh';
-        container.style.zIndex = '10';
-
+        document.body.style.height = '100vh';
       } else {
-        // остальные браузеры — фиксируем body и убираем скролл
-        document.body.style.position = '';
+        // Для Яндекса и остальных — не меняем логику, фиксируем body без скролла
+        document.getElementById('scroll-wrapper').style.display = 'none';
+        document.body.style.position = isYandex() ? 'fixed' : '';
         document.body.style.overflow = 'hidden';
         document.body.style.width = '100vw';
         document.body.style.height = '100vh';
-        document.documentElement.style.height = '';
-
-        const container = document.getElementById('game-container');
-        container.style.position = 'fixed';
-        container.style.top = '0';
-        container.style.left = '0';
-        container.style.width = '100vw';
-        container.style.height = '100vh';
-        container.style.zIndex = '10';
       }
     }
 
@@ -169,7 +121,7 @@
 
     function runAllFixes() {
       setRealVh();
-      massiveScrollFix();
+      runFixes();
     }
 
     window.addEventListener('load', () => {
