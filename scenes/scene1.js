@@ -11,6 +11,9 @@ class Scene1 extends Phaser.Scene {
   }
 
   create() {
+    // стандартный зум
+    this.input.manager.canvas.style.touchAction = 'auto';
+
     // проверка ориентации
     if (window.innerHeight > window.innerWidth) {
       this.showRotateMessage();
