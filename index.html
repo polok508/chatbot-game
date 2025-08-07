@@ -18,13 +18,11 @@
       -webkit-overflow-scrolling: touch;
       overflow: hidden;
       position: fixed;
+      user-select: none;
     }
 
     #game-container {
-      position: fixed; 
-      top: 0; left: 0;
       width: 100vw;
-      height: 100vh; 
       background: #fff;
       overflow: hidden;
       z-index: 20;
@@ -64,7 +62,6 @@
         padding: 1rem 2rem;
         border-radius: 12px;
         box-shadow: 0 0 10px rgba(0,0,0,0.2);
-        user-select: none;
         pointer-events: none;
       }
       canvas {
@@ -99,7 +96,6 @@
       const gameContainer = document.getElementById('game-container');
 
       if (isIOS() && isSafari() && isLandscape()) {
-
         scrollWrapper.style.display = 'block';
 
         document.body.style.position = 'static';
@@ -107,11 +103,11 @@
         document.body.style.width = '';
         document.body.style.height = '';
 
+      
         gameContainer.style.position = 'absolute';
         gameContainer.style.top = '0';
         gameContainer.style.left = '0';
         gameContainer.style.width = '100vw';
-
         gameContainer.style.height = `${window.innerHeight}px`;
 
         setTimeout(() => {
@@ -130,8 +126,9 @@
             document.body.style.width = '100vw';
             document.body.style.height = '100vh';
 
-   
             gameContainer.style.position = 'fixed';
+            gameContainer.style.top = '0';
+            gameContainer.style.left = '0';
             gameContainer.style.height = '100vh';
 
             scrollWrapper.removeEventListener('scroll', onUserScroll);
@@ -141,7 +138,7 @@
         scrollWrapper.addEventListener('scroll', onUserScroll);
 
       } else {
-
+    
         scrollWrapper.style.display = 'none';
 
         document.body.style.position = 'fixed';
