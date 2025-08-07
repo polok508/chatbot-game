@@ -87,42 +87,42 @@
 
     function massiveScrollFix() {
       if (isIOS() && isSafari()) {
-        // Особый фикс для Safari (iOS)
         document.documentElement.style.height = '5000px';
         document.body.style.height = '5000px';
         document.body.style.position = 'relative';
-        document.body.style.overflow = 'auto'; // пока не фиксируем overflow
+        document.body.style.overflow = 'auto';
 
         const scrollToY = 4500;
+
         let attempts = 0;
         const maxAttempts = 15;
 
-        function scrollCycle() {
+        function tryScroll() {
           window.scrollTo(0, scrollToY);
           setTimeout(() => {
-            window.scrollTo(0, 0);
-            attempts++;
-            if (attempts < maxAttempts) {
-              requestAnimationFrame(scrollCycle);
+            if (window.pageYOffset === 0 && attempts < maxAttempts) {
+              attempts++;
+              requestAnimationFrame(tryScroll);
             } else {
-              // после прокрутки фиксируем тело
-              document.body.style.position = 'fixed';
-              document.body.style.width = '100vw';
-              document.body.style.height = '100vh';
-              document.body.style.overflow = 'hidden';
-              document.documentElement.style.height = '';
+              setTimeout(() => {
+                document.body.style.position = 'fixed';
+                document.body.style.width = '100vw';
+                document.body.style.height = '100vh';
+                document.body.style.overflow = 'hidden';
+                document.documentElement.style.height = '';
+              }, 200);
             }
           }, 150);
         }
-        scrollCycle();
+
+        tryScroll();
+
       } else if (isYandex()) {
-        // Оставляем Яндекс как есть (твой рабочий вариант)
         document.body.style.height = '100vh';
         document.body.style.position = 'fixed';
         document.body.style.width = '100vw';
         document.body.style.overflow = 'hidden';
       } else {
-        // Для остальных браузеров — стандартный фикс
         document.body.style.position = '';
         document.body.style.overflow = 'hidden';
         document.body.style.width = '100vw';
