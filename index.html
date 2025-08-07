@@ -8,26 +8,25 @@
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet" />
   <title>Чат-Бот Спасает Бизнес</title>
   <style>
-    html,
-    body {
+    html, body {
       margin: 0;
       padding: 0;
       background: #f4f4f4;
-      overflow: hidden;
-      width: 100%;
-      height: 100%;
+      width: 100vw;
+      height: 100vh;
       font-family: "Roboto", sans-serif;
       touch-action: none;
+      overscroll-behavior-y: none;
+      overflow: hidden;
     }
 
     #game-container {
-      position: absolute;
-      top: 0;
-      left: 0;
-      overflow: hidden;
-      width: 100%;
-      height: calc(var(--vh, 1vh) * 100);
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
       background: #fff;
+      overflow: hidden;
     }
 
     @media screen and (orientation: portrait) {
@@ -58,36 +57,16 @@
   <div id="game-container"></div>
 
   <script>
-    function fixYandexBrowser() {
-      const ua = navigator.userAgent;
-      if (/YaBrowser/.test(ua)) {
-        document.body.style.height = "100vh";
-        document.body.style.position = "fixed";
-        document.body.style.width = "100vw";
-        document.body.style.overflow = "hidden";
-      }
+    const ua = navigator.userAgent;
+
+    function isIOS() {
+      return /iPhone|iPad|iPod/.test(ua);
     }
-
-    function fixIOSViewport() {
-      const ua = navigator.userAgent;
-      const isIOS = /iPhone|iPad|iPod/.test(ua);
-      const isSafari = /Safari/.test(ua) && !/Chrome/.test(ua) && !/CriOS/.test(ua);
-
-      if (isIOS && isSafari) {
-        document.body.style.position = "fixed";
-        document.body.style.width = "100vw";
-        document.body.style.height = "100vh";
-        document.body.style.overflow = "hidden";
-
-        [100, 300, 600].forEach((delay) => {
-          setTimeout(() => window.scrollTo(0, 1), delay);
-        });
-      } else {
-        document.body.style.position = "";
-        document.body.style.width = "";
-        document.body.style.height = "";
-        document.body.style.overflow = "";
-      }
+    function isSafari() {
+      return /Safari/.test(ua) && !/Chrome/.test(ua) && !/CriOS/.test(ua);
+    }
+    function isYandex() {
+      return /YaBrowser/.test(ua);
     }
 
     function setRealVh() {
@@ -95,20 +74,70 @@
       document.documentElement.style.setProperty("--vh", `${vh}px`);
     }
 
+    function applyScrollFix() {
+      // Для iOS Safari и Яндекс Браузера сделаем большую высоту для скролла и аккуратно зафиксируем body
+      if ((isIOS() && isSafari()) || isYandex()) {
+        // Сначала выставляем большую высоту, чтобы можно было проскроллить
+        document.documentElement.style.height = '5000px';
+        document.body.style.height = '5000px';
+        document.body.style.position = 'relative';
+        document.body.style.overflow = 'visible';
+
+        // Несколько скроллов подряд для надёжности
+        [100, 400, 700, 1000, 1300].forEach(delay => {
+          setTimeout(() => {
+            window.scrollTo(0, 3000);
+          }, delay);
+        });
+
+        // После скроллов фиксируем body, убираем высоту лишнюю
+        setTimeout(() => {
+          document.documentElement.style.height = '';
+          document.body.style.height = '';
+          document.body.style.position = 'fixed';
+          document.body.style.width = '100vw';
+          document.body.style.overflow = 'hidden';
+
+          // Убедимся, что контейнер под игру занимает всё окно
+          const container = document.getElementById('game-container');
+          if (container) {
+            container.style.width = '100vw';
+            container.style.height = '100vh';
+          }
+        }, 1500);
+
+      } else {
+        // Для остальных — нормальная фиксация без лишних трюков
+        document.documentElement.style.height = '';
+        document.body.style.height = '100vh';
+        document.body.style.position = 'fixed';
+        document.body.style.width = '100vw';
+        document.body.style.overflow = 'hidden';
+
+        const container = document.getElementById('game-container');
+        if (container) {
+          container.style.width = '100vw';
+          container.style.height = '100vh';
+        }
+      }
+    }
+
     function runAllFixes() {
       setRealVh();
-      fixYandexBrowser();
-      fixIOSViewport();
+      applyScrollFix();
     }
 
     window.addEventListener("load", () => {
       runAllFixes();
-      setTimeout(runAllFixes, 300);
+      setTimeout(runAllFixes, 2000);
     });
 
-    window.addEventListener("resize", runAllFixes);
+    window.addEventListener("resize", () => {
+      setTimeout(runAllFixes, 500);
+    });
+
     window.addEventListener("orientationchange", () => {
-      setTimeout(runAllFixes, 300);
+      setTimeout(runAllFixes, 500);
     });
   </script>
 
