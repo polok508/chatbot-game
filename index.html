@@ -3,27 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport"
-        content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+        content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
   <link rel="icon" type="image/png" href="favicon.png" />
-  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet" />
   <title>Чат-Бот Спасает Бизнес</title>
   <style>
-    html, body {
+    html,
+    body {
       margin: 0;
       padding: 0;
       background: #f4f4f4;
       overflow: hidden;
       width: 100%;
       height: 100%;
-      font-family: 'Roboto', sans-serif;
-      touch-action: none; /* убрать жесты по умолчанию */
-    }
-
-    body.fixed {
-      position: fixed;
-      width: 100vw;
-      height: 100vh;
-      overflow: hidden;
+      font-family: "Roboto", sans-serif;
+      touch-action: none;
     }
 
     #game-container {
@@ -50,7 +44,7 @@
         background: white;
         padding: 1rem 2rem;
         border-radius: 12px;
-        box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
         user-select: none;
         pointer-events: none;
       }
@@ -64,111 +58,56 @@
   <div id="game-container"></div>
 
   <script>
-    // установка кастомной vh переменной для корректного отображения высоты
-    function setRealVh() {
-      const vh = window.innerHeight * 0.01;
-      document.documentElement.style.setProperty('--vh', `${vh}px`);
+    function fixYandexBrowser() {
+      const ua = navigator.userAgent;
+      if (/YaBrowser/.test(ua)) {
+        document.body.style.height = "100vh";
+        document.body.style.position = "fixed";
+        document.body.style.width = "100vw";
+        document.body.style.overflow = "hidden";
+      }
     }
 
-    // функция, временно разрешающая прокрутку, скроллит вниз на 1px и возвращает overflow обратно
-    function scrollToHideAddressBar() {
-      const html = document.documentElement;
-      const body = document.body;
-
-      const originalHtmlOverflow = html.style.overflow;
-      const originalBodyOverflow = body.style.overflow;
-
-      html.style.overflow = 'auto';
-      body.style.overflow = 'auto';
-
-      window.scrollTo(0, 1);
-
-      setTimeout(() => {
-        html.style.overflow = originalHtmlOverflow;
-        body.style.overflow = originalBodyOverflow;
-      }, 300);
-    }
-
-    // усиленный фикс для iOS Safari и других браузеров с панелями
     function fixIOSViewport() {
       const ua = navigator.userAgent;
       const isIOS = /iPhone|iPad|iPod/.test(ua);
       const isSafari = /Safari/.test(ua) && !/Chrome/.test(ua) && !/CriOS/.test(ua);
 
       if (isIOS && isSafari) {
-        document.body.classList.add('fixed');
+        document.body.style.position = "fixed";
+        document.body.style.width = "100vw";
+        document.body.style.height = "100vh";
+        document.body.style.overflow = "hidden";
 
-        // несколько попыток скролла для надежности
-        [100, 300, 600, 1000].forEach(delay => {
-          setTimeout(scrollToHideAddressBar, delay);
-        });
-
-        // повторная установка vh после скролла
-        [150, 350, 650, 1050].forEach(delay => {
-          setTimeout(setRealVh, delay);
+        [100, 300, 600].forEach((delay) => {
+          setTimeout(() => window.scrollTo(0, 1), delay);
         });
       } else {
-        document.body.classList.remove('fixed');
+        document.body.style.position = "";
+        document.body.style.width = "";
+        document.body.style.height = "";
+        document.body.style.overflow = "";
       }
     }
 
-    // фикс для Telegram WebView — тоже вызывает setRealVh и scrollToHideAddressBar
-    function fixTelegramWebView() {
-      const ua = navigator.userAgent;
-      if (/Telegram/.test(ua)) {
-        setRealVh();
-        // Для Telegram тоже пробуем скрыть панели скроллом
-        [100, 300, 600].forEach(delay => {
-          setTimeout(scrollToHideAddressBar, delay);
-        });
-      }
+    function setRealVh() {
+      const vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty("--vh", `${vh}px`);
     }
 
-    // фикс для Android браузеров
-    function fixAndroidBrowsers() {
-      const ua = navigator.userAgent.toLowerCase();
-      const isAndroid = ua.indexOf("android") > -1;
-      if (isAndroid) {
-        setRealVh();
-
-        [100, 300, 600].forEach(delay => {
-          setTimeout(scrollToHideAddressBar, delay);
-        });
-      }
-    }
-
-    // запрос fullscreen на первое касание (важно для iOS)
-    function requestFullscreenOnTouch() {
-      function onFirstTouch() {
-        const el = document.documentElement;
-        if (el.requestFullscreen) {
-          el.requestFullscreen().catch(() => {});
-        } else if (el.webkitRequestFullscreen) {
-          el.webkitRequestFullscreen();
-        }
-        window.removeEventListener('touchend', onFirstTouch);
-      }
-      window.addEventListener('touchend', onFirstTouch);
-    }
-
-    // общий вызов всех фиксов
     function runAllFixes() {
       setRealVh();
+      fixYandexBrowser();
       fixIOSViewport();
-      fixTelegramWebView();
-      fixAndroidBrowsers();
     }
 
-    window.addEventListener('load', () => {
+    window.addEventListener("load", () => {
       runAllFixes();
-      requestFullscreenOnTouch();
-
-      // дополнительный повтор для страховки
       setTimeout(runAllFixes, 300);
     });
 
-    window.addEventListener('resize', runAllFixes);
-    window.addEventListener('orientationchange', () => {
+    window.addEventListener("resize", runAllFixes);
+    window.addEventListener("orientationchange", () => {
       setTimeout(runAllFixes, 300);
     });
   </script>
