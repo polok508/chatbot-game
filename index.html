@@ -86,35 +86,48 @@
     }
 
     function massiveScrollFix() {
-      if ((isIOS() && isSafari()) || isYandex()) {
-        // Создаем многократную прокрутку вниз-вверх, чтобы убрать панели
-        const scrollY = 9000;
-        let attempts = 0;
-        const maxAttempts = 10;
+      if (isIOS() && isSafari()) {
+        // Особый фикс для Safari (iOS)
+        document.documentElement.style.height = '5000px';
+        document.body.style.height = '5000px';
+        document.body.style.position = 'relative';
+        document.body.style.overflow = 'auto'; // пока не фиксируем overflow
 
-        function tryScroll() {
-          window.scrollTo(0, scrollY);
+        const scrollToY = 4500;
+        let attempts = 0;
+        const maxAttempts = 15;
+
+        function scrollCycle() {
+          window.scrollTo(0, scrollToY);
           setTimeout(() => {
             window.scrollTo(0, 0);
             attempts++;
             if (attempts < maxAttempts) {
-              requestAnimationFrame(tryScroll);
+              requestAnimationFrame(scrollCycle);
             } else {
-              // Зафиксируем тело и уберем скролл после прокрутки
-              document.body.style.overflow = 'hidden';
+              // после прокрутки фиксируем тело
               document.body.style.position = 'fixed';
               document.body.style.width = '100vw';
               document.body.style.height = '100vh';
+              document.body.style.overflow = 'hidden';
+              document.documentElement.style.height = '';
             }
-          }, 100);
+          }, 150);
         }
-        tryScroll();
+        scrollCycle();
+      } else if (isYandex()) {
+        // Оставляем Яндекс как есть (твой рабочий вариант)
+        document.body.style.height = '100vh';
+        document.body.style.position = 'fixed';
+        document.body.style.width = '100vw';
+        document.body.style.overflow = 'hidden';
       } else {
-        // Для остальных браузеров просто фиксируем экран без скролла
+        // Для остальных браузеров — стандартный фикс
         document.body.style.position = '';
         document.body.style.overflow = 'hidden';
         document.body.style.width = '100vw';
         document.body.style.height = '100vh';
+        document.documentElement.style.height = '';
       }
     }
 
