@@ -3,6 +3,9 @@ class Scene1 extends Phaser.Scene {
     super({ key: 'Scene1' });
     this.rotateOverlay = null;
     this.rotateText = null;
+
+    // Обработчик для resize/orientationchange с привязкой this
+    this.onResizeHandler = this.checkOrientation.bind(this);
   }
 
   preload() {
@@ -17,13 +20,8 @@ class Scene1 extends Phaser.Scene {
 
     this.checkOrientation();
 
-    window.addEventListener('resize', () => {
-      this.checkOrientation();
-    });
-
-    window.addEventListener('orientationchange', () => {
-      this.checkOrientation();
-    });
+    window.addEventListener('resize', this.onResizeHandler);
+    window.addEventListener('orientationchange', this.onResizeHandler);
 
     // фон
     this.bg = this.add.image(0, 0, 'bg_office')
@@ -140,7 +138,7 @@ class Scene1 extends Phaser.Scene {
   }
 
   checkOrientation() {
-    if (window.innerHeight > window.innerWidth) {
+    if (window.matchMedia('(orientation: portrait)').matches) {
       if (!this.rotateOverlay) {
         this.showRotateMessage();
       }
@@ -248,7 +246,11 @@ class Scene1 extends Phaser.Scene {
     const centerX = this.cameras.main.width / 2;
     const centerY = this.cameras.main.height / 2;
 
-    this.rotateOverlay = this.add.rectangle(centerX, centerY, this.cameras.main.width, this.cameras.main.height, 0x000000, 0.8).setDepth(100);
+    this.rotateOverlay = this.add.rectangle(centerX, centerY, this.cameras.main.width, this.cameras.main.height, 0x000000, 0.8)
+      .setDepth(100)
+      .setScrollFactor(0)
+      .setInteractive()
+      .setOrigin(0.5);
 
     this.rotateText = this.add.text(centerX, centerY, 'Поверните экран горизонтально\nдля начала игры', {
       fontFamily: 'Roboto',
@@ -265,11 +267,15 @@ class Scene1 extends Phaser.Scene {
       this.rotateOverlay.destroy();
       this.rotateOverlay = null;
     }
-
     if (this.rotateText) {
       this.rotateText.destroy();
       this.rotateText = null;
     }
+  }
+
+  shutdown() {
+    window.removeEventListener('resize', this.onResizeHandler);
+    window.removeEventListener('orientationchange', this.onResizeHandler);
   }
 }
 
