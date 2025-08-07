@@ -14,14 +14,13 @@
       height: 100vh;
       overflow: hidden;
       font-family: 'Roboto', sans-serif;
-      -webkit-overflow-scrolling: touch;
       touch-action: none;
       background: #f4f4f4;
     }
 
-    /* для iOS Safari вложенный скроллимый контейнер */
+    /* Вечный скролл контейнер для Safari iOS */
     #scroll-wrapper {
-      display: none; /* скрыт по умолчанию */
+      display: none; /* включаем только для Safari iOS */
       position: fixed;
       top: 0; left: 0;
       width: 100vw;
@@ -34,12 +33,12 @@
 
     #scroll-content {
       width: 1px;
-      height: 5000px; /* огромный скролл для срабатывания */
+      height: 15000px; /* очень большой скролл */
       pointer-events: none;
       user-select: none;
     }
 
-    /* основной контейнер с игрой */
+    /* Основной контейнер с игрой */
     #game-container {
       position: fixed;
       top: 0; left: 0;
@@ -98,14 +97,15 @@
     function runFixes() {
       if (isIOS() && isSafari()) {
         // Включаем скроллимый контейнер для Safari iOS
-        document.getElementById('scroll-wrapper').style.display = 'block';
-        // Блокируем body, чтобы он не скроллился
+        const scrollWrapper = document.getElementById('scroll-wrapper');
+        scrollWrapper.style.display = 'block';
+        // Фиксируем body, запрещаем прокрутку body
         document.body.style.overflow = 'hidden';
         document.body.style.position = 'fixed';
         document.body.style.width = '100vw';
         document.body.style.height = '100vh';
       } else {
-        // Для Яндекса и остальных — не меняем логику, фиксируем body без скролла
+        // Для Яндекса и остальных — оставляем как было, без скролла
         document.getElementById('scroll-wrapper').style.display = 'none';
         document.body.style.position = isYandex() ? 'fixed' : '';
         document.body.style.overflow = 'hidden';
