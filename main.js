@@ -20,6 +20,8 @@ function resetVisibility() {
   hideElement('game-container');
 }
 
+// Масштаб и позиционирование canvas — ВАЖНО!
+// При вертикальном повороте после запуска игры не прячем игру и не показываем уведомление
 function resizeGame() {
   if (!game || !game.canvas) return;
 
@@ -27,10 +29,11 @@ function resizeGame() {
   const windowWidth = window.innerWidth;
   const windowHeight = window.innerHeight;
 
-  if (isMobile()) {
-    const baseWidth = game.config.width;
-    const baseHeight = game.config.height;
+  const baseWidth = game.config.width;
+  const baseHeight = game.config.height;
 
+  // На мобилках подгоняем canvas под экран и центрируем абсолютно
+  if (isMobile()) {
     const scaleX = windowWidth / baseWidth;
     const scaleY = windowHeight / baseHeight;
     const scale = Math.min(scaleX, scaleY);
@@ -45,7 +48,7 @@ function resizeGame() {
     canvas.style.left = `${(windowWidth - canvasWidth) / 2}px`;
     canvas.style.top = `${(windowHeight - canvasHeight) / 2}px`;
   } else {
-
+    // На ПК canvas занимает 100% контейнера
     canvas.style.position = 'relative';
     canvas.style.width = '100%';
     canvas.style.height = '100%';
@@ -79,12 +82,14 @@ function checkOrientation() {
         document.body.style.height = '200vh';
         document.body.style.overflowY = 'auto';
       } else {
+        // После запуска игры — игра всегда показывается, даже если вертикаль
         showElement('game-container');
         document.body.style.height = '100vh';
         document.body.style.overflowY = 'hidden';
       }
     }
   } else {
+    // ПК — сразу игра
     showElement('game-container');
     document.body.style.height = '100vh';
     document.body.style.overflowY = 'hidden';
@@ -92,7 +97,6 @@ function checkOrientation() {
     if (!game) {
       game = new Phaser.Game(config);
       gameStarted = true;
-      resizeGame();
     }
   }
 }
@@ -114,17 +118,19 @@ function startGame() {
 }
 
 window.addEventListener('resize', () => {
-  resizeGame();
   checkOrientation();
+  resizeGame();
 });
 
 window.addEventListener('orientationchange', () => {
-  resizeGame();
   checkOrientation();
 
+  // При смене ориентации в ландшафт поднимаем страницу, чтобы скрыть панель браузера
   if (isMobile() && !window.matchMedia("(orientation: portrait)").matches) {
     setTimeout(() => window.scrollTo(0, 1), 300);
   }
+
+  resizeGame();
 });
 
 window.addEventListener('load', () => {
