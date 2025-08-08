@@ -21,27 +21,6 @@ function resetVisibility() {
   hideElement('game-container');
 }
 
-function createGame() {
-  if (window.game) {
-    window.game.destroy(true);
-    window.game = null;
-  }
-
-  const isDesktop = !isMobile();
-  const w = isDesktop ? 1440 : window.innerWidth;
-  const h = isDesktop ? 992 : window.innerHeight;
-
-  const cfg = {
-    ...config,
-    width: w,
-    height: h,
-  };
-
-  window.game = new Phaser.Game(cfg);
-  window.game.renderer.clearBeforeRender = false;
-  gameStarted = true;
-}
-
 function checkOrientation() {
   const isDesktop = !isMobile();
   const body = document.body;
@@ -74,14 +53,14 @@ function checkOrientation() {
         rotatedToLandscape = true;
         showElement('scroll-notice');
         body.style.overflowY = 'auto';
-        body.style.height = '150vh';
+        body.style.height = '100vh'; // уменьшили scroll area
         return;
       }
     } else {
       if (!gameStarted) {
         showElement('scroll-notice');
         body.style.overflowY = 'auto';
-        body.style.height = '150vh';
+        body.style.height = '100vh'; // уменьшили scroll area
       } else {
         showElement('game-container');
         body.style.overflowY = 'hidden';
@@ -94,7 +73,9 @@ function checkOrientation() {
     body.style.height = '100vh';
 
     if (!window.game) {
-      createGame();
+      window.game = new Phaser.Game(config);
+      window.game.renderer.clearBeforeRender = false;
+      gameStarted = true;
     }
   }
 }
@@ -108,15 +89,13 @@ function startGame() {
   window.scrollTo(0, 0);
 
   if (!window.game) {
-    createGame();
+    window.game = new Phaser.Game(config);
+    window.game.renderer.clearBeforeRender = false;
   }
   gameStarted = true;
 }
 
 window.addEventListener('resize', () => {
-  if (window.game && isMobile()) {
-    window.game.scale.resize(window.innerWidth, window.innerHeight);
-  }
   checkOrientation();
 });
 
