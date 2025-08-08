@@ -16,7 +16,6 @@
       font-family: 'Roboto', sans-serif;
       -webkit-overflow-scrolling: touch;
     }
-
     #game-container {
       width: 100vw;
       height: 100vh;
@@ -27,7 +26,6 @@
       background: #ffffff;
       z-index: 10000;
     }
-
     .overlay {
       position: fixed;
       top: 0;
@@ -45,7 +43,6 @@
       box-sizing: border-box;
       font-family: 'Roboto', sans-serif;
     }
-
     .overlay button {
       padding: 12px 24px;
       font-size: 18px;
@@ -57,11 +54,9 @@
       margin-top: 20px;
       font-family: 'Roboto', sans-serif;
     }
-
     .overlay.hidden {
       display: none;
     }
-
     #scroll-wrapper {
       position: fixed;
       top: 0;
@@ -74,7 +69,6 @@
       display: none;
       background: white;
     }
-
     #scroll-wrapper > div {
       height: 200vh;
       pointer-events: none;
@@ -96,121 +90,8 @@
   <div id="scroll-wrapper"><div></div></div>
   <div id="game-container"></div>
 
-  <script>
-    let gameStarted = false;
-    const orientationOverlay = document.getElementById('orientation-overlay');
-    const startOverlay = document.getElementById('start-overlay');
-    const startBtn = document.getElementById('start-btn');
-    const gameContainer = document.getElementById('game-container');
-    const scrollWrapper = document.getElementById('scroll-wrapper');
 
-    function checkOrientation() {
-      const isLandscape = window.innerWidth > window.innerHeight;
-      if (!gameStarted) {
-        if (isLandscape) {
-          orientationOverlay.classList.add('hidden');
-          startOverlay.classList.remove('hidden');
-        } else {
-          startOverlay.classList.add('hidden');
-          orientationOverlay.classList.remove('hidden');
-        }
-      }
-    }
+  <script src="main.js" defer></script>
 
-    window.addEventListener('resize', checkOrientation);
-    window.addEventListener('orientationchange', () => setTimeout(checkOrientation, 300));
-    document.addEventListener('DOMContentLoaded', checkOrientation);
-
-    function activateScrollWrapper() {
-      scrollWrapper.style.display = 'block';
-      document.body.style.overflow = 'hidden';
-      scrollWrapper.scrollTop = window.innerHeight;
-      scrollWrapper.addEventListener('scroll', () => {
-        if (scrollWrapper.scrollTop < window.innerHeight) {
-          scrollWrapper.scrollTop = window.innerHeight;
-        }
-      });
-      gameContainer.style.height = window.innerHeight + 'px';
-      gameContainer.style.width = window.innerWidth + 'px';
-      gameContainer.style.position = 'fixed';
-      gameContainer.style.top = '0';
-      gameContainer.style.left = '0';
-      gameContainer.style.zIndex = '10000';
-    }
-
-    async function tryFullscreen() {
-      if (document.documentElement.requestFullscreen) {
-        try {
-          await document.documentElement.requestFullscreen();
-          return true;
-        } catch {
-          return false;
-        }
-      } else if (document.documentElement.webkitRequestFullscreen) {
-        try {
-          await document.documentElement.webkitRequestFullscreen();
-          return true;
-        } catch {
-          return false;
-        }
-      }
-      return false;
-    }
-
-    function loadScript(src) {
-      return new Promise((resolve, reject) => {
-        const s = document.createElement('script');
-        s.src = src;
-        s.onload = () => resolve();
-        s.onerror = () => reject(new Error(`Failed to load script ${src}`));
-        document.body.appendChild(s);
-      });
-    }
-
-    async function launchGame() {
-      await loadScript("https://cdn.jsdelivr.net/npm/phaser@3.88.2/dist/phaser.js");
-      await loadScript("scenes/scene1.js");
-      await loadScript("scenes/scene2.js");
-      await loadScript("scenes/scene3.js");
-      await loadScript("scenes/scene4.js");
-      await loadScript("config.secret.js");
-      await loadScript("forms/leadForm.js");
-      await loadScript("scenes/scene5.js");
-      await loadScript("config.js");
-      await loadScript("main.js");
-
-      const config = {
-        type: Phaser.AUTO,
-        parent: 'game-container',
-        width: 1440,
-        height: 992,
-        backgroundColor: '#ffffff',
-        scene: [Scene1, Scene2, Scene3, Scene4, Scene5],
-        scale: {
-          mode: Phaser.Scale.FIT,
-          autoCenter: Phaser.Scale.CENTER_BOTH,
-          orientation: Phaser.Scale.LANDSCAPE,
-        }
-      };
-      new Phaser.Game(config);
-    }
-
-    startBtn.addEventListener('click', async () => {
-      const isLandscape = window.innerWidth > window.innerHeight;
-      if (!isLandscape) return;
-
-      startOverlay.classList.add('hidden');
-      orientationOverlay.classList.add('hidden');
-      gameContainer.style.display = 'block';
-      gameStarted = true;
-
-      const fullscreenWorked = await tryFullscreen();
-      if (!fullscreenWorked) {
-        activateScrollWrapper();
-      }
-
-      launchGame();
-    });
-  </script>
 </body>
 </html>
