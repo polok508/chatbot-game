@@ -1,7 +1,3 @@
-function isMobile() {
-  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-}
-
 const BASE_WIDTH = 1440;
 const BASE_HEIGHT = 992;
 
@@ -13,15 +9,15 @@ const config = {
   backgroundColor: '#000000',
   scene: [Scene1, Scene2, Scene3, Scene4, Scene5],
   scale: {
-    mode: Phaser.Scale.FIT,
+    mode: Phaser.Scale.FIT,           // FIT для сохранения пропорций
     autoCenter: Phaser.Scale.CENTER_BOTH,
     max: {
       width: BASE_WIDTH,
-      height: BASE_HEIGHT
+      height: BASE_HEIGHT,
     },
     min: {
       width: 400,
-      height: 600
+      height: 600,
     }
   }
 };

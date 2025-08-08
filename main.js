@@ -1,4 +1,5 @@
-let game = null;
+window.game = window.game || null;
+
 let gameStarted = false;
 let rotatedToLandscape = false;
 
@@ -20,42 +21,7 @@ function resetVisibility() {
   hideElement('game-container');
 }
 
-// Масштаб и позиционирование canvas — ВАЖНО!
-// При вертикальном повороте после запуска игры не прячем игру и не показываем уведомление
-function resizeGame() {
-  if (!game || !game.canvas) return;
-
-  const canvas = game.canvas;
-  const windowWidth = window.innerWidth;
-  const windowHeight = window.innerHeight;
-
-  const baseWidth = game.config.width;
-  const baseHeight = game.config.height;
-
-  // На мобилках подгоняем canvas под экран и центрируем абсолютно
-  if (isMobile()) {
-    const scaleX = windowWidth / baseWidth;
-    const scaleY = windowHeight / baseHeight;
-    const scale = Math.min(scaleX, scaleY);
-
-    const canvasWidth = baseWidth * scale;
-    const canvasHeight = baseHeight * scale;
-
-    canvas.style.width = `${canvasWidth}px`;
-    canvas.style.height = `${canvasHeight}px`;
-
-    canvas.style.position = 'absolute';
-    canvas.style.left = `${(windowWidth - canvasWidth) / 2}px`;
-    canvas.style.top = `${(windowHeight - canvasHeight) / 2}px`;
-  } else {
-    // На ПК canvas занимает 100% контейнера
-    canvas.style.position = 'relative';
-    canvas.style.width = '100%';
-    canvas.style.height = '100%';
-    canvas.style.left = '0';
-    canvas.style.top = '0';
-  }
-}
+// Убираем центрирование canvas вручную!
 
 function checkOrientation() {
   resetVisibility();
@@ -82,20 +48,19 @@ function checkOrientation() {
         document.body.style.height = '200vh';
         document.body.style.overflowY = 'auto';
       } else {
-        // После запуска игры — игра всегда показывается, даже если вертикаль
         showElement('game-container');
         document.body.style.height = '100vh';
         document.body.style.overflowY = 'hidden';
       }
     }
   } else {
-    // ПК — сразу игра
     showElement('game-container');
     document.body.style.height = '100vh';
     document.body.style.overflowY = 'hidden';
 
-    if (!game) {
-      game = new Phaser.Game(config);
+    if (!window.game) {
+      window.game = new Phaser.Game(config);
+      window.game.renderer.clearBeforeRender = false;
       gameStarted = true;
     }
   }
@@ -110,27 +75,23 @@ function startGame() {
 
   window.scrollTo(0, 0);
 
-  if (!game) {
-    game = new Phaser.Game(config);
+  if (!window.game) {
+    window.game = new Phaser.Game(config);
+    window.game.renderer.clearBeforeRender = false;
   }
   gameStarted = true;
-  resizeGame();
 }
 
 window.addEventListener('resize', () => {
   checkOrientation();
-  resizeGame();
 });
 
 window.addEventListener('orientationchange', () => {
   checkOrientation();
 
-  // При смене ориентации в ландшафт поднимаем страницу, чтобы скрыть панель браузера
   if (isMobile() && !window.matchMedia("(orientation: portrait)").matches) {
     setTimeout(() => window.scrollTo(0, 1), 300);
   }
-
-  resizeGame();
 });
 
 window.addEventListener('load', () => {

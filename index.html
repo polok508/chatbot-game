@@ -5,23 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>Чат-Бот Спасает Бизнес</title>
 
-  <link rel="icon" href="favicon.ico" type="image/x-icon" />
+  <link rel="icon" href="favicon.png" type="image/png" />
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet" />
 
   <style>
     html, body {
-      margin: 0;
-      padding: 0;
+      margin: 0; padding: 0;
       background: #000;
-      width: 100vw;
-      height: 100vh;
+      width: 100vw; height: 100vh;
       font-family: 'Roboto', sans-serif;
       color: white;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
-      overflow-x: hidden;
+      overflow: hidden;
     }
-
     #rotate-notice,
     #scroll-notice,
     #game-container {
@@ -30,7 +27,6 @@
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
     }
-
     #rotate-notice.visible,
     #scroll-notice.visible {
       display: flex !important;
@@ -51,7 +47,6 @@
       flex-direction: column;
       font-weight: 400;
     }
-
     #scroll-notice.visible {
       height: auto;
       top: auto;
@@ -66,7 +61,6 @@
       flex-direction: column;
       justify-content: center;
     }
-
     #game-container.visible {
       display: block !important;
       position: relative;
