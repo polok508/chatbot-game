@@ -1,5 +1,4 @@
 function isMobile() {
- 
   return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 }
 
@@ -9,12 +8,12 @@ const BASE_HEIGHT = 992;
 const config = {
   type: Phaser.AUTO,
   parent: 'game-container',
-  width: isMobile() ? window.innerWidth : BASE_WIDTH,
-  height: isMobile() ? window.innerHeight : BASE_HEIGHT,
-  backgroundColor: '#ffffff',
+  width: BASE_WIDTH,
+  height: BASE_HEIGHT,
+  backgroundColor: '#000000',
   scene: [Scene1, Scene2, Scene3, Scene4, Scene5],
   scale: {
-    mode: isMobile() ? Phaser.Scale.RESIZE : Phaser.Scale.FIT,
+    mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
     max: {
       width: BASE_WIDTH,

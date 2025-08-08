@@ -1,81 +1,80 @@
 let game = null;
 
 function isMobile() {
-    return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+}
+
+function showElement(id) {
+  document.getElementById(id).classList.add('visible');
+}
+
+function hideElement(id) {
+  document.getElementById(id).classList.remove('visible');
+}
+
+function resetVisibility() {
+  hideElement('rotate-notice');
+  hideElement('scroll-notice');
+  hideElement('game-container');
 }
 
 function checkOrientation() {
-    const isPortrait = window.innerHeight > window.innerWidth;
-    const notice = document.getElementById('rotate-notice');
-    const startBtn = document.getElementById('start-button');
+  resetVisibility();
 
+  const isPortrait = window.innerHeight > window.innerWidth;
+
+  if (isMobile()) {
     if (isPortrait) {
-        notice.style.display = 'flex';
-        startBtn.style.display = 'none';
-        if (game && game.canvas) {
-            game.canvas.style.filter = 'blur(5px)';
-            game.canvas.style.pointerEvents = 'none';
-        }
+      showElement('rotate-notice');
+      document.body.style.height = '100vh';
+      document.body.style.overflowY = 'hidden';
     } else {
-        notice.style.display = 'none';
-        if (!game) {
-            startBtn.style.display = 'block';
-        }
-        if (game && game.canvas) {
-            game.canvas.style.filter = 'none';
-            game.canvas.style.pointerEvents = 'auto';
-        }
+      showElement('scroll-notice');
+      document.body.style.height = '200vh';
+      document.body.style.overflowY = 'auto';
     }
+  } else {
+    showElement('game-container');
+    document.body.style.height = '100vh';
+    document.body.style.overflowY = 'hidden';
+
+    if (!game) {
+      game = new Phaser.Game(config);
+    }
+  }
 }
 
-
-function resizeGame() {
-    if (game && isMobile()) {
-        game.scale.resize(window.innerWidth, window.innerHeight);
-    }
-}
-
-window.addEventListener('resize', () => {
-    checkOrientation();
-    resizeGame();
-});
+window.addEventListener('resize', checkOrientation);
 window.addEventListener('orientationchange', () => {
-    checkOrientation();
-    resizeGame();
+  checkOrientation();
 
-    // Для iOS автоскролл
-    if (isMobile() && /iPad|iPhone|iPod/.test(navigator.userAgent)) {
-        setTimeout(() => window.scrollTo(0, 1), 300);
-    }
-});
-
-document.getElementById('start-button').addEventListener('click', async () => {
-    await enterFullscreen();
-    game = new Phaser.Game(config);
-    document.getElementById('start-button').style.display = 'none';
+  if (isMobile() && !window.matchMedia("(orientation: portrait)").matches) {
+    setTimeout(() => window.scrollTo(0, 1), 300);
+  }
 });
 
 window.addEventListener('load', () => {
-    checkOrientation();
-});
+  checkOrientation();
 
-async function enterFullscreen() {
-    const elem = document.documentElement;
+  if (isMobile()) {
+    let gameStarted = false;
 
-    if (elem.requestFullscreen) {
-        await elem.requestFullscreen();
-    } else if (elem.webkitRequestFullscreen) {
-        await elem.webkitRequestFullscreen();
-    }
+    window.addEventListener('scroll', () => {
+      const rotateVisible = document.getElementById('rotate-notice').classList.contains('visible');
+      if (window.scrollY > 100 && !gameStarted && !rotateVisible) {
+        gameStarted = true;
 
-    if (isMobile()) {
-        document.documentElement.style.height = window.innerHeight + "px";
-        document.body.style.height = window.innerHeight + "px";
-        document.body.style.overflow = "hidden";
+        showElement('game-container');
 
-        // Несколько попыток автоскролла чтобы скрыть адресную строку
-        for (let i = 0; i < 3; i++) {
-            setTimeout(() => window.scrollTo(0, 1), i * 300);
+        document.body.style.height = '100vh';
+        document.body.style.overflowY = 'hidden';
+
+        window.scrollTo(0, 0);
+
+        if (!game) {
+          game = new Phaser.Game(config);
         }
-    }
-}
+      }
+    });
+  }
+});
