@@ -1,134 +1,216 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-    <link rel="icon" type="image/png" href="favicon.png" />
-    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
-    <title>Чат-Бот Спасает Бизнес</title>
-    <style>
-        html, body {
-            margin: 0;
-            padding: 0;
-            background: #f4f4f4;
-            overflow: hidden;
-            height: 100%;
-            font-family: 'Roboto', sans-serif;
-        }
-        #game-container {
-            width: 100vw;
-            height: 100vh;
-            display: none; 
-        }
-        .overlay {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: white;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            text-align: center;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-        .overlay button {
-            padding: 12px 24px;
-            font-size: 18px;
-            background: #2196F3;
-            border: none;
-            border-radius: 8px;
-            color: white;
-            cursor: pointer;
-            margin-top: 20px;
-        }
-        .overlay.hidden {
-            display: none;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <link rel="icon" type="image/png" href="favicon.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet" />
+  <title>Чат-Бот Спасает Бизнес</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #f4f4f4;
+      overflow: hidden;
+      height: 100%;
+      font-family: 'Roboto', sans-serif;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    #game-container {
+      width: 100vw;
+      height: 100vh;
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      background: #ffffff;
+      z-index: 10000;
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      text-align: center;
+      padding: 20px;
+      box-sizing: border-box;
+      font-family: 'Roboto', sans-serif;
+    }
+
+    .overlay button {
+      padding: 12px 24px;
+      font-size: 18px;
+      background: #2196F3;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
+      margin-top: 20px;
+      font-family: 'Roboto', sans-serif;
+    }
+
+    .overlay.hidden {
+      display: none;
+    }
+
+    #scroll-wrapper {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow-y: scroll;
+      -webkit-overflow-scrolling: touch;
+      z-index: 9998;
+      display: none;
+      background: white;
+    }
+
+    #scroll-wrapper > div {
+      height: 200vh;
+      pointer-events: none;
+    }
+  </style>
 </head>
 <body>
 
-    <div id="orientation-overlay" class="overlay">
-        <h2>Поверните устройство горизонтально</h2>
-        <p>Игра доступна только в альбомной ориентации</p>
-    </div>
+  <div id="orientation-overlay" class="overlay">
+    <h2>Поверните устройство горизонтально</h2>
+    <p>Игра доступна только в альбомной ориентации</p>
+  </div>
 
-    <div id="start-overlay" class="overlay hidden">
-        <h2>Готовы играть?</h2>
-        <button id="start-btn">Начать игру</button>
-    </div>
+  <div id="start-overlay" class="overlay hidden">
+    <h2>Готовы играть?</h2>
+    <button id="start-btn">Начать игру</button>
+  </div>
 
-    <div id="game-container"></div>
+  <div id="scroll-wrapper"><div></div></div>
+  <div id="game-container"></div>
 
-    <script src="https://cdn.jsdelivr.net/npm/phaser@3.88.2/dist/phaser.js"></script>
+  <script>
+    let gameStarted = false;
+    const orientationOverlay = document.getElementById('orientation-overlay');
+    const startOverlay = document.getElementById('start-overlay');
+    const startBtn = document.getElementById('start-btn');
+    const gameContainer = document.getElementById('game-container');
+    const scrollWrapper = document.getElementById('scroll-wrapper');
 
-    <!-- сцены -->
-    <script src="scenes/scene1.js"></script>
-    <script src="scenes/scene2.js"></script>
-    <script src="scenes/scene3.js"></script>
-    <script src="scenes/scene4.js"></script>
-    <script src="config.secret.js"></script>
-    <script src="forms/leadForm.js"></script>
-    <script src="scenes/scene5.js"></script>
-
-    <script>
-        let gameStarted = false;
-        const orientationOverlay = document.getElementById('orientation-overlay');
-        const startOverlay = document.getElementById('start-overlay');
-        const startBtn = document.getElementById('start-btn');
-        const gameContainer = document.getElementById('game-container');
-
-        function checkOrientation() {
-            const isLandscape = window.innerWidth > window.innerHeight;
-            if (!gameStarted) {
-                if (isLandscape) {
-                    orientationOverlay.classList.add('hidden');
-                    startOverlay.classList.remove('hidden');
-                } else {
-                    startOverlay.classList.add('hidden');
-                    orientationOverlay.classList.remove('hidden');
-                }
-            }
+    function checkOrientation() {
+      const isLandscape = window.innerWidth > window.innerHeight;
+      if (!gameStarted) {
+        if (isLandscape) {
+          orientationOverlay.classList.add('hidden');
+          startOverlay.classList.remove('hidden');
+        } else {
+          startOverlay.classList.add('hidden');
+          orientationOverlay.classList.remove('hidden');
         }
+      }
+    }
 
-        window.addEventListener('resize', checkOrientation);
-        window.addEventListener('orientationchange', checkOrientation);
-        document.addEventListener('DOMContentLoaded', checkOrientation);
+    window.addEventListener('resize', checkOrientation);
+    window.addEventListener('orientationchange', () => setTimeout(checkOrientation, 300));
+    document.addEventListener('DOMContentLoaded', checkOrientation);
 
-        startBtn.addEventListener('click', () => {
-            startOverlay.classList.add('hidden');
-            gameContainer.style.display = 'block';
-            launchGame();
-            gameStarted = true;
-        });
-
-        function launchGame() {
-            const config = {
-                type: Phaser.AUTO,
-                parent: 'game-container',
-                width: 1440,
-                height: 992,
-                backgroundColor: '#ffffff',
-                scene: [Scene1, Scene2, Scene3, Scene4, Scene5],
-                scale: {
-                    mode: Phaser.Scale.FIT,
-                    autoCenter: Phaser.Scale.CENTER_BOTH,
-                    orientation: Phaser.Scale.LANDSCAPE,
-                }
-            };
-            new Phaser.Game(config);
-
-            
-            if (document.documentElement.requestFullscreen) {
-                document.documentElement.requestFullscreen().catch(()=>{});
-            } else if (document.documentElement.webkitRequestFullscreen) {
-                document.documentElement.webkitRequestFullscreen();
-            }
+    function activateScrollWrapper() {
+      scrollWrapper.style.display = 'block';
+      document.body.style.overflow = 'hidden';
+      scrollWrapper.scrollTop = window.innerHeight;
+      scrollWrapper.addEventListener('scroll', () => {
+        if (scrollWrapper.scrollTop < window.innerHeight) {
+          scrollWrapper.scrollTop = window.innerHeight;
         }
-    </script>
+      });
+      gameContainer.style.height = window.innerHeight + 'px';
+      gameContainer.style.width = window.innerWidth + 'px';
+      gameContainer.style.position = 'fixed';
+      gameContainer.style.top = '0';
+      gameContainer.style.left = '0';
+      gameContainer.style.zIndex = '10000';
+    }
+
+    async function tryFullscreen() {
+      if (document.documentElement.requestFullscreen) {
+        try {
+          await document.documentElement.requestFullscreen();
+          return true;
+        } catch {
+          return false;
+        }
+      } else if (document.documentElement.webkitRequestFullscreen) {
+        try {
+          await document.documentElement.webkitRequestFullscreen();
+          return true;
+        } catch {
+          return false;
+        }
+      }
+      return false;
+    }
+
+    function loadScript(src) {
+      return new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = src;
+        s.onload = () => resolve();
+        s.onerror = () => reject(new Error(`Failed to load script ${src}`));
+        document.body.appendChild(s);
+      });
+    }
+
+    async function launchGame() {
+      await loadScript("https://cdn.jsdelivr.net/npm/phaser@3.88.2/dist/phaser.js");
+      await loadScript("scenes/scene1.js");
+      await loadScript("scenes/scene2.js");
+      await loadScript("scenes/scene3.js");
+      await loadScript("scenes/scene4.js");
+      await loadScript("config.secret.js");
+      await loadScript("forms/leadForm.js");
+      await loadScript("scenes/scene5.js");
+      await loadScript("config.js");
+      await loadScript("main.js");
+
+      const config = {
+        type: Phaser.AUTO,
+        parent: 'game-container',
+        width: 1440,
+        height: 992,
+        backgroundColor: '#ffffff',
+        scene: [Scene1, Scene2, Scene3, Scene4, Scene5],
+        scale: {
+          mode: Phaser.Scale.FIT,
+          autoCenter: Phaser.Scale.CENTER_BOTH,
+          orientation: Phaser.Scale.LANDSCAPE,
+        }
+      };
+      new Phaser.Game(config);
+    }
+
+    startBtn.addEventListener('click', async () => {
+      const isLandscape = window.innerWidth > window.innerHeight;
+      if (!isLandscape) return;
+
+      startOverlay.classList.add('hidden');
+      orientationOverlay.classList.add('hidden');
+      gameContainer.style.display = 'block';
+      gameStarted = true;
+
+      const fullscreenWorked = await tryFullscreen();
+      if (!fullscreenWorked) {
+        activateScrollWrapper();
+      }
+
+      launchGame();
+    });
+  </script>
 </body>
 </html>
