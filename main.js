@@ -7,14 +7,18 @@ function isMobile() {
     return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 }
 
-function isIOS() {
-    return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-}
-
 function setBodyStyles(height, overflow) {
     document.body.style.height = height;
     document.documentElement.style.height = height;
     document.body.style.overflowY = overflow;
+}
+
+function showElement(el) {
+    el.classList.add('visible');
+}
+
+function hideElement(el) {
+    el.classList.remove('visible');
 }
 
 function checkOrientation() {
@@ -22,43 +26,23 @@ function checkOrientation() {
 
     if (isMobile()) {
         if (isPortrait) {
-            rotateNotice.style.display = 'flex';
-            scrollNotice.style.display = 'none';
-            gameContainer.style.display = 'none';
+            showElement(rotateNotice);
+            hideElement(scrollNotice);
+            hideElement(gameContainer);
 
             setBodyStyles('100vh', 'hidden');
-
-            // Центрируем текст rotate-notice через стили
-            rotateNotice.style.position = 'fixed';
-            rotateNotice.style.top = '0';
-            rotateNotice.style.left = '0';
-            rotateNotice.style.width = '100vw';
-            rotateNotice.style.height = '100vh';
-            rotateNotice.style.justifyContent = 'center';
-            rotateNotice.style.alignItems = 'center';
-            rotateNotice.style.textAlign = 'center';
-
         } else {
-            rotateNotice.style.display = 'none';
-            scrollNotice.style.display = 'flex';
-            gameContainer.style.display = 'none';
+            hideElement(rotateNotice);
+            showElement(scrollNotice);
+            hideElement(gameContainer);
 
             setBodyStyles('200vh', 'auto');
             window.scrollTo(0, 0);
-
-            // Центрируем текст scroll-notice через стили
-            scrollNotice.style.position = 'fixed';
-            scrollNotice.style.bottom = '0';
-            scrollNotice.style.left = '0';
-            scrollNotice.style.width = '100vw';
-            scrollNotice.style.justifyContent = 'center';
-            scrollNotice.style.alignItems = 'center';
-            scrollNotice.style.textAlign = 'center';
         }
     } else {
-        rotateNotice.style.display = 'none';
-        scrollNotice.style.display = 'none';
-        gameContainer.style.display = 'block';
+        hideElement(rotateNotice);
+        hideElement(scrollNotice);
+        showElement(gameContainer);
 
         setBodyStyles('100vh', 'hidden');
 
@@ -72,7 +56,7 @@ function startGame() {
     setBodyStyles('100vh', 'hidden');
     window.scrollTo(0, 0);
 
-    gameContainer.style.display = 'block';
+    showElement(gameContainer);
     gameContainer.style.margin = '0 auto';
     gameContainer.style.transform = 'translateY(-2vh)';
 
@@ -89,7 +73,6 @@ window.addEventListener('resize', checkOrientation);
 window.addEventListener('orientationchange', () => {
     checkOrientation();
 
-    // В iOS иногда помогает убрать адресную строку после смены ориентации
     if (isMobile() && !window.matchMedia("(orientation: portrait)").matches) {
         setTimeout(() => window.scrollTo(0, 1), 300);
     }

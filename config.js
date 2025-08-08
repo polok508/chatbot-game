@@ -9,7 +9,7 @@ const config = {
   backgroundColor: '#fff',
   scene: [Scene1, Scene2, Scene3, Scene4, Scene5],
   scale: {
-    mode: Phaser.Scale.FIT,           // Сохраняем пропорции, масштабируем
+    mode: Phaser.Scale.FIT,           
     autoCenter: Phaser.Scale.CENTER_BOTH,
     max: {
       width: BASE_WIDTH,
