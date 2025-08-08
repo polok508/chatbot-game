@@ -11,10 +11,11 @@
     html, body {
       margin: 0; padding: 0;
       width: 100vw;
-      height: 100vh;
+      height: calc(var(--vh, 1vh) * 100);
       font-family: 'Roboto', sans-serif;
       background: #f4f4f4;
       touch-action: none;
+      -webkit-overflow-scrolling: touch;
       overflow: hidden;
       position: fixed;
       user-select: none;
@@ -24,7 +25,7 @@
       position: fixed;
       top: 0; left: 0;
       width: 100vw;
-      height: 100vh;
+      height: calc(var(--vh, 1vh) * 100);
       background: #fff;
       overflow: hidden;
       z-index: 20;
@@ -36,7 +37,7 @@
       position: fixed;
       top: 0; left: 0;
       width: 100vw;
-      height: 100vh;
+      height: calc(var(--vh, 1vh) * 100);
       overflow-y: scroll;
       -webkit-overflow-scrolling: touch;
       background: transparent;
@@ -86,14 +87,6 @@
       return /iPhone|iPad|iPod/.test(navigator.userAgent);
     }
 
-    function isAndroid() {
-      return /Android/.test(navigator.userAgent);
-    }
-
-    function isMobile() {
-      return isIOS() || isAndroid();
-    }
-
     function isSafari() {
       const ua = navigator.userAgent;
       return /Safari/.test(ua) && !/Chrome/.test(ua) && !/CriOS/.test(ua);
@@ -112,6 +105,7 @@
       const body = document.body;
 
       if (isIOS() && isSafari() && isLandscape()) {
+    
         scrollWrapper.style.display = 'block';
 
         body.style.position = 'static';
@@ -133,46 +127,32 @@
             body.style.position = 'fixed';
             body.style.overflow = 'hidden';
             body.style.width = '100vw';
-            body.style.height = '100vh';
+            body.style.height = `calc(var(--vh, 1vh) * 100)`;
 
             scrollWrapper.removeEventListener('scroll', onUserScroll);
           }
         }
         scrollWrapper.addEventListener('scroll', onUserScroll);
       } else {
+
         scrollWrapper.style.display = 'none';
 
         body.style.position = 'fixed';
         body.style.overflow = 'hidden';
         body.style.width = '100vw';
-        body.style.height = '100vh';
+        body.style.height = `calc(var(--vh, 1vh) * 100)`;
       }
     }
 
+    function setRealVh() {
+    
+      const vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty('--vh', `${vh}px`);
+    }
+
     function runAllFixes() {
-      if (isIOS() && isSafari()) {
-      
-        setupScrollForSafari();
-      } else if (isYandex() && isMobile() && isLandscape()) {
-      
-        const game = document.getElementById('game-container');
-        const fullHeight = window.screen.height;
-        game.style.height = fullHeight + 'px';
-
-        document.body.style.position = 'fixed';
-        document.body.style.overflow = 'hidden';
-
-        document.getElementById('scroll-wrapper').style.display = 'none';
-      } else {
-        // Все остальные — фиксированная высота 100vh
-        const game = document.getElementById('game-container');
-        game.style.height = '100vh';
-
-        document.body.style.position = 'fixed';
-        document.body.style.overflow = 'hidden';
-
-        document.getElementById('scroll-wrapper').style.display = 'none';
-      }
+      setRealVh();
+      setupScrollForSafari();
     }
 
     window.addEventListener('load', () => {
