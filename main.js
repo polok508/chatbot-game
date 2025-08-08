@@ -21,10 +21,46 @@ function resetVisibility() {
   hideElement('game-container');
 }
 
-// Убираем центрирование canvas вручную!
+function adjustHeight() {
+  const height = window.innerHeight;
+  const gameContainer = document.getElementById('game-container');
+  document.body.style.height = `${height}px`;
+  gameContainer.style.height = `${height}px`;
+}
+
+function resizeGame() {
+  if (!window.game || !window.game.canvas) return;
+
+  const canvas = window.game.canvas;
+  const windowWidth = window.innerWidth;
+  const windowHeight = window.innerHeight;
+
+  if (isMobile()) {
+    const scaleX = windowWidth / window.game.config.width;
+    const scaleY = windowHeight / window.game.config.height;
+    const scale = Math.min(scaleX, scaleY);
+
+    const canvasWidth = window.game.config.width * scale;
+    const canvasHeight = window.game.config.height * scale;
+
+    canvas.style.width = `${canvasWidth}px`;
+    canvas.style.height = `${canvasHeight}px`;
+
+    canvas.style.position = 'absolute';
+    canvas.style.left = `${(windowWidth - canvasWidth) / 2}px`;
+    canvas.style.top = `${(windowHeight - canvasHeight) / 2}px`;
+  } else {
+    canvas.style.position = 'relative';
+    canvas.style.width = '100%';
+    canvas.style.height = '100%';
+    canvas.style.left = '0';
+    canvas.style.top = '0';
+  }
+}
 
 function checkOrientation() {
   resetVisibility();
+  adjustHeight();
 
   const isPortrait = window.innerHeight > window.innerWidth;
 
@@ -32,30 +68,28 @@ function checkOrientation() {
     if (!rotatedToLandscape) {
       if (isPortrait) {
         showElement('rotate-notice');
-        document.body.style.height = '100vh';
         document.body.style.overflowY = 'hidden';
         return;
       } else {
         rotatedToLandscape = true;
         showElement('scroll-notice');
-        document.body.style.height = '200vh';
+        document.body.style.height = `${window.innerHeight * 2}px`;
         document.body.style.overflowY = 'auto';
         return;
       }
     } else {
       if (!gameStarted) {
         showElement('scroll-notice');
-        document.body.style.height = '200vh';
+        document.body.style.height = `${window.innerHeight * 2}px`;
         document.body.style.overflowY = 'auto';
       } else {
         showElement('game-container');
-        document.body.style.height = '100vh';
         document.body.style.overflowY = 'hidden';
+        adjustHeight();
       }
     }
   } else {
     showElement('game-container');
-    document.body.style.height = '100vh';
     document.body.style.overflowY = 'hidden';
 
     if (!window.game) {
@@ -63,6 +97,7 @@ function checkOrientation() {
       window.game.renderer.clearBeforeRender = false;
       gameStarted = true;
     }
+    adjustHeight();
   }
 }
 
@@ -70,8 +105,8 @@ function startGame() {
   hideElement('scroll-notice');
   showElement('game-container');
 
-  document.body.style.height = '100vh';
   document.body.style.overflowY = 'hidden';
+  adjustHeight();
 
   window.scrollTo(0, 0);
 
@@ -80,18 +115,23 @@ function startGame() {
     window.game.renderer.clearBeforeRender = false;
   }
   gameStarted = true;
+  resizeGame();
 }
 
 window.addEventListener('resize', () => {
+  adjustHeight();
+  resizeGame();
   checkOrientation();
 });
 
 window.addEventListener('orientationchange', () => {
+  adjustHeight();
   checkOrientation();
 
   if (isMobile() && !window.matchMedia("(orientation: portrait)").matches) {
     setTimeout(() => window.scrollTo(0, 1), 300);
   }
+  resizeGame();
 });
 
 window.addEventListener('load', () => {
