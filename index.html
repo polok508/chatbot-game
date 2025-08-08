@@ -1,90 +1,66 @@
 <!DOCTYPE html>
 <html lang="ru">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <link rel="icon" type="image/png" href="favicon.png" />
-  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet" />
-  <title>Чат-Бот Спасает Бизнес</title>
-  <style>
-    html, body {
-      margin: 0; padding: 0;
-      height: 100%;
-      font-family: 'Roboto', sans-serif;
-      background: #f4f4f4;
-      overflow: hidden;
-      -webkit-overflow-scrolling: touch;
-    }
-    #game-container {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: #fff;
-      display: none;
-      z-index: 10000;
-    }
-    .overlay {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw; height: 100vh;
-      background: white;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      z-index: 10001;
-      padding: 20px;
-      box-sizing: border-box;
-      text-align: center;
-      font-family: 'Roboto', sans-serif;
-    }
-    .overlay.hidden {
-      display: none;
-    }
-    .overlay button {
-      margin-top: 20px;
-      padding: 12px 24px;
-      font-size: 18px;
-      border-radius: 8px;
-      border: none;
-      background: #2196F3;
-      color: white;
-      cursor: pointer;
-      font-family: 'Roboto', sans-serif;
-    }
-    #scroll-wrapper {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw; height: 100vh;
-      overflow-y: scroll;
-      -webkit-overflow-scrolling: touch;
-      background: white;
-      display: none;
-      z-index: 9999;
-    }
-    #scroll-wrapper > div {
-      height: 200vh;
-      pointer-events: none;
-    }
-  </style>
-</head>
-<body>
+    <head>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="HandheldFriendly" content="true">
+        <link rel="icon" type="image/png" href="favicon.png" />
+        <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+        <title>Чат-Бот Спасает Бизнес</title>
+        <style>
+            html, body {
+                margin: 0;
+                padding: 0;
+                background: #f4f4f4;
+                overflow: hidden;
+                touch-action: none;
+                -ms-touch-action: none;
+            }
+            #game-container {
+                width: 100vw;
+                height: 100vh;
+                position: fixed;
+                top: 0;
+                left: 0;
+            }
+            /* Стили для сообщения о повороте */
+            #orientation-warning {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: #000;
+                color: #fff;
+                justify-content: center;
+                align-items: center;
+                z-index: 9999;
+                font-size: 24px;
+                text-align: center;
+                padding: 20px;
+                font-family: 'Roboto', sans-serif;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="game-container"></div>
+        <!-- Сообщение о повороте будет добавляться динамически -->
 
-  <div id="orientation-overlay" class="overlay">
-    <h2>Поверните устройство горизонтально</h2>
-    <p>Игра доступна только в альбомной ориентации</p>
-  </div>
+        <script src="https://cdn.jsdelivr.net/npm/phaser@3.88.2/dist/phaser.js"></script>
+        
+        <!-- сцены -->
+        <script src="scenes/scene1.js"></script>
+        <script src="scenes/scene2.js"></script>
+        <script src="scenes/scene3.js"></script>
+        <script src="scenes/scene4.js"></script>
+        <script src="config.secret.js"></script>
+        <script src="forms/leadForm.js"></script>
+        <script src="scenes/scene5.js"></script>
 
-  <div id="start-overlay" class="overlay hidden">
-    <h2>Готовы играть?</h2>
-    <button id="start-btn">Начать игру</button>
-  </div>
-
-  <div id="scroll-wrapper"><div></div></div>
-
-  <div id="game-container"></div>
-
-  <script src="main.js"></script>
-</body>
+        <script src="config.js"></script>
+        <script src="main.js"></script>
+    </body>
 </html>
