@@ -1,156 +1,183 @@
 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
 const isYandex = navigator.userAgent.includes('YaBrowser');
 
 const config = {
-  type: Phaser.AUTO,
-  parent: 'game-container',
-  width: 1440,
-  height: 992,
-  backgroundColor: '#ffffff',
-  scene: [Scene1, Scene2, Scene3, Scene4, Scene5],
-  scale: {
-    mode: isMobile ? Phaser.Scale.ENVELOP : Phaser.Scale.FIT,
-    autoCenter: Phaser.Scale.CENTER_BOTH,
-    max: {
-      width: 1440,
-      height: 992
-    },
-    min: {
-      width: 400,
-      height: 600
+    type: Phaser.AUTO,
+    parent: 'game-container',
+    width: 1440,
+    height: 992,
+    backgroundColor: '#ffffff',
+    scene: [Scene1, Scene2, Scene3, Scene4, Scene5],
+    scale: {
+        mode: Phaser.Scale.FIT,
+        autoCenter: Phaser.Scale.CENTER_BOTH,
+        max: {
+            width: 1440,
+            height: 992
+        },
+        min: {
+            width: 400,
+            height: 600
+        }
     }
-  }
 };
 
-
-const orientationEvent = isSafari ? 'resize' : 'orientationchange';
-
 function initGame() {
-  if (isMobile) {
-    checkOrientation();
-  
-    if (isYandex) {
-      setupYandexBrowser();
+    setProperSizes();
+    
+    if (isMobile) {
+        setupMobileEnvironment();
+        checkOrientation();
+    } else {
+
+        startGame(false);
     }
-  } else {
-    new Phaser.Game(config);
-  }
+}
+
+function setProperSizes() {
+    document.documentElement.style.height = '100%';
+    document.body.style.height = '100%';
+    document.getElementById('game-container').style.height = '100%';
+    
+    if (isIOS) {
+        document.body.style.overflow = 'hidden';
+        document.body.style.position = 'fixed';
+    }
+}
+
+function setupMobileEnvironment() {
+    window.scrollTo(0, 1);
+    
+    if (isIOS) {
+        document.body.style.webkitTransform = 'translate3d(0,0,0)';
+        window.addEventListener('scroll', preventScrolling);
+    }
+    
+    if (isYandex) {
+        setupYandexBrowser();
+    }
 }
 
 function checkOrientation() {
-  if (!isLandscape()) {
-    showOrientationWarning();
-    window.addEventListener(orientationEvent, handleOrientationChange);
-  } else {
-    startGame();
-  }
+    if (isLandscape()) {
+        startGame(true);
+    } else {
+        showOrientationWarning();
+        setupOrientationListeners();
+    }
+}
+
+
+function startGame(requestFullscreen) {
+    hideOrientationWarning();
+    
+    if (!window.game) {
+        window.game = new Phaser.Game(config);
+        setupGameResizeHandler();
+        
+        if (requestFullscreen && isMobile) {
+           
+            setTimeout(() => enterFullscreen(), 300);
+        }
+    } else {
+        window.game.scale.refresh();
+    }
 }
 
 function isLandscape() {
-
-  return window.innerWidth > window.innerHeight || 
-         window.matchMedia("(orientation: landscape)").matches;
-}
-
-function handleOrientationChange() {
-  if (!isLandscape()) {
-    showOrientationWarning();
-  } else {
-    hideOrientationWarning();
-    if (!window.game) {
-      startGame();
+    if (window.screen.orientation) {
+        return window.screen.orientation.type.includes('landscape');
     }
-  }
-}
-
-function startGame() {
-
-  enterFullscreen();
-  
-  window.game = new Phaser.Game(config);
-  
- 
-  if (isMobile) {
-    window.addEventListener('resize', () => {
-      if (window.game && isLandscape()) {
-        setTimeout(() => {
-          window.game.scale.refresh();
-        }, 300);
-      }
-    });
-  }
-}
-
-function enterFullscreen() {
-  const element = document.documentElement;
-  if (element.requestFullscreen) {
-    element.requestFullscreen().catch(e => console.log(e));
-  } else if (element.webkitRequestFullscreen) { 
-    element.webkitRequestFullscreen().catch(e => console.log(e));
-  } else if (element.msRequestFullscreen) {
-    element.msRequestFullscreen().catch(e => console.log(e));
-  }
-}
-
-function setupYandexBrowser() {
-
-  document.addEventListener('click', function yandexHide() {
-    enterFullscreen();
-    document.removeEventListener('click', yandexHide);
-  });
-  
-
-  setInterval(() => {
-    if (window.game && isLandscape()) {
-      window.game.scale.refresh();
-    }
-  }, 1000);
+    return window.innerWidth > window.innerHeight || Math.abs(window.orientation) === 90;
 }
 
 function showOrientationWarning() {
-  let warning = document.getElementById('orientation-warning');
-  if (!warning) {
-    warning = document.createElement('div');
-    warning.id = 'orientation-warning';
-    warning.style.position = 'fixed';
-    warning.style.top = '0';
-    warning.style.left = '0';
-    warning.style.width = '100%';
-    warning.style.height = '100%';
-    warning.style.backgroundColor = '#000';
-    warning.style.color = '#fff';
-    warning.style.display = 'flex';
-    warning.style.flexDirection = 'column';
-    warning.style.justifyContent = 'center';
-    warning.style.alignItems = 'center';
-    warning.style.zIndex = '9999';
-    warning.style.fontSize = '24px';
-    warning.style.textAlign = 'center';
-    warning.style.padding = '20px';
-    warning.innerHTML = `
-      <p>Пожалуйста, поверните устройство в горизонтальное положение</p>
-      <button id="force-landscape" style="margin-top: 20px; padding: 10px 20px; font-size: 18px;">
-        Я уже в горизонтальном режиме
-      </button>
-    `;
-    document.body.appendChild(warning);
+    const warning = document.getElementById('orientation-warning');
+    if (warning) {
+        warning.style.display = 'flex';
+    }
     
- 
-    document.getElementById('force-landscape').addEventListener('click', () => {
-      hideOrientationWarning();
-      startGame();
-    });
-  } else {
-    warning.style.display = 'flex';
-  }
+    document.getElementById('force-landscape').addEventListener('click', () => startGame(true), { once: true });
 }
 
 function hideOrientationWarning() {
-  const warning = document.getElementById('orientation-warning');
-  if (warning) {
-    warning.style.display = 'none';
-  }
+    const warning = document.getElementById('orientation-warning');
+    if (warning) {
+        warning.style.display = 'none';
+    }
+}
+
+function setupOrientationListeners() {
+    const events = isIOS ? ['resize', 'orientationchange'] : ['orientationchange'];
+    events.forEach(event => {
+        window.addEventListener(event, handleOrientationChange, { passive: true });
+    });
+}
+
+function handleOrientationChange() {
+    if (isLandscape()) {
+        startGame(true);
+    } else {
+        showOrientationWarning();
+    }
+}
+
+function setupGameResizeHandler() {
+    window.addEventListener('resize', () => {
+        if (window.game) {
+            setTimeout(() => {
+                window.game.scale.refresh();
+                if (isYandex) {
+                    setTimeout(() => window.game.scale.refresh(), 300);
+                }
+            }, 100);
+        }
+    });
+}
+
+function enterFullscreen() {
+
+    if (!isMobile) return;
+
+    const element = document.documentElement;
+    const methods = [
+        'requestFullscreen',
+        'webkitRequestFullscreen',
+        'msRequestFullscreen'
+    ];
+    
+    for (const method of methods) {
+        if (element[method]) {
+            element[method]().catch(e => console.log('Fullscreen error (expected on desktop):', e));
+            break;
+        }
+    }
+}
+
+function preventScrolling() {
+    window.scrollTo(0, 1);
+}
+
+function setupYandexBrowser() {
+    document.addEventListener('click', () => {
+        enterFullscreen();
+        if (window.game) {
+            setTimeout(() => window.game.scale.refresh(), 300);
+        }
+    });
+    
+    const yandexInterval = setInterval(() => {
+        if (window.game && isLandscape()) {
+            window.game.scale.refresh();
+        } else {
+            clearInterval(yandexInterval);
+        }
+    }, 1500);
 }
 
 window.addEventListener('load', initGame);
+
+if (isIOS) {
+    window.addEventListener('pageshow', initGame);
+}
