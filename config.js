@@ -10,7 +10,7 @@ const config = {
     backgroundColor: '#ffffff',
     scene: [Scene1, Scene2, Scene3, Scene4, Scene5],
     scale: {
-        mode: Phaser.Scale.FIT,
+        mode: isMobile ? Phaser.Scale.ENVELOP : Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH,
         max: {
             width: 1440,
@@ -23,6 +23,7 @@ const config = {
     }
 };
 
+
 function initGame() {
     setProperSizes();
     
@@ -30,7 +31,6 @@ function initGame() {
         setupMobileEnvironment();
         checkOrientation();
     } else {
-
         startGame(false);
     }
 }
@@ -42,12 +42,12 @@ function setProperSizes() {
     
     if (isIOS) {
         document.body.style.overflow = 'hidden';
-        document.body.style.position = 'fixed';
+        document.documentElement.style.overflow = 'hidden';
     }
 }
 
 function setupMobileEnvironment() {
-    window.scrollTo(0, 1);
+    hideBrowserUI();
     
     if (isIOS) {
         document.body.style.webkitTransform = 'translate3d(0,0,0)';
@@ -68,22 +68,21 @@ function checkOrientation() {
     }
 }
 
-
 function startGame(requestFullscreen) {
     hideOrientationWarning();
     
     if (!window.game) {
         window.game = new Phaser.Game(config);
-        setupGameResizeHandler();
+        setupViewportResizeHandler();
         
         if (requestFullscreen && isMobile) {
-           
             setTimeout(() => enterFullscreen(), 300);
         }
     } else {
         window.game.scale.refresh();
     }
 }
+
 
 function isLandscape() {
     if (window.screen.orientation) {
@@ -123,21 +122,35 @@ function handleOrientationChange() {
     }
 }
 
-function setupGameResizeHandler() {
+function hideBrowserUI() {
+    window.scrollTo(0, 1);
+    setTimeout(() => window.scrollTo(0, 0), 100);
+    
+    if (/Android/.test(navigator.userAgent)) {
+        const metaViewport = document.querySelector('meta[name=viewport]');
+        metaViewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no');
+    }
+}
+
+function setupViewportResizeHandler() {
+    let lastHeight = window.innerHeight;
+    
     window.addEventListener('resize', () => {
-        if (window.game) {
+        const newHeight = window.innerHeight;
+        
+        if (Math.abs(lastHeight - newHeight) > 60) {
+            lastHeight = newHeight;
             setTimeout(() => {
-                window.game.scale.refresh();
-                if (isYandex) {
-                    setTimeout(() => window.game.scale.refresh(), 300);
+                if (window.game) {
+                    window.game.scale.refresh();
+                    hideBrowserUI();
                 }
-            }, 100);
+            }, 300);
         }
     });
 }
 
 function enterFullscreen() {
-
     if (!isMobile) return;
 
     const element = document.documentElement;
@@ -149,7 +162,7 @@ function enterFullscreen() {
     
     for (const method of methods) {
         if (element[method]) {
-            element[method]().catch(e => console.log('Fullscreen error (expected on desktop):', e));
+            element[method]().catch(e => console.log('Fullscreen error:', e));
             break;
         }
     }
@@ -161,10 +174,10 @@ function preventScrolling() {
 
 function setupYandexBrowser() {
     document.addEventListener('click', () => {
-        enterFullscreen();
-        if (window.game) {
-            setTimeout(() => window.game.scale.refresh(), 300);
-        }
+        setTimeout(() => {
+            window.scrollTo(0, 1);
+            if (window.game) window.game.scale.refresh();
+        }, 300);
     });
     
     const yandexInterval = setInterval(() => {
@@ -175,6 +188,7 @@ function setupYandexBrowser() {
         }
     }, 1500);
 }
+
 
 window.addEventListener('load', initGame);
 
