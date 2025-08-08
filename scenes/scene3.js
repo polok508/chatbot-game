@@ -4,21 +4,25 @@ class Scene3 extends Phaser.Scene {
   }
 
   preload() {
-    // загрузка изображений
     this.load.image('bg_office3', 'assets/bg/scene3.png');
     this.load.image('bot_icon', 'assets/icons/bot.png');
     this.load.image('send_icon', 'assets/icons/send.png');
   }
 
   create() {
-    // создание фона и анимация заголовка
     const { width, height } = this.scale;
+    this.chatX = 957;
+    this.chatY = 250;
+
+    // Фон
     this.add.image(width / 2, height / 2, 'bg_office3').setDisplaySize(width, height);
 
+    // Заголовок с анимацией появления
     this.headerBg = this.add.graphics()
       .fillStyle(0xffffff, 0.7)
-      .fillRoundedRect(403, 100, 635, 87, 20) 
+      .fillRoundedRect(403, 100, 635, 87, 20)
       .setAlpha(0);
+
     this.headerText = this.add.text(403 + 317, 100 + 43, "Летят заявки, ловите их!", {
       fontFamily: 'Roboto',
       fontSize: '40px',
@@ -32,7 +36,7 @@ class Scene3 extends Phaser.Scene {
       delay: 300
     });
 
-    // позиции заявок для клика
+    // Позиции заявок
     this.claimPositions = [
       { x: 182, y: 237 },
       { x: 624, y: 237 },
@@ -45,27 +49,23 @@ class Scene3 extends Phaser.Scene {
     this.claimsCaught = 0;
     this.totalClaims = this.claimPositions.length;
 
-    // создание заявок
+    
     this.claimPositions.forEach((pos, i) => this.spawnClaim(i, pos.x, pos.y));
 
-    // создание окна чата (изначально скрыто)
+   
     this.createChatWindow();
     this.chatContainer.setVisible(false);
 
-    // создание нижней панели (изначально скрыта)
     this.createBottomBar();
     this.bottomBarContainer.setVisible(false);
 
-    // создание кнопки "продолжить" (изначально скрыта)
     this.createContinueButton();
     this.continueBtn.setVisible(false);
 
-    // создание второй кнопки "продолжить" (изначально скрыта)
     this.createSecondContinueButton();
     this.continueBtnSecond.setVisible(false);
   }
 
-  // создание одной заявки с анимацией и обработкой клика
   spawnClaim(index, x, y) {
     const w = 191, h = 95;
     const g = this.add.graphics();
@@ -83,7 +83,7 @@ class Scene3 extends Phaser.Scene {
       fontFamily: 'Roboto',
       fontSize: '30px',
       color: '#fff',
-      fontStyle: 'bold' 
+      fontStyle: 'bold'
     }).setOrigin(0.5).setAlpha(0);
 
     this.tweens.add({
@@ -113,64 +113,51 @@ class Scene3 extends Phaser.Scene {
     });
   }
 
-  // создание окна чата с шапкой и контейнером сообщений
   createChatWindow() {
-    this.chatX = 957;
-    this.chatY = 250;
     this.chatWidth = 413;
     this.chatHeight = 672;
 
     this.chatContainer = this.add.container(this.chatX, this.chatY);
-
 
     const bg = this.add.graphics();
     bg.fillStyle(0xffffff, 1);
     bg.fillRoundedRect(0, 0, this.chatWidth, this.chatHeight, 20);
     this.chatContainer.add(bg);
 
-
     const headerBar = this.add.graphics();
     headerBar.fillStyle(0xD0CDF8, 1);
     headerBar.fillRoundedRect(0, 0, this.chatWidth, 70, 20);
     this.chatContainer.add(headerBar);
 
-    // шапка
     const botIcon = this.add.image(45, 35, 'bot_icon')
       .setOrigin(0.5)
       .setDisplaySize(50, 50);
     this.chatContainer.add(botIcon);
 
-
     const botLabel = this.add.text(105, 35, "Онлайн-помощник", {
       fontFamily: 'Roboto',
       fontSize: '20px',
       color: '#000',
-      fontWeight: 'bold' 
+      fontWeight: 'bold'
     }).setOrigin(0, 0.5);
     this.chatContainer.add(botLabel);
 
-    // контейнер для сообщений чуть ниже шапки
     this.messagesContainer = this.add.container(0, 90);
     this.chatContainer.add(this.messagesContainer);
 
-    // маска для сообщений, чтобы не выходили за пределы
     const maskShape = this.make.graphics();
     maskShape.fillStyle(0xffffff);
     maskShape.fillRect(this.chatX, this.chatY + 90, this.chatWidth, this.chatHeight - 90);
     const mask = maskShape.createGeometryMask();
     this.messagesContainer.setMask(mask);
 
-    // инициализация массива сообщений и переменной для вертикального позиционирования
     this.chatMessages = [];
     this.nextMessageY = 0;
-    this.maxVisibleHeight = this.chatHeight - 90 - 40;
   }
 
-  // создание нижней панели с полем сообщения и кнопкой отправки
   createBottomBar() {
     this.bottomBarContainer = this.add.container(this.chatX, this.chatY + 604);
 
-    // закруглённая белая плашка с бордером
     const bar = this.add.graphics();
     bar.fillStyle(0xffffff, 1);
     bar.fillRoundedRect(0, 0, this.chatWidth, 68, 20);
@@ -178,7 +165,6 @@ class Scene3 extends Phaser.Scene {
     bar.strokeRoundedRect(0, 0, this.chatWidth, 68, 20);
     this.bottomBarContainer.add(bar);
 
-    // плейсхолдер для текста сообщения
     this.messagePlaceholder = this.add.text(30, 34, 'Сообщение', {
       fontFamily: 'Roboto',
       fontSize: '16px',
@@ -186,28 +172,24 @@ class Scene3 extends Phaser.Scene {
     }).setOrigin(0, 0.5);
     this.bottomBarContainer.add(this.messagePlaceholder);
 
-    // иконка отправки сообщения
     const sendIcon = this.add.image(this.chatWidth - 30, 34, 'send_icon')
       .setOrigin(0.5)
       .setDisplaySize(41, 41);
     this.bottomBarContainer.add(sendIcon);
 
-
     this.bottomBarContainer.disableInteractive();
   }
 
-  // добавление нового сообщения в чат
   addMessage(text, isBot = true) {
     const maxBubbleWidth = 300;
     const paddingX = 20;
     const paddingY = 16;
     const radius = 10;
 
-    // временный текст для вычисления размеров пузыря
     const tempText = this.add.text(0, 0, text, {
       fontFamily: 'Roboto',
       fontSize: '18px',
-      fontWeight: 'bold', 
+      fontWeight: 'bold',
       wordWrap: { width: maxBubbleWidth - paddingX * 2 },
       align: 'left',
     });
@@ -216,31 +198,26 @@ class Scene3 extends Phaser.Scene {
     const bubbleHeight = tempText.height + paddingY * 2;
     tempText.destroy();
 
-    // закругления сообщений
     const bubble = this.add.graphics();
     bubble.fillStyle(0xEFEFEF, 1);
     bubble.fillRoundedRect(0, 0, bubbleWidth, bubbleHeight, radius);
 
-    // сам текст сообщения
     const msgText = this.add.text(paddingX, paddingY, text, {
       fontFamily: 'Roboto',
       fontSize: '18px',
-      fontWeight: 'bold', 
+      fontWeight: 'bold',
       color: '#000',
       wordWrap: { width: maxBubbleWidth - paddingX * 2 },
       align: 'left',
     });
 
-    // позиционирование: слева для бота, справа для пользователя
     const xPos = isBot ? 10 : this.chatWidth - bubbleWidth - 10;
     const msgContainer = this.add.container(xPos, this.nextMessageY, [bubble, msgText]);
     this.messagesContainer.add(msgContainer);
     this.chatMessages.push(msgContainer);
 
-    // обновляем координату по вертикали для следующего сообщения
     this.nextMessageY += bubbleHeight + 12;
 
-    // автоскролл, если сообщений много
     const visibleHeight = this.chatHeight - 90 - 40;
     const extraMargin = 20;
     if (this.nextMessageY > visibleHeight) {
@@ -250,7 +227,6 @@ class Scene3 extends Phaser.Scene {
     }
   }
 
-  // очистка всех сообщений из чата
   clearChat() {
     this.chatMessages.forEach(msg => msg.destroy());
     this.chatMessages = [];
@@ -258,12 +234,10 @@ class Scene3 extends Phaser.Scene {
     this.messagesContainer.y = 90;
   }
 
-
   delay(ms) {
     return new Promise(resolve => this.time.delayedCall(ms, resolve));
   }
 
-  // показать окно чата с анимацией
   showChatWindow() {
     this.chatContainer.setAlpha(0).setVisible(true);
     this.tweens.add({
@@ -277,25 +251,21 @@ class Scene3 extends Phaser.Scene {
     });
   }
 
-  // первое сообщение бота при показе чата
   showFirstBotMessage() {
     this.bottomBarContainer.setVisible(false);
     this.clearChat();
     this.addMessage("Только что чат-бот обработал 6 заявок за 60 секунд! Автоматически зарегистрированы и распределены по категориям", true);
   }
 
-  // показать кнопку продолжить
   showContinueButton() {
     this.continueBtn.setVisible(true);
   }
 
-  // скрыть кнопку продолжить и отключить интерактив
   hideContinueButton() {
     this.continueBtn.setVisible(false);
     this.continueBtnZone.disableInteractive();
   }
 
-  // создание первой кнопки продолжить с зоной клика
   createContinueButton() {
     const btnBg = this.add.graphics();
     btnBg.fillStyle(0x3A25B4, 1);
@@ -328,7 +298,6 @@ class Scene3 extends Phaser.Scene {
     });
   }
 
-  // запуск автодиаолога с вопросами и ответами
   async startAutoDialog() {
     const dialog = [
       { q: 'Какие есть тарифы?', a: 'У нас есть несколько тарифов на выбор.' },
@@ -354,7 +323,6 @@ class Scene3 extends Phaser.Scene {
     this.showSecondContinueButton();
   }
 
-  // создание второй кнопки продолжить
   createSecondContinueButton() {
     const btnBg = this.add.graphics();
     btnBg.fillStyle(0x3A25B4, 1);
@@ -385,13 +353,11 @@ class Scene3 extends Phaser.Scene {
     });
   }
 
-  // показать вторую кнопку продолжить
   showSecondContinueButton() {
     this.continueBtnSecond.setVisible(true);
     this.continueBtnSecondZone.setVisible(true).setInteractive();
   }
 
-  // скрыть вторую кнопку и отключить интерактив
   hideSecondContinueButton() {
     this.continueBtnSecond.setVisible(false);
     this.continueBtnSecondZone.disableInteractive().setVisible(false);

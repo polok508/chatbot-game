@@ -10,15 +10,15 @@ class Scene2 extends Phaser.Scene {
   }
 
   create() {
-    // фон
-    const bg = this.add.image(0, 0, 'manager_bg')
-      .setOrigin(0, 0)
-      .setDisplaySize(1440, 992);
+    // отключение очистки канваса перед рендером (чтобы убрать мерцание)
+    this.sys.settings.clearBeforeRender = false;
 
+    // Фон растянутый на всю сцену
+    this.bg = this.add.image(0, 0, 'manager_bg').setOrigin(0, 0);
+    this.bg.setDisplaySize(this.scale.width, this.scale.height);
 
     this.time.delayedCall(1500, () => {
-
-      const overlay = this.add.rectangle(0, 0, 1440, 992, 0x070707, 0.8)
+      const overlay = this.add.rectangle(0, 0, this.scale.width, this.scale.height, 0x070707, 0.8)
         .setOrigin(0, 0)
         .setAlpha(0);
       this.tweens.add({
@@ -26,7 +26,6 @@ class Scene2 extends Phaser.Scene {
         alpha: 1,
         duration: 500
       });
-
 
       const msgBg1 = this.add.graphics();
       msgBg1.fillStyle(0x3A25B4, 1);
@@ -48,7 +47,6 @@ class Scene2 extends Phaser.Scene {
         duration: 400,
         delay: 200
       });
-
 
       const loader = this.add.image(720, 496, 'ellipse1')
         .setDisplaySize(200, 200)
@@ -78,7 +76,6 @@ class Scene2 extends Phaser.Scene {
           alpha: 0,
           duration: 300,
           onComplete: () => {
-
             const msgBg2 = this.add.graphics();
             msgBg2.fillStyle(0xFFFFFF, 0.7);
             msgBg2.fillRoundedRect(0, 0, 357, 95, 20);
@@ -102,7 +99,7 @@ class Scene2 extends Phaser.Scene {
               duration: 400
             });
 
-            // кнопка
+            // кнопка продолжения
             const btnBg = this.add.graphics();
             btnBg.fillStyle(0x3A25B4, 1);
             btnBg.fillRoundedRect(0, 0, 357, 95, 20);
@@ -114,7 +111,7 @@ class Scene2 extends Phaser.Scene {
               .setAlpha(0)
               .setInteractive({ useHandCursor: true })
               .on('pointerdown', () => {
-                this.scene.start('Scene3');
+                this.scene.transition({ target: 'Scene3', duration: 500 });
               });
 
             const btnText = this.add.text(542 + 357 / 2, 746 + 95 / 2, "Продолжить", {
@@ -124,18 +121,20 @@ class Scene2 extends Phaser.Scene {
               color: '#FFFFFF'
             }).setOrigin(0.5).setAlpha(0);
 
-
             this.tweens.add({
               targets: [btn, btnText],
               alpha: 1,
               duration: 400,
               delay: 200
-              // пульсация убрана
             });
           }
         });
       });
     });
+  }
+
+  resize(width, height) {
+    if (this.bg) this.bg.setDisplaySize(width, height);
   }
 }
 

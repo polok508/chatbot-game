@@ -11,6 +11,9 @@ class Scene1 extends Phaser.Scene {
   }
 
   create() {
+    // отключение очистки канваса перед рендером (убирает мерцание)
+    this.sys.settings.clearBeforeRender = false;
+
     // Фон, растянутый на всю сцену
     this.bg = this.add.image(0, 0, 'bg_office').setOrigin(0, 0);
     this.bg.setDisplaySize(this.scale.width, this.scale.height);
@@ -33,9 +36,7 @@ class Scene1 extends Phaser.Scene {
 
     this.tweens.add({ targets: [this.titleBg, this.titleText], alpha: 1, duration: 500, delay: 200 });
 
-    // ... остальные элементы, сохранённые в this для ресайза
-    // Заполним массив для линий, сообщений и кнопок для удобства
-
+    // Линии
     this.lines = [];
     const linesData = [
       { key: 'vector1', x: 169.87, y: 262.93, w: 233.48, h: 97.10, delay: 1200 },
@@ -113,21 +114,18 @@ class Scene1 extends Phaser.Scene {
         840, 739,
         "справится уже сегодня", 301, 48, 0x0F0F0F, 0.5,
         "Установить Чат-Бота", 357, 95,
-        () => { this.scene.start('Scene2'); }
+        () => { 
+          this.scene.transition({ target: 'Scene2', duration: 500 });
+        }
       );
     });
   }
 
-  // resize метод для обновления размеров при ресайзе окна
   resize(width, height) {
-    // Фон
     if (this.bg) this.bg.setDisplaySize(width, height);
 
-    // Центрируем заголовок
     if (this.titleBg) this.titleBg.setPosition((width - 1300) / 2, 100);
-    // Заголовок не меняем размер шрифта, но при желании можно
 
-    // Линии - просто обновим позицию и размеры
     if (this.lines) {
       this.lines.forEach(({ line, shadow, data }) => {
         line.setPosition(data.x * width / 1440, data.y * height / 992);
@@ -137,18 +135,13 @@ class Scene1 extends Phaser.Scene {
       });
     }
 
-    // Сообщения
     if (this.messages) {
       this.messages.forEach(({ bg, txt, data }) => {
         bg.setPosition(data.x * width / 1440, data.y * height / 992);
         bg.setDisplaySize(data.w * width / 1440, data.h * height / 992);
         txt.setPosition(bg.x + 20 * width / 1440, bg.y + 20 * height / 992);
-        // Можно подгонять размер шрифта, если нужно
       });
     }
-
-    // Кнопки — если хранятся в this, обновляй позицию аналогично
-
   }
 
   createButtonContainer(x, y, topText, topBgWidth, topBgHeight, topBgColor, topBgAlpha, btnText, btnWidth, btnHeight, onClick) {

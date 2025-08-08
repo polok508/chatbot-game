@@ -12,122 +12,64 @@ class Scene4 extends Phaser.Scene {
   create() {
     const { width, height } = this.scale;
 
-    // фон сцены
+    // Фон сцены
     this.add.image(width / 2, height / 2, 'bg_office4').setDisplaySize(width, height);
 
-    // левый полупрозрачный блок
+    // Левый полупрозрачный блок
     const bgPanelLeft = this.add.graphics();
     bgPanelLeft.fillStyle(0xE0E0E0, 0.85);
     bgPanelLeft.fillRoundedRect(70, 331, 635, 330, 20);
-
 
     this.add.image(70 + 16.88 + 45, 331 + 5.63 + 45, 'bot2')
       .setOrigin(0.5)
       .setDisplaySize(90, 90);
 
+    const leftTexts = [
+      "Чат-бот автоматизирует рутину:",
+      "Отвечает на вопросы 24/7",
+      "Собирает и систематизирует",
+      "заявки",
+      "Фильтрует спам и первичные",
+      "запросы"
+    ];
 
-    this.add.text(70 + 120, 331 + 20, "Чат-бот автоматизирует рутину:", {
-      fontFamily: 'Roboto',
-      fontSize: '30px',
-      color: '#000000',
-      fontWeight: '400'
-    }).setOrigin(0, 0);
+    leftTexts.forEach((text, i) => {
+      this.add.text(70 + 120, 331 + 20 + i * 40, text, {
+        fontFamily: 'Roboto',
+        fontSize: '30px',
+        color: '#000000',
+        fontWeight: '400'
+      }).setOrigin(0, 0);
+    });
 
-
-    this.add.text(70 + 120, 331 + 70, "Отвечает на вопросы 24/7", {
-      fontFamily: 'Roboto',
-      fontSize: '30px',
-      color: '#000000',
-      fontWeight: '400'
-    }).setOrigin(0, 0);
-
-
-    this.add.text(70 + 120, 331 + 110, "Собирает и систематизирует", {
-      fontFamily: 'Roboto',
-      fontSize: '30px',
-      color: '#000000',
-      fontWeight: '400'
-    }).setOrigin(0, 0);
-
-    this.add.text(70 + 120, 331 + 150, "заявки", {
-      fontFamily: 'Roboto',
-      fontSize: '30px',
-      color: '#000000',
-      fontWeight: '400'
-    }).setOrigin(0, 0);
-
-
-    this.add.text(70 + 120, 331 + 190, "Фильтрует спам и первичные", {
-      fontFamily: 'Roboto',
-      fontSize: '30px',
-      color: '#000000',
-      fontWeight: '400'
-    }).setOrigin(0, 0);
-
-    this.add.text(70 + 120, 331 + 230, "запросы", {
-      fontFamily: 'Roboto',
-      fontSize: '30px',
-      color: '#000000',
-      fontWeight: '400'
-    }).setOrigin(0, 0);
-
-    // правый полупрозрачный блок
+    // Правый полупрозрачный блок
     const bgPanelRight = this.add.graphics();
     bgPanelRight.fillStyle(0xE0E0E0, 0.85);
     bgPanelRight.fillRoundedRect(735, 331, 635, 330, 20);
-
 
     this.add.image(735 + 16.88 + 45, 331 + 5.63 + 45, 'team')
       .setOrigin(0.5)
       .setDisplaySize(90, 90);
 
+    const rightTexts = [
+      "Ваша команда фокусируется",
+      "на том, что приносит деньги:",
+      "Закрытие сделок",
+      "Работа с лояльными",
+      "клиентами",
+      "Без шаблонных ответов"
+    ];
 
-    this.add.text(735 + 120, 331 + 20, "Ваша команда фокусируется", {
-      fontFamily: 'Roboto',
-      fontSize: '30px',
-      color: '#000000',
-      fontWeight: '400'
-    }).setOrigin(0, 0);
+    rightTexts.forEach((text, i) => {
+      this.add.text(735 + 120, 331 + 20 + i * 40, text, {
+        fontFamily: 'Roboto',
+        fontSize: '30px',
+        color: '#000000',
+        fontWeight: '400'
+      }).setOrigin(0, 0);
+    });
 
-
-    this.add.text(735 + 120, 331 + 70, "на том, что приносит деньги:", {
-      fontFamily: 'Roboto',
-      fontSize: '30px',
-      color: '#000000',
-      fontWeight: '400'
-    }).setOrigin(0, 0);
-
-
-    this.add.text(735 + 120, 331 + 120, "Закрытие сделок", {
-      fontFamily: 'Roboto',
-      fontSize: '30px',
-      color: '#000000',
-      fontWeight: '400'
-    }).setOrigin(0, 0);
-
-
-    this.add.text(735 + 120, 331 + 160, "Работа с лояльными", {
-      fontFamily: 'Roboto',
-      fontSize: '30px',
-      color: '#000000',
-      fontWeight: '400'
-    }).setOrigin(0, 0);
-
-    this.add.text(735 + 120, 331 + 200, "клиентами", {
-      fontFamily: 'Roboto',
-      fontSize: '30px',
-      color: '#000000',
-      fontWeight: '400'
-    }).setOrigin(0, 0);
-
-    this.add.text(735 + 120, 331 + 240, "Без шаблонных ответов", {
-      fontFamily: 'Roboto',
-      fontSize: '30px',
-      color: '#000000',
-      fontWeight: '400'
-    }).setOrigin(0, 0);
-
-    // кнопка продолжить
+    
     const btnX = 1068;
     const btnY = 847;
     const btnWidth = 302;
@@ -147,7 +89,7 @@ class Scene4 extends Phaser.Scene {
       fontSize: '30px',
       color: '#FFFFFF',
       fontWeight: '400'
-    }).setOrigin(0.5, 0.5);
+    }).setOrigin(0.5);
   }
 }
 

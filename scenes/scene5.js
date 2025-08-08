@@ -11,9 +11,10 @@ class Scene5 extends Phaser.Scene {
   create() {
     const { width, height } = this.scale;
 
+    // Фон сцены
     this.add.image(width / 2, height / 2, 'bg_office5').setDisplaySize(width, height);
 
-
+    // Заголовок с полупрозрачным фоном
     this.headerBg = this.add.graphics();
     this.headerBg.fillStyle(0x000000, 0.5);
     this.headerBg.fillRoundedRect(403, 100, 635, 87, 10);
@@ -27,7 +28,7 @@ class Scene5 extends Phaser.Scene {
       wordWrap: { width: 438 }
     }).setOrigin(0.5);
 
-    // Кнопка
+    // Кнопка "Оставить заявку"
     const buttonWidth = 350;
     const buttonHeight = 90;
     const buttonX = width / 2;
@@ -51,6 +52,7 @@ class Scene5 extends Phaser.Scene {
     this.buttonContainer.setSize(buttonWidth, buttonHeight);
     this.buttonContainer.setInteractive({ useHandCursor: true });
 
+   
     this.buttonContainer.on('pointerover', () => {
       buttonBg.clear();
       buttonBg.fillStyle(0x2e1c87, 1);
@@ -63,14 +65,16 @@ class Scene5 extends Phaser.Scene {
       buttonBg.fillRoundedRect(-buttonWidth / 2, -buttonHeight / 2, buttonWidth, buttonHeight, 20);
     });
 
+    // Клик по кнопке — показать форму заявки и скрыть заголовок
     this.buttonContainer.on('pointerdown', () => {
       this.leadForm.show();
       this.hideHeader();
     });
 
+    // Инициализация формы заявки
     this.leadForm.create();
 
-
+    // Переопределение show и hide формы для управления заголовком
     const originalShow = this.leadForm.show.bind(this.leadForm);
     const originalHide = this.leadForm.hide.bind(this.leadForm);
 
@@ -84,6 +88,7 @@ class Scene5 extends Phaser.Scene {
       this.showHeader();
     };
 
+    // По умолчанию форма скрыта, заголовок виден
     this.leadForm.hide();
   }
 
