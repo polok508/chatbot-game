@@ -11,7 +11,8 @@
     html, body {
       margin: 0; padding: 0;
       width: 100vw;
-      height: calc(var(--vh, 1vh) * 100);
+      /* Высота с запасом на safe area bottom — чтобы игра занимала весь экран включая панель */
+      height: calc(100vh + env(safe-area-inset-bottom, 0px));
       font-family: 'Roboto', sans-serif;
       background: #f4f4f4;
       touch-action: none;
@@ -19,17 +20,18 @@
       overflow: hidden;
       position: fixed;
       user-select: none;
+      box-sizing: border-box;
     }
 
     #game-container {
       position: fixed;
       top: 0; left: 0;
       width: 100vw;
-      height: calc(var(--vh, 1vh) * 100);
+      /* Тянем игру на всю высоту, включая панель */
+      height: calc(100vh + env(safe-area-inset-bottom, 0px));
       background: #fff;
       overflow: hidden;
       z-index: 20;
-      padding-bottom: env(safe-area-inset-bottom, 0);
       box-sizing: border-box;
     }
 
@@ -92,10 +94,6 @@
       return /Safari/.test(ua) && !/Chrome/.test(ua) && !/CriOS/.test(ua);
     }
 
-    function isYandex() {
-      return /YaBrowser/.test(navigator.userAgent);
-    }
-
     function isLandscape() {
       return window.matchMedia("(orientation: landscape)").matches;
     }
@@ -105,7 +103,7 @@
       const body = document.body;
 
       if (isIOS() && isSafari() && isLandscape()) {
-    
+
         scrollWrapper.style.display = 'block';
 
         body.style.position = 'static';
@@ -134,7 +132,6 @@
         }
         scrollWrapper.addEventListener('scroll', onUserScroll);
       } else {
-
         scrollWrapper.style.display = 'none';
 
         body.style.position = 'fixed';
@@ -145,7 +142,6 @@
     }
 
     function setRealVh() {
-    
       const vh = window.innerHeight * 0.01;
       document.documentElement.style.setProperty('--vh', `${vh}px`);
     }
