@@ -20,7 +20,6 @@ function checkOrientation() {
   }
 }
 
-
 async function tryFullscreen() {
   if (document.documentElement.requestFullscreen) {
     try {
@@ -36,7 +35,6 @@ async function tryFullscreen() {
   return false;
 }
 
-
 function hideAddressBar() {
   if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
     setTimeout(() => window.scrollTo(0, 1), 1000);
@@ -44,7 +42,6 @@ function hideAddressBar() {
     window.scrollTo(0, 1);
   }
 }
-
 
 function activateScrollWrapper() {
   scrollWrapper.style.display = 'block';
@@ -63,7 +60,6 @@ function activateScrollWrapper() {
   gameContainer.style.zIndex = '10000';
 }
 
-
 function loadScript(src) {
   return new Promise((resolve, reject) => {
     if (document.querySelector(`script[src="${src}"]`)) {
@@ -81,48 +77,38 @@ function loadScript(src) {
 async function launchGame() {
   if (game) return; 
 
+
   await loadScript("https://cdn.jsdelivr.net/npm/phaser@3.88.2/dist/phaser.js");
   await loadScript("scenes/scene1.js");
   await loadScript("scenes/scene2.js");
   await loadScript("scenes/scene3.js");
   await loadScript("scenes/scene4.js");
   await loadScript("config.secret.js");
-  await loadScript("forms/leadForm.js");
+  await loadScript("forms/leadForm.js");    
   await loadScript("scenes/scene5.js");
-  await loadScript("config.js");
-
- 
-  const config = {
-    type: Phaser.AUTO,
-    parent: 'game-container',
-    width: 1440,
-    height: 992,
-    backgroundColor: '#ffffff',
-    scene: [Scene1, Scene2, Scene3, Scene4, Scene5],
-    scale: {
-      mode: Phaser.Scale.FIT,
-      autoCenter: Phaser.Scale.CENTER_BOTH,
-      orientation: Phaser.Scale.LANDSCAPE,
-    }
-  };
+  await loadScript("config.js");              
 
   game = new Phaser.Game(config);
+  resizeGame();
 }
 
-
+function resizeGame() {
+  if (!game) return;
+  const width = window.innerWidth;
+  const height = window.innerHeight;
+  game.scale.resize(width, height);
+  gameContainer.style.width = width + 'px';
+  gameContainer.style.height = height + 'px';
+}
 
 window.addEventListener('resize', () => {
-  if (game) {
-    game.scale.resize(window.innerWidth, window.innerHeight);
-  }
+  resizeGame();
   checkOrientation();
 });
 
 window.addEventListener('orientationchange', () => {
   setTimeout(() => {
-    if (game) {
-      game.scale.resize(window.innerWidth, window.innerHeight);
-    }
+    resizeGame();
     checkOrientation();
     hideAddressBar();
   }, 300);
@@ -133,11 +119,8 @@ document.addEventListener('DOMContentLoaded', () => {
   hideAddressBar();
 });
 
-
-
 startBtn.addEventListener('click', async () => {
-  const isLandscape = window.innerWidth > window.innerHeight;
-  if (!isLandscape) return;
+  if (!(window.innerWidth > window.innerHeight)) return;
 
   startOverlay.classList.add('hidden');
   orientationOverlay.classList.add('hidden');
