@@ -74,9 +74,16 @@ function loadScript(src) {
   });
 }
 
-async function launchGame() {
-  if (game) return; 
+// Получить физический размер с учётом DPR
+function getDPRWidth() {
+  return Math.floor(window.innerWidth * window.devicePixelRatio);
+}
+function getDPRHeight() {
+  return Math.floor(window.innerHeight * window.devicePixelRatio);
+}
 
+async function launchGame() {
+  if (game) return; // предотвратить повторный запуск
 
   await loadScript("https://cdn.jsdelivr.net/npm/phaser@3.88.2/dist/phaser.js");
   await loadScript("scenes/scene1.js");
@@ -84,19 +91,29 @@ async function launchGame() {
   await loadScript("scenes/scene3.js");
   await loadScript("scenes/scene4.js");
   await loadScript("config.secret.js");
-  await loadScript("forms/leadForm.js");    
+  await loadScript("forms/leadForm.js");
   await loadScript("scenes/scene5.js");
-  await loadScript("config.js");              
+  await loadScript("config.js");
 
-  game = new Phaser.Game(config);
-  resizeGame();
+  // Создаём Phaser игру с размерами с учётом DPR
+  const configWithDPR = Object.assign({}, config, {
+    width: getDPRWidth(),
+    height: getDPRHeight(),
+    scale: {
+      mode: Phaser.Scale.RESIZE,          // используем RESIZE для динамического изменения
+      autoCenter: Phaser.Scale.CENTER_BOTH,
+      orientation: Phaser.Scale.LANDSCAPE,
+    }
+  });
+
+  game = new Phaser.Game(configWithDPR);
 }
 
 function resizeGame() {
   if (!game) return;
   const width = window.innerWidth;
   const height = window.innerHeight;
-  game.scale.resize(width, height);
+  game.scale.resize(getDPRWidth(), getDPRHeight());
   gameContainer.style.width = width + 'px';
   gameContainer.style.height = height + 'px';
 }
