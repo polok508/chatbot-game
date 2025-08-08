@@ -5,28 +5,25 @@ class Scene1 extends Phaser.Scene {
 
   preload() {
     this.load.image('bg_office', 'assets/bg/scene1.png');
-
     this.load.image('vector1', 'assets/icons/vector1.png');
     this.load.image('vector2', 'assets/icons/vector2.png');
     this.load.image('vector3', 'assets/icons/vector3.png');
   }
 
   create() {
-    this.add.image(0, 0, 'bg_office')
-      .setOrigin(0, 0)
-      .setDisplaySize(1440, 992);
+    // Фон, растянутый на всю сцену
+    this.bg = this.add.image(0, 0, 'bg_office').setOrigin(0, 0);
+    this.bg.setDisplaySize(this.scale.width, this.scale.height);
 
-    // заголовок
-    const titleBgGfx = this.add.graphics();
-    titleBgGfx.fillStyle(0xffffff, 0.7);
-    titleBgGfx.fillRoundedRect(0, 0, 1300, 87, 10);
-    titleBgGfx.generateTexture('title_bg', 1300, 87);
-    titleBgGfx.destroy();
+    // Заголовок с фоном
+    this.titleBgGfx = this.add.graphics();
+    this.titleBgGfx.fillStyle(0xffffff, 0.7);
+    this.titleBgGfx.fillRoundedRect(0, 0, 1300, 87, 10);
+    this.titleBgGfx.generateTexture('title_bg', 1300, 87);
+    this.titleBgGfx.destroy();
 
-    const titleBg = this.add.image((1440 - 1300) / 2, 100, 'title_bg')
-      .setOrigin(0, 0)
-      .setAlpha(0);
-    const titleText = this.add.text(255, 120, "Бизнес растёт, но заявки становятся проблемой?", {
+    this.titleBg = this.add.image((this.scale.width - 1300) / 2, 100, 'title_bg').setOrigin(0, 0).setAlpha(0);
+    this.titleText = this.add.text(255, 120, "Бизнес растёт, но заявки становятся проблемой?", {
       fontFamily: 'Roboto',
       fontSize: '40px',
       fontWeight: '400',
@@ -34,9 +31,12 @@ class Scene1 extends Phaser.Scene {
       wordWrap: { width: 935 }
     }).setAlpha(0);
 
-    this.tweens.add({ targets: [titleBg, titleText], alpha: 1, duration: 500, delay: 200 });
+    this.tweens.add({ targets: [this.titleBg, this.titleText], alpha: 1, duration: 500, delay: 200 });
 
-    // линии
+    // ... остальные элементы, сохранённые в this для ресайза
+    // Заполним массив для линий, сообщений и кнопок для удобства
+
+    this.lines = [];
     const linesData = [
       { key: 'vector1', x: 169.87, y: 262.93, w: 233.48, h: 97.10, delay: 1200 },
       { key: 'vector2', x: 721.55, y: 374.16, w: 225.30, h: 94.92, delay: 2200 },
@@ -44,19 +44,8 @@ class Scene1 extends Phaser.Scene {
     ];
 
     linesData.forEach(({ key, x, y, w, h, delay }) => {
-      const line = this.add.image(x, y, key)
-        .setOrigin(0, 0)
-        .setDisplaySize(w, h)
-        .setDepth(2)
-        .setAlpha(0.9);
-
-
-      const shadow = this.add.image(x + 3, y + 3, key)
-        .setOrigin(0, 0)
-        .setDisplaySize(w, h)
-        .setTint(0x000000)
-        .setAlpha(0.3)
-        .setDepth(1);
+      let line = this.add.image(x, y, key).setOrigin(0, 0).setDisplaySize(w, h).setDepth(2).setAlpha(0.9);
+      let shadow = this.add.image(x + 3, y + 3, key).setOrigin(0, 0).setDisplaySize(w, h).setTint(0x000000).setAlpha(0.3).setDepth(1);
 
       const shape = this.make.graphics();
       shape.fillRect(x, y, 0, h);
@@ -67,9 +56,7 @@ class Scene1 extends Phaser.Scene {
 
       this.tweens.add({
         targets: shape,
-        props: {
-          scaleX: { from: 0, to: 1 },
-        },
+        props: { scaleX: { from: 0, to: 1 } },
         duration: 700,
         delay,
         ease: 'Power1',
@@ -79,9 +66,12 @@ class Scene1 extends Phaser.Scene {
           shape.fillRect(x, y, w * shape.scaleX, h);
         }
       });
+
+      this.lines.push({ line, shadow, shape, data: { x, y, w, h } });
     });
 
-    // сообщения
+    // Сообщения
+    this.messages = [];
     const messages = [
       { x: 270, y: 227, w: 378, h: 75, text: "Теряете клиентов из-за:", tw: 338, delay: 1800 },
       { x: 400, y: 342, w: 319, h: 75, text: "Очередей в ответах", tw: 279, delay: 2800 },
@@ -106,9 +96,11 @@ class Scene1 extends Phaser.Scene {
       }).setOrigin(0, 0).setAlpha(0);
 
       this.tweens.add({ targets: [bg, txt], alpha: 1, duration: 400, delay });
+
+      this.messages.push({ bg, txt, data: { x, y, w, h, tw } });
     });
 
-    // кнопки
+    // Кнопки
     this.time.delayedCall(5300, () => {
       this.createButtonContainer(
         290, 739,
@@ -124,6 +116,39 @@ class Scene1 extends Phaser.Scene {
         () => { this.scene.start('Scene2'); }
       );
     });
+  }
+
+  // resize метод для обновления размеров при ресайзе окна
+  resize(width, height) {
+    // Фон
+    if (this.bg) this.bg.setDisplaySize(width, height);
+
+    // Центрируем заголовок
+    if (this.titleBg) this.titleBg.setPosition((width - 1300) / 2, 100);
+    // Заголовок не меняем размер шрифта, но при желании можно
+
+    // Линии - просто обновим позицию и размеры
+    if (this.lines) {
+      this.lines.forEach(({ line, shadow, data }) => {
+        line.setPosition(data.x * width / 1440, data.y * height / 992);
+        line.setDisplaySize(data.w * width / 1440, data.h * height / 992);
+        shadow.setPosition(line.x + 3 * width / 1440, line.y + 3 * height / 992);
+        shadow.setDisplaySize(line.displayWidth, line.displayHeight);
+      });
+    }
+
+    // Сообщения
+    if (this.messages) {
+      this.messages.forEach(({ bg, txt, data }) => {
+        bg.setPosition(data.x * width / 1440, data.y * height / 992);
+        bg.setDisplaySize(data.w * width / 1440, data.h * height / 992);
+        txt.setPosition(bg.x + 20 * width / 1440, bg.y + 20 * height / 992);
+        // Можно подгонять размер шрифта, если нужно
+      });
+    }
+
+    // Кнопки — если хранятся в this, обновляй позицию аналогично
+
   }
 
   createButtonContainer(x, y, topText, topBgWidth, topBgHeight, topBgColor, topBgAlpha, btnText, btnWidth, btnHeight, onClick) {

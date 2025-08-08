@@ -1,13 +1,13 @@
 const config = {
   type: Phaser.AUTO,
   parent: 'game-container',
-  width: 1440,  
-  height: 992,  
+  width: 1440,
+  height: 992,
   backgroundColor: '#ffffff',
   scene: [Scene1, Scene2, Scene3, Scene4, Scene5],
   scale: {
-    mode: Phaser.Scale.FIT,            
-    autoCenter: Phaser.Scale.CENTER_BOTH, 
+    mode: Phaser.Scale.FIT,
+    autoCenter: Phaser.Scale.CENTER_BOTH,
     max: {
       width: 1440,
       height: 992
@@ -18,5 +18,3 @@ const config = {
     }
   }
 };
-
-const game = new Phaser.Game(config);
