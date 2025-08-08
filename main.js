@@ -11,6 +11,12 @@ function isIOS() {
     return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 }
 
+function setBodyStyles(height, overflow) {
+    document.body.style.height = height;
+    document.documentElement.style.height = height;
+    document.body.style.overflowY = overflow;
+}
+
 function checkOrientation() {
     const isPortrait = window.innerHeight > window.innerWidth;
 
@@ -20,27 +26,41 @@ function checkOrientation() {
             scrollNotice.style.display = 'none';
             gameContainer.style.display = 'none';
 
-            document.body.style.height = '100vh';
-            document.documentElement.style.height = '100vh';
-            document.body.style.overflowY = 'hidden';
+            setBodyStyles('100vh', 'hidden');
+
+            // Центрируем текст rotate-notice через стили
+            rotateNotice.style.position = 'fixed';
+            rotateNotice.style.top = '0';
+            rotateNotice.style.left = '0';
+            rotateNotice.style.width = '100vw';
+            rotateNotice.style.height = '100vh';
+            rotateNotice.style.justifyContent = 'center';
+            rotateNotice.style.alignItems = 'center';
+            rotateNotice.style.textAlign = 'center';
+
         } else {
             rotateNotice.style.display = 'none';
             scrollNotice.style.display = 'flex';
             gameContainer.style.display = 'none';
 
-            document.body.style.height = '200vh';
-            document.documentElement.style.height = '200vh';
-            document.body.style.overflowY = 'auto';
+            setBodyStyles('200vh', 'auto');
             window.scrollTo(0, 0);
+
+            // Центрируем текст scroll-notice через стили
+            scrollNotice.style.position = 'fixed';
+            scrollNotice.style.bottom = '0';
+            scrollNotice.style.left = '0';
+            scrollNotice.style.width = '100vw';
+            scrollNotice.style.justifyContent = 'center';
+            scrollNotice.style.alignItems = 'center';
+            scrollNotice.style.textAlign = 'center';
         }
     } else {
         rotateNotice.style.display = 'none';
         scrollNotice.style.display = 'none';
         gameContainer.style.display = 'block';
 
-        document.body.style.height = '100vh';
-        document.documentElement.style.height = '100vh';
-        document.body.style.overflowY = 'hidden';
+        setBodyStyles('100vh', 'hidden');
 
         startGame();
     }
@@ -49,12 +69,10 @@ function checkOrientation() {
 function startGame() {
     if (game) return;
 
-    document.body.style.height = '100vh';
-    document.documentElement.style.height = '100vh';
+    setBodyStyles('100vh', 'hidden');
     window.scrollTo(0, 0);
 
     gameContainer.style.display = 'block';
-    // Подъем игры, чтобы чуть выглядывала сверху
     gameContainer.style.margin = '0 auto';
     gameContainer.style.transform = 'translateY(-2vh)';
 
@@ -68,7 +86,14 @@ window.addEventListener('scroll', () => {
 });
 
 window.addEventListener('resize', checkOrientation);
-window.addEventListener('orientationchange', checkOrientation);
+window.addEventListener('orientationchange', () => {
+    checkOrientation();
+
+    // В iOS иногда помогает убрать адресную строку после смены ориентации
+    if (isMobile() && !window.matchMedia("(orientation: portrait)").matches) {
+        setTimeout(() => window.scrollTo(0, 1), 300);
+    }
+});
 
 document.addEventListener('click', (e) => {
     if (e.target.id === 'start-button') {
