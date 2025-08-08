@@ -53,14 +53,14 @@ function checkOrientation() {
         rotatedToLandscape = true;
         showElement('scroll-notice');
         body.style.overflowY = 'auto';
-        body.style.height = '100vh'; // уменьшили scroll area
+        body.style.height = '150vh'; // уменьшили scroll area
         return;
       }
     } else {
       if (!gameStarted) {
         showElement('scroll-notice');
         body.style.overflowY = 'auto';
-        body.style.height = '100vh'; // уменьшили scroll area
+        body.style.height = '150vh'; // уменьшили scroll area
       } else {
         showElement('game-container');
         body.style.overflowY = 'hidden';
