@@ -1,5 +1,9 @@
 let game = null;
 
+function isMobile() {
+    return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+}
+
 function checkOrientation() {
     const isPortrait = window.innerHeight > window.innerWidth;
     const notice = document.getElementById('rotate-notice');
@@ -24,8 +28,26 @@ function checkOrientation() {
     }
 }
 
-window.addEventListener('resize', checkOrientation);
-window.addEventListener('orientationchange', checkOrientation);
+
+function resizeGame() {
+    if (game && isMobile()) {
+        game.scale.resize(window.innerWidth, window.innerHeight);
+    }
+}
+
+window.addEventListener('resize', () => {
+    checkOrientation();
+    resizeGame();
+});
+window.addEventListener('orientationchange', () => {
+    checkOrientation();
+    resizeGame();
+
+    // Для iOS автоскролл
+    if (isMobile() && /iPad|iPhone|iPod/.test(navigator.userAgent)) {
+        setTimeout(() => window.scrollTo(0, 1), 300);
+    }
+});
 
 document.getElementById('start-button').addEventListener('click', async () => {
     await enterFullscreen();
@@ -37,12 +59,6 @@ window.addEventListener('load', () => {
     checkOrientation();
 });
 
-// Проверка iOS Safari
-function isIOS() {
-    return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-}
-
-// Попытка включить fullscreen
 async function enterFullscreen() {
     const elem = document.documentElement;
 
@@ -50,17 +66,16 @@ async function enterFullscreen() {
         await elem.requestFullscreen();
     } else if (elem.webkitRequestFullscreen) {
         await elem.webkitRequestFullscreen();
-    } else {
-        // Псевдо-фуллскрин для iOS Safari и Telegram
+    }
+
+    if (isMobile()) {
         document.documentElement.style.height = window.innerHeight + "px";
         document.body.style.height = window.innerHeight + "px";
         document.body.style.overflow = "hidden";
 
-        if (isIOS()) {
-            // Автоскролл для скрытия панели
-            setTimeout(() => {
-                window.scrollTo(0, 1);
-            }, 50);
+        // Несколько попыток автоскролла чтобы скрыть адресную строку
+        for (let i = 0; i < 3; i++) {
+            setTimeout(() => window.scrollTo(0, 1), i * 300);
         }
     }
 }
