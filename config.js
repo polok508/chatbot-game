@@ -1,4 +1,6 @@
 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+const isYandex = navigator.userAgent.includes('YaBrowser');
 
 const config = {
   type: Phaser.AUTO,
@@ -21,33 +23,41 @@ const config = {
   }
 };
 
-// Инициализация игры с проверкой ориентации
+
+const orientationEvent = isSafari ? 'resize' : 'orientationchange';
+
 function initGame() {
   if (isMobile) {
     checkOrientation();
+  
+    if (isYandex) {
+      setupYandexBrowser();
+    }
   } else {
     new Phaser.Game(config);
   }
 }
 
-// Проверка ориентации для мобильных устройств
 function checkOrientation() {
-  if (window.innerHeight > window.innerWidth) {
-    // Показываем сообщение о необходимости поворота
+  if (!isLandscape()) {
     showOrientationWarning();
-    // Добавляем обработчик изменения ориентации
-    window.addEventListener('orientationchange', handleOrientationChange);
+    window.addEventListener(orientationEvent, handleOrientationChange);
   } else {
-    // Если ориентация горизонтальная - запускаем игру
     startGame();
   }
 }
 
+function isLandscape() {
+
+  return window.innerWidth > window.innerHeight || 
+         window.matchMedia("(orientation: landscape)").matches;
+}
+
 function handleOrientationChange() {
-  if (window.innerHeight > window.innerWidth) {
+  if (!isLandscape()) {
     showOrientationWarning();
   } else {
-    document.getElementById('orientation-warning').style.display = 'none';
+    hideOrientationWarning();
     if (!window.game) {
       startGame();
     }
@@ -55,13 +65,47 @@ function handleOrientationChange() {
 }
 
 function startGame() {
-  // Запускаем полноэкранный режим
-  if (document.documentElement.requestFullscreen) {
-    document.documentElement.requestFullscreen().catch(e => console.log(e));
-  }
+
+  enterFullscreen();
   
-  // Инициализируем игру
   window.game = new Phaser.Game(config);
+  
+ 
+  if (isMobile) {
+    window.addEventListener('resize', () => {
+      if (window.game && isLandscape()) {
+        setTimeout(() => {
+          window.game.scale.refresh();
+        }, 300);
+      }
+    });
+  }
+}
+
+function enterFullscreen() {
+  const element = document.documentElement;
+  if (element.requestFullscreen) {
+    element.requestFullscreen().catch(e => console.log(e));
+  } else if (element.webkitRequestFullscreen) { 
+    element.webkitRequestFullscreen().catch(e => console.log(e));
+  } else if (element.msRequestFullscreen) {
+    element.msRequestFullscreen().catch(e => console.log(e));
+  }
+}
+
+function setupYandexBrowser() {
+
+  document.addEventListener('click', function yandexHide() {
+    enterFullscreen();
+    document.removeEventListener('click', yandexHide);
+  });
+  
+
+  setInterval(() => {
+    if (window.game && isLandscape()) {
+      window.game.scale.refresh();
+    }
+  }, 1000);
 }
 
 function showOrientationWarning() {
@@ -77,31 +121,36 @@ function showOrientationWarning() {
     warning.style.backgroundColor = '#000';
     warning.style.color = '#fff';
     warning.style.display = 'flex';
+    warning.style.flexDirection = 'column';
     warning.style.justifyContent = 'center';
     warning.style.alignItems = 'center';
     warning.style.zIndex = '9999';
     warning.style.fontSize = '24px';
     warning.style.textAlign = 'center';
     warning.style.padding = '20px';
-    warning.innerHTML = 'Пожалуйста, поверните устройство в горизонтальное положение для игры';
+    warning.innerHTML = `
+      <p>Пожалуйста, поверните устройство в горизонтальное положение</p>
+      <button id="force-landscape" style="margin-top: 20px; padding: 10px 20px; font-size: 18px;">
+        Я уже в горизонтальном режиме
+      </button>
+    `;
     document.body.appendChild(warning);
+    
+ 
+    document.getElementById('force-landscape').addEventListener('click', () => {
+      hideOrientationWarning();
+      startGame();
+    });
   } else {
     warning.style.display = 'flex';
   }
 }
 
-// Запуск при загрузке страницы
-window.addEventListener('load', () => {
-  initGame();
-});
-
-// Обработчик изменения размера окна
-window.addEventListener('resize', () => {
-  if (window.game && isMobile) {
-    if (window.innerHeight > window.innerWidth) {
-      document.getElementById('orientation-warning').style.display = 'flex';
-    } else {
-      document.getElementById('orientation-warning').style.display = 'none';
-    }
+function hideOrientationWarning() {
+  const warning = document.getElementById('orientation-warning');
+  if (warning) {
+    warning.style.display = 'none';
   }
-});
+}
+
+window.addEventListener('load', initGame);
