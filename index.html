@@ -19,23 +19,20 @@
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
       overflow-x: hidden;
-      /* безопасные отступы снизу */
-      padding-bottom: env(safe-area-inset-bottom, 20px);
+     
     }
 
-    /* Десктоп — фиксированная высота и нет паддинга */
     body.desktop,
     #game-container.desktop {
       height: 100vh !important;
-      padding-bottom: 0 !important;
       min-height: 0 !important;
+      padding-bottom: 0 !important;
     }
 
-    /* Мобила — min-height и padding снизу */
     body.mobile,
     #game-container.mobile {
       min-height: 100vh !important;
-      padding-bottom: env(safe-area-inset-bottom, 20px);
+      padding-bottom: 0 !important;
     }
 
     #rotate-notice,
@@ -93,7 +90,7 @@
       background: #fff;
       overflow: hidden;
       z-index: 1;
-      padding-bottom: env(safe-area-inset-bottom, 20px);
+    
     }
   </style>
 </head>

@@ -47,25 +47,30 @@ function checkOrientation() {
       if (isPortrait) {
         showElement('rotate-notice');
         body.style.overflowY = 'hidden';
+        body.style.height = '100vh';
         return;
       } else {
         rotatedToLandscape = true;
         showElement('scroll-notice');
         body.style.overflowY = 'auto';
+        body.style.height = '150vh';
         return;
       }
     } else {
       if (!gameStarted) {
         showElement('scroll-notice');
         body.style.overflowY = 'auto';
+        body.style.height = '150vh'; 
       } else {
         showElement('game-container');
         body.style.overflowY = 'hidden';
+        body.style.height = '100vh';
       }
     }
   } else {
     showElement('game-container');
     body.style.overflowY = 'hidden';
+    body.style.height = '100vh';
 
     if (!window.game) {
       window.game = new Phaser.Game(config);
@@ -80,6 +85,7 @@ function startGame() {
   showElement('game-container');
 
   document.body.style.overflowY = 'hidden';
+  document.body.style.height = '100vh';
   window.scrollTo(0, 0);
 
   if (!window.game) {
