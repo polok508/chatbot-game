@@ -1,4 +1,6 @@
 let game = null;
+let gameStarted = false;
+let rotateNoticeShown = false; // Флаг, чтобы показать предупреждение один раз
 
 function isMobile() {
   return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
@@ -18,7 +20,7 @@ function resetVisibility() {
   hideElement('game-container');
 }
 
-// Масштабирование и позиционирование canvas
+// Масштабирование и центрирование canvas
 function resizeGame() {
   if (!game || !game.canvas) return;
 
@@ -45,6 +47,14 @@ function resizeGame() {
   }
 }
 
+function stopGame() {
+  if (game) {
+    game.destroy(true);
+    game = null;
+  }
+  gameStarted = false;
+}
+
 function checkOrientation() {
   resetVisibility();
 
@@ -52,27 +62,61 @@ function checkOrientation() {
 
   if (isMobile()) {
     if (isPortrait) {
-      // Портрет - просим повернуть устройство
-      showElement('rotate-notice');
-      document.body.style.height = '100vh';
-      document.body.style.overflowY = 'hidden';
+      if (!rotateNoticeShown) {
+        showElement('rotate-notice');
+        document.body.style.height = '100vh';
+        document.body.style.overflowY = 'hidden';
+
+        if (gameStarted) {
+          stopGame();
+        }
+
+        rotateNoticeShown = true;
+      } else {
+        // Второй и последующие разы — просто скрываем игру и ничего не показываем
+        resetVisibility();
+        document.body.style.height = '100vh';
+        document.body.style.overflowY = 'hidden';
+      }
     } else {
-      // Ландшафт - показываем прокрутку
-      showElement('scroll-notice');
-      document.body.style.height = '200vh';
-      document.body.style.overflowY = 'auto';
+      if (!gameStarted) {
+        showElement('scroll-notice');
+        document.body.style.height = '200vh';
+        document.body.style.overflowY = 'auto';
+      } else {
+        showElement('game-container');
+        document.body.style.height = '100vh';
+        document.body.style.overflowY = 'hidden';
+      }
     }
   } else {
-    // ПК - сразу игра
+    // ПК — сразу игра
     showElement('game-container');
     document.body.style.height = '100vh';
     document.body.style.overflowY = 'hidden';
 
     if (!game) {
       game = new Phaser.Game(config);
+      gameStarted = true;
       resizeGame();
     }
   }
+}
+
+function startGame() {
+  hideElement('scroll-notice');
+  showElement('game-container');
+
+  document.body.style.height = '100vh';
+  document.body.style.overflowY = 'hidden';
+
+  window.scrollTo(0, 0);
+
+  if (!game) {
+    game = new Phaser.Game(config);
+  }
+  gameStarted = true;
+  resizeGame();
 }
 
 window.addEventListener('resize', () => {
@@ -92,25 +136,10 @@ window.addEventListener('load', () => {
   checkOrientation();
 
   if (isMobile()) {
-    let gameStarted = false;
-
     window.addEventListener('scroll', () => {
       const rotateVisible = document.getElementById('rotate-notice').classList.contains('visible');
       if (window.scrollY > 100 && !gameStarted && !rotateVisible) {
-        gameStarted = true;
-
-        hideElement('scroll-notice');
-        showElement('game-container');
-
-        document.body.style.height = '100vh';
-        document.body.style.overflowY = 'hidden';
-
-        window.scrollTo(0, 0);
-
-        if (!game) {
-          game = new Phaser.Game(config);
-        }
-        resizeGame();
+        startGame();
       }
     });
   }
