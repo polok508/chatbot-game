@@ -37,21 +37,30 @@ window.addEventListener('load', () => {
     checkOrientation();
 });
 
+// Проверка iOS Safari
+function isIOS() {
+    return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+}
+
 // Попытка включить fullscreen
 async function enterFullscreen() {
     const elem = document.documentElement;
 
-    // Настоящий fullscreen API (Chrome, Firefox, Edge, Android-браузеры)
     if (elem.requestFullscreen) {
         await elem.requestFullscreen();
-    } else if (elem.webkitRequestFullscreen) { // Safari
+    } else if (elem.webkitRequestFullscreen) {
         await elem.webkitRequestFullscreen();
-    } else if (elem.msRequestFullscreen) { // IE/Edge старые
-        await elem.msRequestFullscreen();
     } else {
-        // Псевдо-фуллскрин для iOS Safari/Telegram
+        // Псевдо-фуллскрин для iOS Safari и Telegram
+        document.documentElement.style.height = window.innerHeight + "px";
         document.body.style.height = window.innerHeight + "px";
         document.body.style.overflow = "hidden";
-        window.scrollTo(0, 0);
+
+        if (isIOS()) {
+            // Автоскролл для скрытия панели
+            setTimeout(() => {
+                window.scrollTo(0, 1);
+            }, 50);
+        }
     }
 }
