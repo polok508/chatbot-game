@@ -23,11 +23,12 @@
     position: fixed;
     top: 0; left: 0;
     width: 100vw;
-    height: 100vh;
+
+    height: calc(100vh + env(safe-area-inset-bottom));
     background: #fff;
     overflow: hidden;
     z-index: 20;
-    padding-bottom: env(safe-area-inset-bottom, 0);
+    padding-bottom: env(safe-area-inset-bottom);
     box-sizing: border-box;
   }
   @media screen and (orientation: portrait) {
@@ -77,13 +78,20 @@
   }
 
   function setSizes() {
-    const vh = window.innerHeight;
+    let vh = window.innerHeight;
+
+   
+    const safeAreaInsetBottom = parseInt(getComputedStyle(document.documentElement).getPropertyValue('env(safe-area-inset-bottom)')) || 0;
+
+    vh = vh + safeAreaInsetBottom;
+
     document.body.style.width = '100vw';
     document.body.style.height = vh + 'px';
 
     const game = document.getElementById('game-container');
     game.style.width = '100vw';
     game.style.height = vh + 'px';
+    game.style.paddingBottom = safeAreaInsetBottom + 'px';
   }
 
   function setupForSafari() {
@@ -128,6 +136,7 @@
       const game = document.getElementById('game-container');
       game.style.width = '100vw';
       game.style.height = '100vh';
+      game.style.paddingBottom = '0px';
     }
   }
 
