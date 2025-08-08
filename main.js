@@ -1,5 +1,6 @@
 let game = null;
 let gameStarted = false;
+let rotatedToLandscape = false;
 
 function isMobile() {
   return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
@@ -19,7 +20,6 @@ function resetVisibility() {
   hideElement('game-container');
 }
 
-// Центрирование и масштабирование canvas
 function resizeGame() {
   if (!game || !game.canvas) return;
 
@@ -28,21 +28,24 @@ function resizeGame() {
   const windowHeight = window.innerHeight;
 
   if (isMobile()) {
-    // Для мобилок: масштабируем и центрируем canvas с position absolute
-    const scaleX = windowWidth / game.config.width;
-    const scaleY = windowHeight / game.config.height;
+    const baseWidth = game.config.width;
+    const baseHeight = game.config.height;
+
+    const scaleX = windowWidth / baseWidth;
+    const scaleY = windowHeight / baseHeight;
     const scale = Math.min(scaleX, scaleY);
 
-    const canvasWidth = game.config.width * scale;
-    const canvasHeight = game.config.height * scale;
+    const canvasWidth = baseWidth * scale;
+    const canvasHeight = baseHeight * scale;
 
     canvas.style.width = `${canvasWidth}px`;
     canvas.style.height = `${canvasHeight}px`;
+
     canvas.style.position = 'absolute';
     canvas.style.left = `${(windowWidth - canvasWidth) / 2}px`;
     canvas.style.top = `${(windowHeight - canvasHeight) / 2}px`;
   } else {
-    // Для ПК: canvas занимает 100% без смещений, position relative
+
     canvas.style.position = 'relative';
     canvas.style.width = '100%';
     canvas.style.height = '100%';
@@ -54,15 +57,32 @@ function resizeGame() {
 function checkOrientation() {
   resetVisibility();
 
+  const isPortrait = window.innerHeight > window.innerWidth;
+
   if (isMobile()) {
-    if (!gameStarted) {
-      showElement('scroll-notice');
-      document.body.style.height = '200vh';
-      document.body.style.overflowY = 'auto';
+    if (!rotatedToLandscape) {
+      if (isPortrait) {
+        showElement('rotate-notice');
+        document.body.style.height = '100vh';
+        document.body.style.overflowY = 'hidden';
+        return;
+      } else {
+        rotatedToLandscape = true;
+        showElement('scroll-notice');
+        document.body.style.height = '200vh';
+        document.body.style.overflowY = 'auto';
+        return;
+      }
     } else {
-      showElement('game-container');
-      document.body.style.height = '100vh';
-      document.body.style.overflowY = 'hidden';
+      if (!gameStarted) {
+        showElement('scroll-notice');
+        document.body.style.height = '200vh';
+        document.body.style.overflowY = 'auto';
+      } else {
+        showElement('game-container');
+        document.body.style.height = '100vh';
+        document.body.style.overflowY = 'hidden';
+      }
     }
   } else {
     showElement('game-container');
