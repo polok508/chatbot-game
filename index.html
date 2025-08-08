@@ -1,39 +1,79 @@
 <!DOCTYPE html>
 <html lang="ru">
-    <head>
-        <meta charset="UTF-8"/>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
-        <link rel="icon" type="image/png" href="favicon.png" />
-        <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
-        <title>Чат-Бот Спасает Бизнес</title>
-        <style>
-            html, body {
-                margin: 0;
-                padding: 0;
-                background: #f4f4f4;
-                overflow: hidden;
-            }
-            #game-container {
-                width: 100vw;
-                height: 100vh;
-            }
-        </style>
-    </head>
-    <body>
-        <div id="game-container"></div>
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<link rel="icon" type="image/png" href="favicon.png" />
+<link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet" />
+<title>Чат-Бот Спасает Бизнес</title>
+<style>
+  html, body {
+    margin: 0; padding: 0;
+    background: #f4f4f4;
+    overflow: hidden;
+    height: 100%;
+    width: 100%;
+  }
+  body {
+ 
+    writing-mode: horizontal-tb;
+  }
+  #game-container {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    max-width: 100vw;
+    max-height: 100vh;
+  }
+</style>
+</head>
+<body>
+  <div id="game-container"></div>
 
-        <script src="https://cdn.jsdelivr.net/npm/phaser@3.88.2/dist/phaser.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3.88.2/dist/phaser.js"></script>
+
+  <!-- сцены -->
+  <script src="scenes/scene1.js"></script>
+  <script src="scenes/scene2.js"></script>
+  <script src="scenes/scene3.js"></script>
+  <script src="scenes/scene4.js"></script>
+  <script src="config.secret.js"></script>
+  <script src="forms/leadForm.js"></script>
+  <script src="scenes/scene5.js"></script>
+
+  <script src="config.js"></script>
+  <script src="main.js"></script>
+
+  <script>
+  
+    function updateGameContainerSize() {
+      const gameContainer = document.getElementById('game-container');
+
+    
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+
+     
+      if (vh > vw) {
+    
+        gameContainer.style.width = vw + 'px';
+        gameContainer.style.height = vh + 'px';
+      } else {
         
-        <!-- сцены -->
-        <script src="scenes/scene1.js"></script>
-        <script src="scenes/scene2.js"></script>
-        <script src="scenes/scene3.js"></script>
-        <script src="scenes/scene4.js"></script>
-        <script src="config.secret.js"></script>
-        <script src="forms/leadForm.js"></script>
-        <script src="scenes/scene5.js"></script>
+        gameContainer.style.width = vw + 'px';
+        gameContainer.style.height = vh + 'px';
+      }
+    }
 
-        <script src="config.js"></script>
-        <script src="main.js"></script>
-    </body>
+    window.addEventListener('resize', updateGameContainerSize);
+    window.addEventListener('orientationchange', () => {
+      setTimeout(updateGameContainerSize, 200); 
+    });
+
+
+    updateGameContainerSize();
+  </script>
+</body>
 </html>
