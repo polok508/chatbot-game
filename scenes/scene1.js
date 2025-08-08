@@ -1,33 +1,22 @@
 class Scene1 extends Phaser.Scene {
   constructor() {
     super({ key: 'Scene1' });
-
-    this.onResizeHandler = this.checkOrientation.bind(this);
   }
 
   preload() {
     this.load.image('bg_office', 'assets/bg/scene1.png');
+
     this.load.image('vector1', 'assets/icons/vector1.png');
     this.load.image('vector2', 'assets/icons/vector2.png');
     this.load.image('vector3', 'assets/icons/vector3.png');
   }
 
   create() {
-    this.input.manager.canvas.style.touchAction = 'auto';
-
-    this.checkOrientation();
-
-    window.addEventListener('resize', this.onResizeHandler);
-    window.addEventListener('orientationchange', this.onResizeHandler);
-
-    setTimeout(() => {
-      window.scrollTo(0, 1);
-    }, 200);
-
-    this.bg = this.add.image(0, 0, 'bg_office')
+    this.add.image(0, 0, 'bg_office')
       .setOrigin(0, 0)
       .setDisplaySize(1440, 992);
 
+    // заголовок
     const titleBgGfx = this.add.graphics();
     titleBgGfx.fillStyle(0xffffff, 0.7);
     titleBgGfx.fillRoundedRect(0, 0, 1300, 87, 10);
@@ -47,6 +36,7 @@ class Scene1 extends Phaser.Scene {
 
     this.tweens.add({ targets: [titleBg, titleText], alpha: 1, duration: 500, delay: 200 });
 
+    // линии
     const linesData = [
       { key: 'vector1', x: 169.87, y: 262.93, w: 233.48, h: 97.10, delay: 1200 },
       { key: 'vector2', x: 721.55, y: 374.16, w: 225.30, h: 94.92, delay: 2200 },
@@ -59,6 +49,7 @@ class Scene1 extends Phaser.Scene {
         .setDisplaySize(w, h)
         .setDepth(2)
         .setAlpha(0.9);
+
 
       const shadow = this.add.image(x + 3, y + 3, key)
         .setOrigin(0, 0)
@@ -90,6 +81,7 @@ class Scene1 extends Phaser.Scene {
       });
     });
 
+    // сообщения
     const messages = [
       { x: 270, y: 227, w: 378, h: 75, text: "Теряете клиентов из-за:", tw: 338, delay: 1800 },
       { x: 400, y: 342, w: 319, h: 75, text: "Очередей в ответах", tw: 279, delay: 2800 },
@@ -116,6 +108,7 @@ class Scene1 extends Phaser.Scene {
       this.tweens.add({ targets: [bg, txt], alpha: 1, duration: 400, delay });
     });
 
+    // кнопки
     this.time.delayedCall(5300, () => {
       this.createButtonContainer(
         290, 739,
@@ -131,17 +124,6 @@ class Scene1 extends Phaser.Scene {
         () => { this.scene.start('Scene2'); }
       );
     });
-  }
-
-  checkOrientation() {
-    // Просто пауза сцены при портретной ориентации, без показа overlay
-    if (window.matchMedia('(orientation: portrait)').matches) {
-      this.scene.pause();
-    } else {
-      this.scene.resume();
-      setTimeout(() => window.scrollTo(0, 1), 100);
-      setTimeout(() => window.scrollTo(0, 1), 300);
-    }
   }
 
   createButtonContainer(x, y, topText, topBgWidth, topBgHeight, topBgColor, topBgAlpha, btnText, btnWidth, btnHeight, onClick) {
@@ -231,11 +213,6 @@ class Scene1 extends Phaser.Scene {
       closeBtnBg.destroy();
       closeBtnText.destroy();
     });
-  }
-
-  shutdown() {
-    window.removeEventListener('resize', this.onResizeHandler);
-    window.removeEventListener('orientationchange', this.onResizeHandler);
   }
 }
 
