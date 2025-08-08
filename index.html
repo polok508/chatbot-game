@@ -12,9 +12,9 @@
     html, body {
       margin: 0; padding: 0;
       background: #fff;
-      width: 100vw;
+      width: 100vw; height: 100vh;
       font-family: 'Roboto', sans-serif;
-      color: black;
+      color: white;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
       overflow: hidden;
@@ -48,10 +48,9 @@
       font-weight: 400;
     }
     #scroll-notice.visible {
+      height: auto;
       top: auto;
       bottom: 0;
-      height: auto;
-      max-height: 30vh;
       padding: 15px 20px;
       font-size: 20px;
       background: rgba(0, 0, 0, 0.85);
@@ -59,24 +58,17 @@
       border-top-right-radius: 12px;
       cursor: default;
       z-index: 10001;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      left: 0;
-      right: 0;
-      position: fixed;
       flex-direction: column;
+      justify-content: center;
     }
     #game-container.visible {
       display: block !important;
       position: relative;
       width: 100vw;
-      height: auto; 
+      height: 100vh;
       background: #fff;
       overflow: hidden;
       z-index: 1;
-      transform: translateY(-2vh);
-      margin: 0 auto;
     }
   </style>
 </head>
