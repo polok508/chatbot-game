@@ -21,42 +21,51 @@ function resetVisibility() {
   hideElement('game-container');
 }
 
-
-
 function checkOrientation() {
+  const isDesktop = !isMobile();
+  const body = document.body;
+  const gameContainer = document.getElementById('game-container');
+
+  if (isDesktop) {
+    body.classList.add('desktop');
+    body.classList.remove('mobile');
+    gameContainer.classList.add('desktop');
+    gameContainer.classList.remove('mobile');
+  } else {
+    body.classList.add('mobile');
+    body.classList.remove('desktop');
+    gameContainer.classList.add('mobile');
+    gameContainer.classList.remove('desktop');
+  }
+
   resetVisibility();
 
   const isPortrait = window.innerHeight > window.innerWidth;
 
-  if (isMobile()) {
+  if (!isDesktop) {
     if (!rotatedToLandscape) {
       if (isPortrait) {
         showElement('rotate-notice');
-        document.body.style.height = '100vh';
-        document.body.style.overflowY = 'hidden';
+        body.style.overflowY = 'hidden';
         return;
       } else {
         rotatedToLandscape = true;
         showElement('scroll-notice');
-        document.body.style.height = '200vh';
-        document.body.style.overflowY = 'auto';
+        body.style.overflowY = 'auto';
         return;
       }
     } else {
       if (!gameStarted) {
         showElement('scroll-notice');
-        document.body.style.height = '200vh';
-        document.body.style.overflowY = 'auto';
+        body.style.overflowY = 'auto';
       } else {
         showElement('game-container');
-        document.body.style.height = '100vh';
-        document.body.style.overflowY = 'hidden';
+        body.style.overflowY = 'hidden';
       }
     }
   } else {
     showElement('game-container');
-    document.body.style.height = '100vh';
-    document.body.style.overflowY = 'hidden';
+    body.style.overflowY = 'hidden';
 
     if (!window.game) {
       window.game = new Phaser.Game(config);
@@ -70,9 +79,7 @@ function startGame() {
   hideElement('scroll-notice');
   showElement('game-container');
 
-  document.body.style.height = '100vh';
   document.body.style.overflowY = 'hidden';
-
   window.scrollTo(0, 0);
 
   if (!window.game) {

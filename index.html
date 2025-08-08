@@ -12,13 +12,32 @@
     html, body {
       margin: 0; padding: 0;
       background: #fff;
-      width: 100vw; height: 100vh;
+      width: 100%;
+      min-height: 100vh;
       font-family: 'Roboto', sans-serif;
       color: white;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
-      overflow: hidden;
+      overflow-x: hidden;
+      /* безопасные отступы снизу */
+      padding-bottom: env(safe-area-inset-bottom, 20px);
     }
+
+    /* Десктоп — фиксированная высота и нет паддинга */
+    body.desktop,
+    #game-container.desktop {
+      height: 100vh !important;
+      padding-bottom: 0 !important;
+      min-height: 0 !important;
+    }
+
+    /* Мобила — min-height и padding снизу */
+    body.mobile,
+    #game-container.mobile {
+      min-height: 100vh !important;
+      padding-bottom: env(safe-area-inset-bottom, 20px);
+    }
+
     #rotate-notice,
     #scroll-notice,
     #game-container {
@@ -27,13 +46,14 @@
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
     }
+
     #rotate-notice.visible,
     #scroll-notice.visible {
       display: flex !important;
       position: fixed;
       top: 0; left: 0;
-      width: 100vw;
-      height: 100vh;
+      width: 100%;
+      height: 100%;
       background: #000;
       color: white;
       font-size: 24px;
@@ -46,7 +66,9 @@
       z-index: 10000;
       flex-direction: column;
       font-weight: 400;
+      padding-bottom: env(safe-area-inset-bottom, 20px);
     }
+
     #scroll-notice.visible {
       height: auto;
       top: auto;
@@ -60,15 +82,18 @@
       z-index: 10001;
       flex-direction: column;
       justify-content: center;
+      padding-bottom: calc(env(safe-area-inset-bottom, 20px) + 20px);
     }
+
     #game-container.visible {
       display: block !important;
       position: relative;
-      width: 100vw;
-      height: 100vh;
+      width: 100%;
+      min-height: 100vh;
       background: #fff;
       overflow: hidden;
       z-index: 1;
+      padding-bottom: env(safe-area-inset-bottom, 20px);
     }
   </style>
 </head>
