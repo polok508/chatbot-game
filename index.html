@@ -11,10 +11,10 @@
   <style>
     html, body {
       margin: 0; padding: 0;
-      background: #000;
-      width: 100vw; height: 100vh;
+      background: #fff; /* белый фон */
+      width: 100vw;
       font-family: 'Roboto', sans-serif;
-      color: white;
+      color: black; /* текст черный для читаемости на белом */
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
       overflow: hidden;
@@ -65,10 +65,13 @@
       display: block !important;
       position: relative;
       width: 100vw;
-      height: 100vh;
-      background: #000;
+      height: auto; /* высоту задает JS */
+      background: #fff; /* белый фон вокруг игры */
       overflow: hidden;
       z-index: 1;
+      /* подъем игры вверх */
+      transform: translateY(-2vh);
+      margin: 0 auto;
     }
   </style>
 </head>

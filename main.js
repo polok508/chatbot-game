@@ -19,20 +19,29 @@ function checkOrientation() {
             rotateNotice.style.display = 'flex';
             scrollNotice.style.display = 'none';
             gameContainer.style.display = 'none';
+
+            document.body.style.height = '100vh';
+            document.documentElement.style.height = '100vh';
+            document.body.style.overflowY = 'hidden';
         } else {
             rotateNotice.style.display = 'none';
             scrollNotice.style.display = 'flex';
             gameContainer.style.display = 'none';
-          
+
             document.body.style.height = '200vh';
             document.documentElement.style.height = '200vh';
+            document.body.style.overflowY = 'auto';
             window.scrollTo(0, 0);
         }
     } else {
-        
         rotateNotice.style.display = 'none';
         scrollNotice.style.display = 'none';
         gameContainer.style.display = 'block';
+
+        document.body.style.height = '100vh';
+        document.documentElement.style.height = '100vh';
+        document.body.style.overflowY = 'hidden';
+
         startGame();
     }
 }
@@ -40,13 +49,12 @@ function checkOrientation() {
 function startGame() {
     if (game) return;
 
-
     document.body.style.height = '100vh';
     document.documentElement.style.height = '100vh';
     window.scrollTo(0, 0);
 
-   
     gameContainer.style.display = 'block';
+    // Подъем игры, чтобы чуть выглядывала сверху
     gameContainer.style.margin = '0 auto';
     gameContainer.style.transform = 'translateY(-2vh)';
 

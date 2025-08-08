@@ -6,10 +6,10 @@ const config = {
   parent: 'game-container',
   width: BASE_WIDTH,
   height: BASE_HEIGHT,
-  backgroundColor: '#000000',
+  backgroundColor: '#fff',
   scene: [Scene1, Scene2, Scene3, Scene4, Scene5],
   scale: {
-    mode: Phaser.Scale.FIT,           // FIT для сохранения пропорций
+    mode: Phaser.Scale.FIT,           // Сохраняем пропорции, масштабируем
     autoCenter: Phaser.Scale.CENTER_BOTH,
     max: {
       width: BASE_WIDTH,
