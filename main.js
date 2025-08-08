@@ -1,6 +1,5 @@
 let game = null;
 let gameStarted = false;
-let rotateNoticeShown = false; // Флаг, чтобы показать предупреждение один раз
 
 function isMobile() {
   return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
@@ -20,7 +19,7 @@ function resetVisibility() {
   hideElement('game-container');
 }
 
-// Масштабирование и центрирование canvas
+// Центрирование и масштабирование canvas
 function resizeGame() {
   if (!game || !game.canvas) return;
 
@@ -29,68 +28,43 @@ function resizeGame() {
   const windowHeight = window.innerHeight;
 
   if (isMobile()) {
+    // Для мобилок: масштабируем и центрируем canvas с position absolute
     const scaleX = windowWidth / game.config.width;
     const scaleY = windowHeight / game.config.height;
     const scale = Math.min(scaleX, scaleY);
 
-    canvas.style.width = `${game.config.width * scale}px`;
-    canvas.style.height = `${game.config.height * scale}px`;
+    const canvasWidth = game.config.width * scale;
+    const canvasHeight = game.config.height * scale;
+
+    canvas.style.width = `${canvasWidth}px`;
+    canvas.style.height = `${canvasHeight}px`;
     canvas.style.position = 'absolute';
-    canvas.style.top = `${(windowHeight - game.config.height * scale) / 2}px`;
-    canvas.style.left = `${(windowWidth - game.config.width * scale) / 2}px`;
+    canvas.style.left = `${(windowWidth - canvasWidth) / 2}px`;
+    canvas.style.top = `${(windowHeight - canvasHeight) / 2}px`;
   } else {
+    // Для ПК: canvas занимает 100% без смещений, position relative
     canvas.style.position = 'relative';
     canvas.style.width = '100%';
     canvas.style.height = '100%';
-    canvas.style.top = '0';
     canvas.style.left = '0';
+    canvas.style.top = '0';
   }
-}
-
-function stopGame() {
-  if (game) {
-    game.destroy(true);
-    game = null;
-  }
-  gameStarted = false;
 }
 
 function checkOrientation() {
   resetVisibility();
 
-  const isPortrait = window.innerHeight > window.innerWidth;
-
   if (isMobile()) {
-    if (isPortrait) {
-      if (!rotateNoticeShown) {
-        showElement('rotate-notice');
-        document.body.style.height = '100vh';
-        document.body.style.overflowY = 'hidden';
-
-        if (gameStarted) {
-          stopGame();
-        }
-
-        rotateNoticeShown = true;
-      } else {
-        // Второй и последующие разы — просто скрываем игру и ничего не показываем
-        resetVisibility();
-        document.body.style.height = '100vh';
-        document.body.style.overflowY = 'hidden';
-      }
+    if (!gameStarted) {
+      showElement('scroll-notice');
+      document.body.style.height = '200vh';
+      document.body.style.overflowY = 'auto';
     } else {
-      if (!gameStarted) {
-        showElement('scroll-notice');
-        document.body.style.height = '200vh';
-        document.body.style.overflowY = 'auto';
-      } else {
-        showElement('game-container');
-        document.body.style.height = '100vh';
-        document.body.style.overflowY = 'hidden';
-      }
+      showElement('game-container');
+      document.body.style.height = '100vh';
+      document.body.style.overflowY = 'hidden';
     }
   } else {
-    // ПК — сразу игра
     showElement('game-container');
     document.body.style.height = '100vh';
     document.body.style.overflowY = 'hidden';
@@ -120,11 +94,12 @@ function startGame() {
 }
 
 window.addEventListener('resize', () => {
-  checkOrientation();
   resizeGame();
+  checkOrientation();
 });
 
 window.addEventListener('orientationchange', () => {
+  resizeGame();
   checkOrientation();
 
   if (isMobile() && !window.matchMedia("(orientation: portrait)").matches) {
