@@ -1,5 +1,5 @@
 const BASE_WIDTH = 1440;
-const BASE_HEIGHT = 955;
+const BASE_HEIGHT = 920;
 
 const config = {
   type: Phaser.AUTO,

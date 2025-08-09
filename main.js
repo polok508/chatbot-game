@@ -3,7 +3,7 @@ window.game = window.game || null;
 let gameStarted = false;
 let rotatedToLandscape = false;
 
-const MOBILE_LANDSCAPE_SCALE = 0.9; // Можно менять для сжатия по диагонали
+const MOBILE_LANDSCAPE_SCALE = 0.95; // Можно менять для сжатия по диагонали
 
 function isMobile() {
   return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
