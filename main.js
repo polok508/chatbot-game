@@ -69,8 +69,8 @@ function checkOrientation() {
     } else {
       body.classList.add('landscape');
 
-      // Вот тут — только для мобильной горизонтальной ориентации подкорректируем размер и масштаб игры
-      gameWrapper.style.transform = 'scale(0.95)';  // чуть уменьшаем, чтобы не обрезалась игра
+      // Мобильная горизонтальная ориентация — уменьшаем масштаб до 0.9
+      gameWrapper.style.transform = 'scale(0.9)';
       gameWrapper.style.padding = '0';
       gameWrapper.style.margin = '0';
 
@@ -113,7 +113,7 @@ function startGame() {
   const gameWrapper = document.getElementById('game-wrapper');
 
   if (isLandscape && isMobile()) {
-    gameWrapper.style.transform = 'scale(0.95)';
+    gameWrapper.style.transform = 'scale(0.9)';
   } else {
     gameWrapper.style.transform = 'none';
   }
