@@ -7,15 +7,13 @@ function isMobile() {
     return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 }
 
-function isIOS() {
-    return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+function isPortrait() {
+    return window.innerHeight > window.innerWidth;
 }
 
 function checkOrientation() {
-    const isPortrait = window.innerHeight > window.innerWidth;
-
     if (isMobile()) {
-        if (isPortrait) {
+        if (isPortrait()) {
             rotateNotice.style.display = 'flex';
             scrollNotice.style.display = 'none';
             gameContainer.style.display = 'none';
@@ -55,40 +53,34 @@ function startGame() {
 
     gameContainer.style.display = 'block';
     gameContainer.style.margin = '0 auto';
-    gameContainer.style.transform = 'translateY(-2vh)';
 
     game = new Phaser.Game(config);
-    window.game = game; 
 
-    resizeGameForMobileLandscape(); 
+    adjustGameScale();
 }
 
-
-function resizeGameForMobileLandscape() {
-    if (isMobile() && window.innerWidth > window.innerHeight && game) {
-        const scaleX = window.innerWidth / BASE_WIDTH;
-        const scaleY = window.innerHeight / BASE_HEIGHT;
-        const scale = Math.min(scaleX, scaleY);
-
-        game.scale.setZoom(scale);
-        game.scale.refresh();
+function adjustGameScale() {
+    if (isMobile() && !isPortrait()) {
+        const scaleFactor = window.innerHeight / BASE_HEIGHT;
+        gameContainer.style.transform = `scale(${scaleFactor}) translateY(0)`;
+    } else {
+        gameContainer.style.transform = 'scale(1) translateY(0)';
     }
 }
 
 window.addEventListener('scroll', () => {
-    if (isMobile() && window.scrollY > window.innerHeight / 2) {
+    if (isMobile() && !isPortrait() && window.scrollY > window.innerHeight / 2) {
         startGame();
     }
 });
 
 window.addEventListener('resize', () => {
     checkOrientation();
-    resizeGameForMobileLandscape();
+    adjustGameScale();
 });
-
 window.addEventListener('orientationchange', () => {
     checkOrientation();
-    resizeGameForMobileLandscape();
+    adjustGameScale();
 });
 
 document.addEventListener('click', (e) => {
