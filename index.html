@@ -99,14 +99,8 @@
       justify-content: center;
       align-items: center;
       overflow: hidden;
-    }
-
-    /* Убираем фиксированный scale, даём игре максимум ширины и высоты */
-    body.mobile.landscape #game-wrapper {
-      max-height: 100vh;
-      overflow: hidden;
+      /* Убрали фиксированный scale(1), теперь масштаб в JS */
       transform-origin: center center;
-      transform: scale(1);
       transition: transform 0.3s ease;
     }
 

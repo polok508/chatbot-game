@@ -24,6 +24,7 @@ function resetVisibility() {
 function checkOrientation() {
   const isDesktop = !isMobile();
   const body = document.body;
+  const gameWrapper = document.getElementById('game-wrapper');
   const gameContainer = document.getElementById('game-container');
 
   if (isDesktop) {
@@ -42,6 +43,9 @@ function checkOrientation() {
       window.game.renderer.clearBeforeRender = false;
       gameStarted = true;
     }
+
+    // Сброс масштаба для десктопа
+    gameWrapper.style.transform = 'scale(1)';
   } else {
     body.classList.add('mobile');
     body.classList.remove('desktop');
@@ -56,9 +60,15 @@ function checkOrientation() {
       showElement('rotate-notice');
       body.style.overflowY = 'hidden';
       body.style.height = '100vh';
+
+      // Сброс масштаба при портрете
+      gameWrapper.style.transform = 'scale(1)';
       return;
     } else {
       body.classList.add('landscape');
+
+      // Добавляем небольшой масштаб для горизонтальной ориентации
+      gameWrapper.style.transform = 'scale(0.95)';
 
       if (!rotatedToLandscape && !gameStarted) {
         rotatedToLandscape = true;
@@ -94,6 +104,11 @@ function startGame() {
     window.game.renderer.clearBeforeRender = false;
   }
   gameStarted = true;
+
+  // При старте игры тоже убеждаемся, что масштаб верный
+  const isLandscape = window.innerWidth > window.innerHeight;
+  const gameWrapper = document.getElementById('game-wrapper');
+  gameWrapper.style.transform = isLandscape ? 'scale(0.95)' : 'scale(1)';
 }
 
 window.addEventListener('resize', () => {
