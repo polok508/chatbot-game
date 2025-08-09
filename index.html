@@ -12,13 +12,28 @@
     html, body {
       margin: 0; padding: 0;
       background: #fff;
-      width: 100vw;
+      width: 100%;
+      min-height: 100vh;
       font-family: 'Roboto', sans-serif;
-      color: black;
+      color: white;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
-      overflow: hidden;
+      overflow-x: hidden;
     }
+
+    body.desktop,
+    #game-container.desktop {
+      height: 100vh !important;
+      min-height: 0 !important;
+      padding-bottom: 0 !important;
+    }
+
+    body.mobile,
+    #game-container.mobile {
+      min-height: 100vh !important;
+      padding-bottom: 0 !important;
+    }
+
     #rotate-notice,
     #scroll-notice,
     #game-container {
@@ -27,12 +42,14 @@
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
     }
-    #rotate-notice,
-    #scroll-notice {
+
+    #rotate-notice.visible,
+    #scroll-notice.visible {
+      display: flex !important;
       position: fixed;
       top: 0; left: 0;
-      width: 100vw;
-      height: 100vh;
+      width: 100%;
+      height: 100%;
       background: #000;
       color: white;
       font-size: 24px;
@@ -45,8 +62,10 @@
       z-index: 10000;
       flex-direction: column;
       font-weight: 400;
+      padding-bottom: env(safe-area-inset-bottom, 20px);
     }
-    #scroll-notice {
+
+    #scroll-notice.visible {
       height: auto;
       top: auto;
       bottom: 0;
@@ -59,15 +78,43 @@
       z-index: 10001;
       flex-direction: column;
       justify-content: center;
+      padding-bottom: calc(env(safe-area-inset-bottom, 20px) + 20px);
     }
-    #game-container {
+
+    #game-container.visible {
+      display: block !important;
       position: relative;
-      width: 100vw;
+      width: 100%;
+      min-height: 100vh;
       background: #fff;
       overflow: hidden;
       z-index: 1;
-      margin: 0 auto;
-      transform-origin: top center;
+    }
+
+    /* Новая обертка для масштабирования */
+    #game-wrapper {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    /* Масштабирование и ограничение по высоте на мобилках в горизонтали */
+    body.mobile.landscape #game-wrapper {
+      max-height: 100vh;
+      overflow: hidden;
+      transform-origin: center center;
+      transform: scale(0.85);
+      transition: transform 0.3s ease;
+    }
+
+    /* Гарантируем видимость контейнера с игрой */
+    #game-container.visible {
+      display: block !important;
+      width: 100%;
+      height: auto;
     }
   </style>
 </head>
@@ -76,7 +123,9 @@
   <div id="rotate-notice">Пожалуйста, переверните устройство в горизонтальную ориентацию</div>
   <div id="scroll-notice">Прокрутите вниз, чтобы начать игру</div>
 
-  <div id="game-container"></div>
+  <div id="game-wrapper">
+    <div id="game-container"></div>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/phaser@3.88.2/dist/phaser.js"></script>
 
