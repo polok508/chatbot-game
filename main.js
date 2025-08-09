@@ -69,8 +69,8 @@ function checkOrientation() {
     } else {
       body.classList.add('landscape');
 
-      // Мобильная горизонтальная ориентация — уменьшаем масштаб до 0.9
-      gameWrapper.style.transform = 'scale(0.9)';
+      // Мобильная горизонтальная ориентация — уменьшаем масштаб до 0.7
+      gameWrapper.style.transform = 'scale(0.7)';
       gameWrapper.style.padding = '0';
       gameWrapper.style.margin = '0';
 
