@@ -3,6 +3,8 @@ window.game = window.game || null;
 let gameStarted = false;
 let rotatedToLandscape = false;
 
+const MOBILE_LANDSCAPE_SCALE = 0.7; 
+
 function isMobile() {
   return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 }
@@ -69,8 +71,8 @@ function checkOrientation() {
     } else {
       body.classList.add('landscape');
 
-      // Мобильная горизонтальная ориентация — уменьшаем масштаб до 0.7
-      gameWrapper.style.transform = 'scale(0.7)';
+      // Мобильная горизонтальная ориентация 
+      gameWrapper.style.transform = `scale(${MOBILE_LANDSCAPE_SCALE})`;
       gameWrapper.style.padding = '0';
       gameWrapper.style.margin = '0';
 
@@ -109,14 +111,7 @@ function startGame() {
   }
   gameStarted = true;
 
-  const isLandscape = window.innerWidth > window.innerHeight;
-  const gameWrapper = document.getElementById('game-wrapper');
-
-  if (isLandscape && isMobile()) {
-    gameWrapper.style.transform = 'scale(0.9)';
-  } else {
-    gameWrapper.style.transform = 'none';
-  }
+  
 }
 
 window.addEventListener('resize', () => {
