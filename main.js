@@ -21,6 +21,19 @@ function resetVisibility() {
   hideElement('game-container');
 }
 
+function resizeGameToWindow() {
+  const gameContainer = document.getElementById('game-container');
+  const width = window.innerWidth;
+  const height = window.innerHeight;
+
+  gameContainer.style.width = width + 'px';
+  gameContainer.style.height = height + 'px';
+
+  if (window.game) {
+    window.game.scale.resize(width, height);
+  }
+}
+
 function checkOrientation() {
   const isDesktop = !isMobile();
   const body = document.body;
@@ -44,7 +57,9 @@ function checkOrientation() {
       gameStarted = true;
     }
 
-    gameWrapper.style.transform = 'scale(1)';
+    gameWrapper.style.transform = 'none';
+    gameWrapper.style.padding = '0';
+    gameWrapper.style.margin = '0';
   } else {
     body.classList.add('mobile');
     body.classList.remove('desktop');
@@ -59,15 +74,16 @@ function checkOrientation() {
       body.style.overflowY = 'hidden';
       body.style.height = window.innerHeight + 'px';
 
-      gameWrapper.style.transform = 'scale(1)';
-      gameWrapper.style.paddingBottom = 'env(safe-area-inset-bottom, 20px)';
+      gameWrapper.style.transform = 'none';
+      gameWrapper.style.padding = 'env(safe-area-inset-bottom, 20px)';
+      gameWrapper.style.margin = '0';
       return;
     } else {
       body.classList.add('landscape');
 
-      gameWrapper.style.transform = 'scale(1)'; // убираем масштабирование
-
-      gameWrapper.style.paddingBottom = '0'; // убираем паддинг снизу
+      gameWrapper.style.transform = 'none';
+      gameWrapper.style.padding = '0';
+      gameWrapper.style.margin = '0';
 
       if (!rotatedToLandscape && !gameStarted) {
         rotatedToLandscape = true;
@@ -84,14 +100,8 @@ function checkOrientation() {
           showElement('game-container');
           body.style.overflowY = 'hidden';
           body.style.height = window.innerHeight + 'px';
+          resizeGameToWindow();
         }
-      }
-
-      // Resize Phaser canvas под контейнер в мобильном ландшафте
-      if (window.game && gameStarted) {
-        const w = gameContainer.clientWidth;
-        const h = gameContainer.clientHeight;
-        window.game.scale.resize(w, h);
       }
     }
   }
@@ -109,20 +119,10 @@ function startGame() {
     window.game = new Phaser.Game(config);
     window.game.renderer.clearBeforeRender = false;
   }
+
   gameStarted = true;
 
-  const isLandscape = window.innerWidth > window.innerHeight;
-  const gameWrapper = document.getElementById('game-wrapper');
-  gameWrapper.style.transform = 'scale(1)';
-  gameWrapper.style.paddingBottom = isLandscape ? '0' : 'env(safe-area-inset-bottom, 20px)';
-
-  // Подгоняем Phaser canvas под контейнер
-  const gameContainer = document.getElementById('game-container');
-  const w = gameContainer.clientWidth;
-  const h = gameContainer.clientHeight;
-  if (window.game) {
-    window.game.scale.resize(w, h);
-  }
+  resizeGameToWindow();
 }
 
 window.addEventListener('resize', () => {
