@@ -3,7 +3,7 @@ window.game = window.game || null;
 let gameStarted = false;
 let rotatedToLandscape = false;
 
-const MOBILE_LANDSCAPE_SCALE = 0.9; // масштаб игры по диагонали
+const MOBILE_LANDSCAPE_SCALE = 1.0; // масштаб игры по диагонали
 const HEIGHT_BUFFER = 20; // запас по высоте в пикселях, можно подбирать
 
 function isMobile() {
@@ -25,9 +25,17 @@ function resetVisibility() {
 }
 
 function getSafeAreaInset(name) {
-  // Получаем отступы безопасной зоны, если браузер поддерживает env()
   const val = getComputedStyle(document.documentElement).getPropertyValue(`env(safe-area-inset-${name})`);
   return val ? parseInt(val) : 0;
+}
+
+function getViewportHeight() {
+  return window.visualViewport ? window.visualViewport.height : window.innerHeight;
+}
+
+function updateVhCssVar() {
+  const vh = getViewportHeight();
+  document.documentElement.style.setProperty('--vh', vh + 'px');
 }
 
 function checkOrientation() {
@@ -36,23 +44,24 @@ function checkOrientation() {
   const gameWrapper = document.getElementById('game-wrapper');
   const gameContainer = document.getElementById('game-container');
 
+  const vh = getViewportHeight();
+
   if (isDesktop) {
     body.classList.add('desktop');
     body.classList.remove('mobile', 'landscape');
     gameContainer.classList.add('desktop');
     gameContainer.classList.remove('mobile');
 
-    // Сброс стилей контейнера
     gameWrapper.style.transform = 'none';
     gameWrapper.style.width = '100vw';
-    gameWrapper.style.height = '100vh';
+    gameWrapper.style.height = 'calc(var(--vh, 100vh))';
     gameWrapper.style.padding = '0';
     gameWrapper.style.margin = '0';
 
     resetVisibility();
     showElement('game-container');
     body.style.overflowY = 'hidden';
-    body.style.height = '100vh';
+    body.style.height = 'calc(var(--vh, 100vh))';
 
     if (!window.game) {
       window.game = new Phaser.Game(config);
@@ -69,25 +78,22 @@ function checkOrientation() {
     const isPortrait = window.innerHeight > window.innerWidth;
 
     if (isPortrait && !gameStarted) {
-      // Портрет - показать rotate notice
       body.classList.remove('landscape');
       showElement('rotate-notice');
       body.style.overflowY = 'hidden';
-      body.style.height = window.innerHeight + 'px';
+      body.style.height = vh + 'px';
 
       gameWrapper.style.transform = 'none';
       gameWrapper.style.width = '100vw';
-      gameWrapper.style.height = '100vh';
+      gameWrapper.style.height = 'calc(var(--vh, 100vh))';
       gameWrapper.style.padding = 'env(safe-area-inset-bottom, 20px)';
       gameWrapper.style.margin = '0';
       return;
     } else {
-      // Горизонтальная ориентация
       body.classList.add('landscape');
 
       const scale = MOBILE_LANDSCAPE_SCALE;
 
-      // Отступы безопасной зоны сверху и снизу
       const safeTop = getSafeAreaInset('top');
       const safeBottom = getSafeAreaInset('bottom');
 
@@ -95,8 +101,7 @@ function checkOrientation() {
       gameWrapper.style.padding = '0';
       gameWrapper.style.margin = '0';
 
-      // Учитываем буфер и safe-area в высоте
-      const adjustedHeight = (window.innerHeight + HEIGHT_BUFFER + safeTop + safeBottom) / scale;
+      const adjustedHeight = (vh + HEIGHT_BUFFER + safeTop + safeBottom) / scale;
       const adjustedWidth = window.innerWidth / scale;
 
       gameWrapper.style.width = adjustedWidth + 'px';
@@ -106,17 +111,17 @@ function checkOrientation() {
         rotatedToLandscape = true;
         showElement('scroll-notice');
         body.style.overflowY = 'auto';
-        body.style.height = (window.innerHeight * 1.5) + 'px';
+        body.style.height = (vh * 1.5) + 'px';
         return;
       } else {
         if (!gameStarted) {
           showElement('scroll-notice');
           body.style.overflowY = 'auto';
-          body.style.height = (window.innerHeight * 1.5) + 'px';
+          body.style.height = (vh * 1.5) + 'px';
         } else {
           showElement('game-container');
           body.style.overflowY = 'hidden';
-          body.style.height = window.innerHeight + 'px';
+          body.style.height = vh + 'px';
         }
       }
     }
@@ -128,7 +133,7 @@ function startGame() {
   showElement('game-container');
 
   document.body.style.overflowY = 'hidden';
-  document.body.style.height = window.innerHeight + 'px';
+  document.body.style.height = getViewportHeight() + 'px';
   window.scrollTo(0, 0);
 
   if (!window.game) {
@@ -139,18 +144,23 @@ function startGame() {
 }
 
 window.addEventListener('resize', () => {
+  updateVhCssVar();
   checkOrientation();
 });
 
 window.addEventListener('orientationchange', () => {
-  checkOrientation();
+  setTimeout(() => {
+    updateVhCssVar();
+    checkOrientation();
 
-  if (isMobile() && !window.matchMedia("(orientation: portrait)").matches) {
-    setTimeout(() => window.scrollTo(0, 1), 300);
-  }
+    if (isMobile() && !window.matchMedia("(orientation: portrait)").matches) {
+      window.scrollTo(0, 1);
+    }
+  }, 300);
 });
 
 window.addEventListener('load', () => {
+  updateVhCssVar();
   checkOrientation();
 
   if (isMobile()) {
