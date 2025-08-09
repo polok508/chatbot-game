@@ -1,121 +1,100 @@
-window.game = window.game || null;
-
-let gameStarted = false;
-let rotatedToLandscape = false;
+let game;
+const gameContainer = document.getElementById('game-container');
+const rotateNotice = document.getElementById('rotate-notice');
+const scrollNotice = document.getElementById('scroll-notice');
 
 function isMobile() {
-  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 }
 
-function showElement(id) {
-  document.getElementById(id).classList.add('visible');
-}
-
-function hideElement(id) {
-  document.getElementById(id).classList.remove('visible');
-}
-
-function resetVisibility() {
-  hideElement('rotate-notice');
-  hideElement('scroll-notice');
-  hideElement('game-container');
+function isIOS() {
+    return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 }
 
 function checkOrientation() {
-  const isDesktop = !isMobile();
-  const body = document.body;
-  const gameContainer = document.getElementById('game-container');
+    const isPortrait = window.innerHeight > window.innerWidth;
 
-  if (isDesktop) {
-    body.classList.add('desktop');
-    body.classList.remove('mobile');
-    gameContainer.classList.add('desktop');
-    gameContainer.classList.remove('mobile');
-  } else {
-    body.classList.add('mobile');
-    body.classList.remove('desktop');
-    gameContainer.classList.add('mobile');
-    gameContainer.classList.remove('desktop');
-  }
+    if (isMobile()) {
+        if (isPortrait) {
+            rotateNotice.style.display = 'flex';
+            scrollNotice.style.display = 'none';
+            gameContainer.style.display = 'none';
 
-  resetVisibility();
+            document.body.style.height = '100vh';
+            document.documentElement.style.height = '100vh';
+            document.body.style.overflowY = 'hidden';
+        } else {
+            rotateNotice.style.display = 'none';
+            scrollNotice.style.display = 'flex';
+            gameContainer.style.display = 'none';
 
-  const isPortrait = window.innerHeight > window.innerWidth;
-
-  if (!isDesktop) {
-    if (!rotatedToLandscape) {
-      if (isPortrait) {
-        showElement('rotate-notice');
-        body.style.overflowY = 'hidden';
-        body.style.height = '100vh';
-        return;
-      } else {
-        rotatedToLandscape = true;
-        showElement('scroll-notice');
-        body.style.overflowY = 'auto';
-        body.style.height = '150vh'; // уменьшили scroll area
-        return;
-      }
+            document.body.style.height = '200vh';
+            document.documentElement.style.height = '200vh';
+            document.body.style.overflowY = 'auto';
+            window.scrollTo(0, 0);
+        }
     } else {
-      if (!gameStarted) {
-        showElement('scroll-notice');
-        body.style.overflowY = 'auto';
-        body.style.height = '150vh'; // уменьшили scroll area
-      } else {
-        showElement('game-container');
-        body.style.overflowY = 'hidden';
-        body.style.height = '100vh';
-      }
-    }
-  } else {
-    showElement('game-container');
-    body.style.overflowY = 'hidden';
-    body.style.height = '100vh';
+        rotateNotice.style.display = 'none';
+        scrollNotice.style.display = 'none';
+        gameContainer.style.display = 'block';
 
-    if (!window.game) {
-      window.game = new Phaser.Game(config);
-      window.game.renderer.clearBeforeRender = false;
-      gameStarted = true;
+        document.body.style.height = '100vh';
+        document.documentElement.style.height = '100vh';
+        document.body.style.overflowY = 'hidden';
+
+        startGame();
     }
-  }
 }
 
 function startGame() {
-  hideElement('scroll-notice');
-  showElement('game-container');
+    if (game) return;
 
-  document.body.style.overflowY = 'hidden';
-  document.body.style.height = '100vh';
-  window.scrollTo(0, 0);
+    document.body.style.height = '100vh';
+    document.documentElement.style.height = '100vh';
+    window.scrollTo(0, 0);
 
-  if (!window.game) {
-    window.game = new Phaser.Game(config);
-    window.game.renderer.clearBeforeRender = false;
-  }
-  gameStarted = true;
+    gameContainer.style.display = 'block';
+    gameContainer.style.margin = '0 auto';
+    gameContainer.style.transform = 'translateY(-2vh)';
+
+    game = new Phaser.Game(config);
+    window.game = game; 
+
+    resizeGameForMobileLandscape(); 
 }
 
+
+function resizeGameForMobileLandscape() {
+    if (isMobile() && window.innerWidth > window.innerHeight && game) {
+        const scaleX = window.innerWidth / BASE_WIDTH;
+        const scaleY = window.innerHeight / BASE_HEIGHT;
+        const scale = Math.min(scaleX, scaleY);
+
+        game.scale.setZoom(scale);
+        game.scale.refresh();
+    }
+}
+
+window.addEventListener('scroll', () => {
+    if (isMobile() && window.scrollY > window.innerHeight / 2) {
+        startGame();
+    }
+});
+
 window.addEventListener('resize', () => {
-  checkOrientation();
+    checkOrientation();
+    resizeGameForMobileLandscape();
 });
 
 window.addEventListener('orientationchange', () => {
-  checkOrientation();
-
-  if (isMobile() && !window.matchMedia("(orientation: portrait)").matches) {
-    setTimeout(() => window.scrollTo(0, 1), 300);
-  }
+    checkOrientation();
+    resizeGameForMobileLandscape();
 });
 
-window.addEventListener('load', () => {
-  checkOrientation();
-
-  if (isMobile()) {
-    window.addEventListener('scroll', () => {
-      const rotateVisible = document.getElementById('rotate-notice').classList.contains('visible');
-      if (window.scrollY > 100 && !gameStarted && !rotateVisible) {
+document.addEventListener('click', (e) => {
+    if (e.target.id === 'start-button') {
         startGame();
-      }
-    });
-  }
+    }
 });
+
+checkOrientation();
