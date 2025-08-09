@@ -3,7 +3,7 @@ window.game = window.game || null;
 let gameStarted = false;
 let rotatedToLandscape = false;
 
-const MOBILE_LANDSCAPE_SCALE = 0.9; // Можно менять для сжатия по диагонали
+const MOBILE_LANDSCAPE_SCALE = 1.5; // Можно менять для сжатия по диагонали
 
 function isMobile() {
   return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
@@ -71,7 +71,7 @@ function checkOrientation() {
     } else {
       body.classList.add('landscape');
 
-      // Мобильная горизонтальная ориентация - уменьшаем масштаб для комфортного просмотра
+      // Мобильная горизонтальная ориентация 
       gameWrapper.style.transform = `scale(${MOBILE_LANDSCAPE_SCALE})`;
       gameWrapper.style.padding = '0';
       gameWrapper.style.margin = '0';
