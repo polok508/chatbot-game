@@ -28,6 +28,7 @@ function checkOrientation() {
   const gameContainer = document.getElementById('game-container');
 
   if (isDesktop) {
+    // Оставляем десктоп без изменений, как было раньше
     body.classList.add('desktop');
     body.classList.remove('mobile', 'landscape');
     gameContainer.classList.add('desktop');
@@ -36,7 +37,7 @@ function checkOrientation() {
     resetVisibility();
     showElement('game-container');
     body.style.overflowY = 'hidden';
-    body.style.height = window.innerHeight + 'px';
+    body.style.height = '100vh';
 
     if (!window.game) {
       window.game = new Phaser.Game(config);
@@ -46,6 +47,7 @@ function checkOrientation() {
 
     gameWrapper.style.transform = 'scale(1)';
   } else {
+    // Мобильные устройства
     body.classList.add('mobile');
     body.classList.remove('desktop');
 
@@ -60,11 +62,14 @@ function checkOrientation() {
       body.style.height = window.innerHeight + 'px';
 
       gameWrapper.style.transform = 'scale(1)';
+      gameWrapper.style.paddingBottom = 'env(safe-area-inset-bottom, 20px)'; // возвращаем паддинг по умолчанию
       return;
     } else {
       body.classList.add('landscape');
 
+      // Здесь только мобильный ландшафт — применяем масштаб и убираем нижний padding
       gameWrapper.style.transform = 'scale(0.95)';
+      gameWrapper.style.paddingBottom = '0';
 
       if (!rotatedToLandscape && !gameStarted) {
         rotatedToLandscape = true;
@@ -82,6 +87,13 @@ function checkOrientation() {
           body.style.overflowY = 'hidden';
           body.style.height = window.innerHeight + 'px';
         }
+      }
+
+      // Подгоняем Phaser canvas под размеры контейнера
+      if (window.game && gameStarted) {
+        const w = gameContainer.clientWidth;
+        const h = gameContainer.clientHeight;
+        window.game.scale.resize(w, h);
       }
     }
   }
@@ -104,6 +116,15 @@ function startGame() {
   const isLandscape = window.innerWidth > window.innerHeight;
   const gameWrapper = document.getElementById('game-wrapper');
   gameWrapper.style.transform = isLandscape ? 'scale(0.95)' : 'scale(1)';
+  gameWrapper.style.paddingBottom = isLandscape ? '0' : 'env(safe-area-inset-bottom, 20px)';
+
+  // Подгоняем Phaser под контейнер после старта
+  const gameContainer = document.getElementById('game-container');
+  const w = gameContainer.clientWidth;
+  const h = gameContainer.clientHeight;
+  if (window.game) {
+    window.game.scale.resize(w, h);
+  }
 }
 
 window.addEventListener('resize', () => {
