@@ -3,7 +3,7 @@ window.game = window.game || null;
 let gameStarted = false;
 let rotatedToLandscape = false;
 
-const MOBILE_LANDSCAPE_SCALE = 0.85; // Можно менять для сжатия по диагонали
+const MOBILE_LANDSCAPE_SCALE = 0.9; // Можно менять для сжатия по диагонали
 
 function isMobile() {
   return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
@@ -35,6 +35,13 @@ function checkOrientation() {
     gameContainer.classList.add('desktop');
     gameContainer.classList.remove('mobile');
 
+    // Сброс стилей контейнера
+    gameWrapper.style.transform = 'none';
+    gameWrapper.style.width = '100vw';
+    gameWrapper.style.height = '100vh';
+    gameWrapper.style.padding = '0';
+    gameWrapper.style.margin = '0';
+
     resetVisibility();
     showElement('game-container');
     body.style.overflowY = 'hidden';
@@ -46,10 +53,6 @@ function checkOrientation() {
       gameStarted = true;
     }
 
-    gameWrapper.style.transform = 'none';
-    gameWrapper.style.padding = '0';
-    gameWrapper.style.margin = '0';
-
   } else {
     body.classList.add('mobile');
     body.classList.remove('desktop');
@@ -59,22 +62,32 @@ function checkOrientation() {
     const isPortrait = window.innerHeight > window.innerWidth;
 
     if (isPortrait && !gameStarted) {
+      // Портрет - показать rotate notice
       body.classList.remove('landscape');
       showElement('rotate-notice');
       body.style.overflowY = 'hidden';
       body.style.height = window.innerHeight + 'px';
 
       gameWrapper.style.transform = 'none';
+      gameWrapper.style.width = '100vw';
+      gameWrapper.style.height = '100vh';
       gameWrapper.style.padding = 'env(safe-area-inset-bottom, 20px)';
       gameWrapper.style.margin = '0';
       return;
     } else {
+      // Горизонтальная ориентация
       body.classList.add('landscape');
 
-      // Мобильная горизонтальная ориентация 
-      gameWrapper.style.transform = `scale(${MOBILE_LANDSCAPE_SCALE})`;
+      // масштаб
+      const scale = MOBILE_LANDSCAPE_SCALE;
+      gameWrapper.style.transform = `scale(${scale})`;
       gameWrapper.style.padding = '0';
       gameWrapper.style.margin = '0';
+
+      // Подгоняем реальные размеры контейнера под масштаб,
+      // чтобы после transform: scale игра не обрезалась
+      gameWrapper.style.width = window.innerWidth / scale + 'px';
+      gameWrapper.style.height = window.innerHeight / scale + 'px';
 
       if (!rotatedToLandscape && !gameStarted) {
         rotatedToLandscape = true;
