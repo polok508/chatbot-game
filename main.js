@@ -28,8 +28,7 @@ function checkOrientation() {
 
   if (isDesktop) {
     body.classList.add('desktop');
-    body.classList.remove('mobile');
-    body.classList.remove('landscape');
+    body.classList.remove('mobile', 'landscape');
     gameContainer.classList.add('desktop');
     gameContainer.classList.remove('mobile');
 
@@ -46,14 +45,13 @@ function checkOrientation() {
   } else {
     body.classList.add('mobile');
     body.classList.remove('desktop');
-    gameContainer.classList.add('mobile');
-    gameContainer.classList.remove('desktop');
 
     resetVisibility();
 
     const isPortrait = window.innerHeight > window.innerWidth;
 
-    if (isPortrait) {
+    if (isPortrait && !gameStarted) {
+      // Показываем уведомление о горизонтали только до старта игры
       body.classList.remove('landscape');
       showElement('rotate-notice');
       body.style.overflowY = 'hidden';
@@ -61,7 +59,8 @@ function checkOrientation() {
       return;
     } else {
       body.classList.add('landscape');
-      if (!rotatedToLandscape) {
+
+      if (!rotatedToLandscape && !gameStarted) {
         rotatedToLandscape = true;
         showElement('scroll-notice');
         body.style.overflowY = 'auto';

@@ -101,20 +101,20 @@
       overflow: hidden;
     }
 
-    /* Масштабирование и ограничение по высоте на мобилках в горизонтали */
+    /* Убираем фиксированный scale, даём игре максимум ширины и высоты */
     body.mobile.landscape #game-wrapper {
       max-height: 100vh;
       overflow: hidden;
       transform-origin: center center;
-      transform: scale(0.85);
+      transform: scale(1);
       transition: transform 0.3s ease;
     }
 
-    /* Гарантируем видимость контейнера с игрой */
-    #game-container.visible {
-      display: block !important;
-      width: 100%;
-      height: auto;
+    /* Подгоняем контейнер игры под экран */
+    body.mobile.landscape #game-container {
+      width: 100vw !important;
+      height: auto !important;
+      max-height: 100vh !important;
     }
   </style>
 </head>
