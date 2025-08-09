@@ -12,7 +12,7 @@ class Scene3 extends Phaser.Scene {
   create() {
     const { width, height } = this.scale;
     this.chatX = 957;
-    this.chatY = 250;
+    this.chatY = 200;
 
     // Фон
     this.add.image(width / 2, height / 2, 'bg_office3').setDisplaySize(width, height);

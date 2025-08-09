@@ -106,7 +106,7 @@ class Scene2 extends Phaser.Scene {
             btnBg.generateTexture('btn_bg_continue', 357, 95);
             btnBg.destroy();
 
-            const btn = this.add.image(542, 746, 'btn_bg_continue')
+            const btn = this.add.image(542, 700, 'btn_bg_continue')
               .setOrigin(0, 0)
               .setAlpha(0)
               .setInteractive({ useHandCursor: true })
@@ -114,7 +114,7 @@ class Scene2 extends Phaser.Scene {
                 this.scene.transition({ target: 'Scene3', duration: 500 });
               });
 
-            const btnText = this.add.text(542 + 357 / 2, 746 + 95 / 2, "Продолжить", {
+            const btnText = this.add.text(542 + 357 / 2, 700 + 95 / 2, "Продолжить", {
               fontFamily: 'Roboto',
               fontSize: '30px',
               fontWeight: '400',

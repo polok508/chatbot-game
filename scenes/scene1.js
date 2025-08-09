@@ -104,14 +104,14 @@ class Scene1 extends Phaser.Scene {
     // Кнопки
     this.time.delayedCall(5300, () => {
       this.createButtonContainer(
-        290, 739,
+        290, 700,
         "дорого и долго", 211, 48, 0x0F0F0F, 0.5,
         "Нанять менеджера", 331, 95,
         () => { this.showManagerPopup(); }
       );
 
       this.createButtonContainer(
-        840, 739,
+        840, 700,
         "справится уже сегодня", 301, 48, 0x0F0F0F, 0.5,
         "Установить Чат-Бота", 357, 95,
         () => { 
@@ -189,7 +189,7 @@ class Scene1 extends Phaser.Scene {
   }
 
   showManagerPopup() {
-    const overlay = this.add.rectangle(720, 496, 1440, 992, 0x000000, 0.6).setOrigin(0.5).setDepth(10);
+    const overlay = this.add.rectangle(720, 496, 1500, 995, 0x000000, 0.6).setOrigin(0.5).setDepth(10);
 
     const popupWidth = 600;
     const popupHeight = 250;

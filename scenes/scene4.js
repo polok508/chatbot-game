@@ -71,7 +71,7 @@ class Scene4 extends Phaser.Scene {
 
     
     const btnX = 1068;
-    const btnY = 847;
+    const btnY = 780;
     const btnWidth = 302;
     const btnHeight = 75;
     const btnRadius = 20;
