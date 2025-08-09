@@ -28,7 +28,6 @@ function checkOrientation() {
   const gameContainer = document.getElementById('game-container');
 
   if (isDesktop) {
-    // Оставляем десктоп без изменений, как было раньше
     body.classList.add('desktop');
     body.classList.remove('mobile', 'landscape');
     gameContainer.classList.add('desktop');
@@ -47,7 +46,6 @@ function checkOrientation() {
 
     gameWrapper.style.transform = 'scale(1)';
   } else {
-    // Мобильные устройства
     body.classList.add('mobile');
     body.classList.remove('desktop');
 
@@ -62,26 +60,26 @@ function checkOrientation() {
       body.style.height = window.innerHeight + 'px';
 
       gameWrapper.style.transform = 'scale(1)';
-      gameWrapper.style.paddingBottom = 'env(safe-area-inset-bottom, 20px)'; // возвращаем паддинг по умолчанию
+      gameWrapper.style.paddingBottom = 'env(safe-area-inset-bottom, 20px)';
       return;
     } else {
       body.classList.add('landscape');
 
-      // Здесь только мобильный ландшафт — применяем масштаб и убираем нижний padding
-      gameWrapper.style.transform = 'scale(0.95)';
-      gameWrapper.style.paddingBottom = '0';
+      gameWrapper.style.transform = 'scale(1)'; // убираем масштабирование
+
+      gameWrapper.style.paddingBottom = '0'; // убираем паддинг снизу
 
       if (!rotatedToLandscape && !gameStarted) {
         rotatedToLandscape = true;
         showElement('scroll-notice');
         body.style.overflowY = 'auto';
-        body.style.height = window.innerHeight * 1.5 + 'px';
+        body.style.height = (window.innerHeight * 1.5) + 'px';
         return;
       } else {
         if (!gameStarted) {
           showElement('scroll-notice');
           body.style.overflowY = 'auto';
-          body.style.height = window.innerHeight * 1.5 + 'px';
+          body.style.height = (window.innerHeight * 1.5) + 'px';
         } else {
           showElement('game-container');
           body.style.overflowY = 'hidden';
@@ -89,7 +87,7 @@ function checkOrientation() {
         }
       }
 
-      // Подгоняем Phaser canvas под размеры контейнера
+      // Resize Phaser canvas под контейнер в мобильном ландшафте
       if (window.game && gameStarted) {
         const w = gameContainer.clientWidth;
         const h = gameContainer.clientHeight;
@@ -115,10 +113,10 @@ function startGame() {
 
   const isLandscape = window.innerWidth > window.innerHeight;
   const gameWrapper = document.getElementById('game-wrapper');
-  gameWrapper.style.transform = isLandscape ? 'scale(0.95)' : 'scale(1)';
+  gameWrapper.style.transform = 'scale(1)';
   gameWrapper.style.paddingBottom = isLandscape ? '0' : 'env(safe-area-inset-bottom, 20px)';
 
-  // Подгоняем Phaser под контейнер после старта
+  // Подгоняем Phaser canvas под контейнер
   const gameContainer = document.getElementById('game-container');
   const w = gameContainer.clientWidth;
   const h = gameContainer.clientHeight;

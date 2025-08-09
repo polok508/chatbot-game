@@ -13,7 +13,7 @@
       margin: 0; padding: 0;
       background: #fff;
       width: 100%;
-      min-height: 100vh;
+      height: 100%;
       font-family: 'Roboto', sans-serif;
       color: white;
       -webkit-font-smoothing: antialiased;
@@ -92,7 +92,6 @@
       z-index: 1;
     }
 
-    /* Новая обертка для масштабирования */
     #game-wrapper {
       width: 100vw;
       height: 100vh;
@@ -100,17 +99,14 @@
       justify-content: center;
       align-items: center;
       overflow: hidden;
-
+      box-sizing: border-box;
       padding-top: env(safe-area-inset-top, 20px);
       padding-bottom: env(safe-area-inset-bottom, 20px);
-
-      box-sizing: border-box;
-
       transform-origin: center center;
       transition: transform 0.3s ease;
     }
 
-    /* Только для мобильного ландшафта убираем нижний padding */
+    /* Для мобильной горизонтальной ориентации — убираем padding-bottom */
     body.mobile.landscape #game-wrapper {
       padding-bottom: 0;
     }
