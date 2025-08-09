@@ -21,19 +21,6 @@ function resetVisibility() {
   hideElement('game-container');
 }
 
-function resizeGameToWindow() {
-  const gameContainer = document.getElementById('game-container');
-  const width = window.innerWidth;
-  const height = window.innerHeight;
-
-  gameContainer.style.width = width + 'px';
-  gameContainer.style.height = height + 'px';
-
-  if (window.game) {
-    window.game.scale.resize(width, height);
-  }
-}
-
 function checkOrientation() {
   const isDesktop = !isMobile();
   const body = document.body;
@@ -60,6 +47,7 @@ function checkOrientation() {
     gameWrapper.style.transform = 'none';
     gameWrapper.style.padding = '0';
     gameWrapper.style.margin = '0';
+
   } else {
     body.classList.add('mobile');
     body.classList.remove('desktop');
@@ -81,7 +69,8 @@ function checkOrientation() {
     } else {
       body.classList.add('landscape');
 
-      gameWrapper.style.transform = 'none';
+      // Вот тут — только для мобильной горизонтальной ориентации подкорректируем размер и масштаб игры
+      gameWrapper.style.transform = 'scale(0.95)';  // чуть уменьшаем, чтобы не обрезалась игра
       gameWrapper.style.padding = '0';
       gameWrapper.style.margin = '0';
 
@@ -100,7 +89,6 @@ function checkOrientation() {
           showElement('game-container');
           body.style.overflowY = 'hidden';
           body.style.height = window.innerHeight + 'px';
-          resizeGameToWindow();
         }
       }
     }
@@ -119,10 +107,16 @@ function startGame() {
     window.game = new Phaser.Game(config);
     window.game.renderer.clearBeforeRender = false;
   }
-
   gameStarted = true;
 
-  resizeGameToWindow();
+  const isLandscape = window.innerWidth > window.innerHeight;
+  const gameWrapper = document.getElementById('game-wrapper');
+
+  if (isLandscape && isMobile()) {
+    gameWrapper.style.transform = 'scale(0.95)';
+  } else {
+    gameWrapper.style.transform = 'none';
+  }
 }
 
 window.addEventListener('resize', () => {

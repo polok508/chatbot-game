@@ -89,11 +89,10 @@
       align-items: center;
       overflow: hidden;
       box-sizing: border-box;
-      padding-top: env(safe-area-inset-top, 20px);
-      padding-bottom: env(safe-area-inset-bottom, 20px);
+      padding: 0;
+      margin: 0;
       transform-origin: center center;
       transition: transform 0.3s ease;
-      margin: 0;
     }
 
     body.mobile.landscape #game-wrapper {
@@ -102,6 +101,7 @@
       padding: 0 !important;
       margin: 0 !important;
       overflow: hidden;
+      transform: none !important;
     }
 
     #game-container {

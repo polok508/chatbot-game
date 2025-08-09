@@ -1,19 +1,16 @@
-const BASE_WIDTH = 1440;
-const BASE_HEIGHT = 992;
-
 const config = {
   type: Phaser.AUTO,
   parent: 'game-container',
-  width: BASE_WIDTH,
-  height: BASE_HEIGHT,
+  width: 1440,    
+  height: 992,
   backgroundColor: '#fff',
   scene: [Scene1, Scene2, Scene3, Scene4, Scene5],
   scale: {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
     max: {
-      width: BASE_WIDTH,
-      height: BASE_HEIGHT,
+      width: 1440,
+      height: 992,
     },
     min: {
       width: 400,
