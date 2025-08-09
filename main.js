@@ -3,7 +3,8 @@ window.game = window.game || null;
 let gameStarted = false;
 let rotatedToLandscape = false;
 
-const MOBILE_LANDSCAPE_SCALE = 0.9; // Можно менять для сжатия по диагонали
+const MOBILE_LANDSCAPE_SCALE = 0.9; // масштаб игры по диагонали
+const HEIGHT_BUFFER = 20; // запас по высоте в пикселях, можно подбирать
 
 function isMobile() {
   return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
@@ -21,6 +22,12 @@ function resetVisibility() {
   hideElement('rotate-notice');
   hideElement('scroll-notice');
   hideElement('game-container');
+}
+
+function getSafeAreaInset(name) {
+  // Получаем отступы безопасной зоны, если браузер поддерживает env()
+  const val = getComputedStyle(document.documentElement).getPropertyValue(`env(safe-area-inset-${name})`);
+  return val ? parseInt(val) : 0;
 }
 
 function checkOrientation() {
@@ -78,16 +85,22 @@ function checkOrientation() {
       // Горизонтальная ориентация
       body.classList.add('landscape');
 
-      // масштаб
       const scale = MOBILE_LANDSCAPE_SCALE;
+
+      // Отступы безопасной зоны сверху и снизу
+      const safeTop = getSafeAreaInset('top');
+      const safeBottom = getSafeAreaInset('bottom');
+
       gameWrapper.style.transform = `scale(${scale})`;
       gameWrapper.style.padding = '0';
       gameWrapper.style.margin = '0';
 
-      // Подгоняем реальные размеры контейнера под масштаб,
-      // чтобы после transform: scale игра не обрезалась
-      gameWrapper.style.width = window.innerWidth / scale + 'px';
-      gameWrapper.style.height = window.innerHeight / scale + 'px';
+      // Учитываем буфер и safe-area в высоте
+      const adjustedHeight = (window.innerHeight + HEIGHT_BUFFER + safeTop + safeBottom) / scale;
+      const adjustedWidth = window.innerWidth / scale;
+
+      gameWrapper.style.width = adjustedWidth + 'px';
+      gameWrapper.style.height = adjustedHeight + 'px';
 
       if (!rotatedToLandscape && !gameStarted) {
         rotatedToLandscape = true;
