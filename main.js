@@ -36,7 +36,7 @@ function checkOrientation() {
     resetVisibility();
     showElement('game-container');
     body.style.overflowY = 'hidden';
-    body.style.height = '100vh';
+    body.style.height = window.innerHeight + 'px';
 
     if (!window.game) {
       window.game = new Phaser.Game(config);
@@ -44,7 +44,6 @@ function checkOrientation() {
       gameStarted = true;
     }
 
-    // Сброс масштаба для десктопа
     gameWrapper.style.transform = 'scale(1)';
   } else {
     body.classList.add('mobile');
@@ -55,36 +54,33 @@ function checkOrientation() {
     const isPortrait = window.innerHeight > window.innerWidth;
 
     if (isPortrait && !gameStarted) {
-      // Показываем уведомление о горизонтали только до старта игры
       body.classList.remove('landscape');
       showElement('rotate-notice');
       body.style.overflowY = 'hidden';
-      body.style.height = '100vh';
+      body.style.height = window.innerHeight + 'px';
 
-      // Сброс масштаба при портрете
       gameWrapper.style.transform = 'scale(1)';
       return;
     } else {
       body.classList.add('landscape');
 
-      // Добавляем небольшой масштаб для горизонтальной ориентации
       gameWrapper.style.transform = 'scale(0.95)';
 
       if (!rotatedToLandscape && !gameStarted) {
         rotatedToLandscape = true;
         showElement('scroll-notice');
         body.style.overflowY = 'auto';
-        body.style.height = '150vh';
+        body.style.height = window.innerHeight * 1.5 + 'px';
         return;
       } else {
         if (!gameStarted) {
           showElement('scroll-notice');
           body.style.overflowY = 'auto';
-          body.style.height = '150vh';
+          body.style.height = window.innerHeight * 1.5 + 'px';
         } else {
           showElement('game-container');
           body.style.overflowY = 'hidden';
-          body.style.height = '100vh';
+          body.style.height = window.innerHeight + 'px';
         }
       }
     }
@@ -96,7 +92,7 @@ function startGame() {
   showElement('game-container');
 
   document.body.style.overflowY = 'hidden';
-  document.body.style.height = '100vh';
+  document.body.style.height = window.innerHeight + 'px';
   window.scrollTo(0, 0);
 
   if (!window.game) {
@@ -105,7 +101,6 @@ function startGame() {
   }
   gameStarted = true;
 
-  // При старте игры тоже убеждаемся, что масштаб верный
   const isLandscape = window.innerWidth > window.innerHeight;
   const gameWrapper = document.getElementById('game-wrapper');
   gameWrapper.style.transform = isLandscape ? 'scale(0.95)' : 'scale(1)';

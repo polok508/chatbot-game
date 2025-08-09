@@ -99,12 +99,16 @@
       justify-content: center;
       align-items: center;
       overflow: hidden;
-      /* Убрали фиксированный scale(1), теперь масштаб в JS */
+
+      /* Учёт safe-area, чтобы убрать обрезку на iOS и других устройствах */
+      padding-top: env(safe-area-inset-top, 20px);
+      padding-bottom: env(safe-area-inset-bottom, 20px);
+      box-sizing: border-box;
+
       transform-origin: center center;
       transition: transform 0.3s ease;
     }
 
-    /* Подгоняем контейнер игры под экран */
     body.mobile.landscape #game-container {
       width: 100vw !important;
       height: auto !important;
